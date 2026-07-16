@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ねむりのいき — Breath of Sleep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Kiwi+Maru:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#141a2e;
+    --night-deep:#0d1122;
+    --lamp:#f2c98a;
+    --lamp-dim:#c9a06a;
+    --skin:#f6dcc8;
+    --blush:#f0b3a0;
+    --swaddle:#a8b8d8;
+    --text:#e8e2d6;
+    --text-dim:#9aa0b5;
+    --calm:#9db8e8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+  body{
+    background:radial-gradient(ellipse 120% 90% at 50% 110%, #2a3354 0%, var(--night) 45%, var(--night-deep) 100%);
+    color:var(--text);
+    font-family:'Zen Maru Gothic',sans-serif;
+    display:flex;align-items:center;justify-content:center;
+    user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  }
+  #stage{position:relative;width:min(100vw,480px);height:100%;max-height:900px;
+    display:flex;flex-direction:column;align-items:center;overflow:hidden}
+
+  .star{position:absolute;border-radius:50%;background:#fff;opacity:.25;
+    animation:twinkle 4s ease-in-out infinite}
+  @keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.5}}
+
+  /* ---- screens ---- */
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:28px;text-align:center;
+    transition:opacity .7s ease;z-index:5}
+  .screen.hidden{opacity:0;pointer-events:none}
+
+  h1{font-family:'Kiwi Maru',serif;font-weight:500;font-size:2.1rem;letter-spacing:.32em;
+    margin-bottom:10px;color:var(--lamp)}
+  h1.en{letter-spacing:.1em;font-size:1.85rem}
+  .subtitle{color:var(--text-dim);font-size:.9rem;line-height:1.9;margin-bottom:36px}
+
+  .btn{font-family:inherit;font-size:1rem;letter-spacing:.14em;
+    background:none;color:var(--lamp);border:1.5px solid var(--lamp-dim);
+    border-radius:999px;padding:14px 38px;cursor:pointer;margin:7px 0;min-width:210px;
+    transition:background .3s,color .3s}
+  .btn:hover,.btn:focus-visible{background:var(--lamp);color:var(--night-deep)}
+  .btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+  .btn.ghost{border-color:rgba(255,255,255,.2);color:var(--text-dim);font-size:.88rem;padding:12px 34px}
+  .btn.ghost:hover{background:rgba(255,255,255,.08);color:var(--text)}
+
+  /* ---- language switcher ---- */
+  #langbar{position:absolute;top:22px;left:50%;transform:translateX(-50%);
+    display:flex;gap:0;z-index:10}
+  #langbar button{font-family:inherit;font-size:.7rem;letter-spacing:.05em;
+    background:none;border:1px solid rgba(255,255,255,.14);color:var(--text-dim);
+    padding:6px 12px;cursor:pointer;transition:all .25s}
+  #langbar button:first-child{border-radius:999px 0 0 999px}
+  #langbar button:last-child{border-radius:0 999px 999px 0}
+  #langbar button.on{background:rgba(242,201,138,.14);border-color:var(--lamp-dim);color:var(--lamp)}
+  #langbar button:focus-visible{outline:1px solid var(--lamp);outline-offset:2px}
+
+  /* ---- help ---- */
+  #help{justify-content:flex-start;padding-top:max(44px,7vh);overflow-y:auto}
+  #help h2{font-family:'Kiwi Maru',serif;font-weight:500;font-size:1.5rem;
+    letter-spacing:.16em;color:var(--lamp);margin-bottom:26px}
+  .help-item{text-align:left;width:100%;max-width:344px;margin-bottom:20px}
+  .help-item .lead{font-size:.88rem;color:var(--text);line-height:1.65;margin-bottom:4px}
+  .help-item .sub{font-size:.77rem;color:var(--text-dim);line-height:1.65;padding-left:1.1em}
+  .help-meaning{max-width:344px;border-top:1px solid rgba(242,201,138,.2);
+    padding-top:20px;margin-top:4px;margin-bottom:28px}
+  .help-meaning .tag{font-size:.88rem;color:var(--lamp);margin-bottom:11px;letter-spacing:.03em}
+  .help-meaning p{font-size:.79rem;color:var(--text-dim);line-height:1.9}
+
+  /* ---- play ---- */
+  #play{justify-content:flex-start;padding-top:max(16px,3vh)}
+  #topbar{width:100%;max-width:334px;display:flex;align-items:center;gap:7px;margin-bottom:4px}
+  #moon{font-size:1rem;filter:grayscale(.4);transition:filter 1s}
+  #calmbar{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+  #calmfill{height:100%;width:0%;border-radius:4px;
+    background:linear-gradient(90deg,var(--calm),var(--lamp));transition:width .8s ease}
+  #pausebtn{background:none;border:none;color:var(--text-dim);font-size:1.2rem;
+    cursor:pointer;padding:4px 5px;line-height:1;transition:color .2s}
+  #pausebtn:hover,#pausebtn:focus-visible{color:var(--lamp);outline:none}
+
+  #cuetext{min-height:2.7em;font-size:.83rem;color:var(--text-dim);line-height:1.45;
+    transition:opacity .5s;margin:5px 0 2px;display:flex;align-items:center;
+    justify-content:center;padding:0 12px}
+  #cuetext.show{color:var(--lamp)}
+
+  #babywrap{position:relative;width:min(57vw,228px);margin:0}
+  #babysvg{width:100%;display:block}
+  .crying #babygroup{animation:fuss 0.9s ease-in-out infinite}
+  .settle #babygroup{animation:sway 5.5s ease-in-out infinite}
+  .drowsy #babygroup{animation:sway 8s ease-in-out infinite}
+  @keyframes fuss{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+  @keyframes sway{0%,100%{transform:rotate(-.7deg)}50%{transform:rotate(.7deg)}}
+  .shiver #babygroup{animation:shiver .18s linear 8}
+  .startle #arms{animation:moro .8s ease-out 1}
+  .nuzzle #head{animation:nuzzle 1.6s ease-in-out 1}
+  @keyframes shiver{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+  @keyframes moro{0%{transform:scale(1)}25%{transform:scale(1.12) translateY(-3px)}100%{transform:scale(1)}}
+  @keyframes nuzzle{0%,100%{transform:rotate(0)}40%{transform:rotate(-7deg) translateX(-4px)}}
+  #head circle[fill="var(--blush)"]{transition:opacity 2s}
+  .drowsy #head circle[fill="var(--blush)"],
+  .asleep #head circle[fill="var(--blush)"]{opacity:.8}
+  #tearL,#tearR{opacity:0}
+  .crying #tearL,.crying #tearR{opacity:.85;animation:tear 1.4s ease-in infinite}
+  @keyframes tear{0%{transform:translateY(0);opacity:.85}100%{transform:translateY(14px);opacity:0}}
+  #zzz{opacity:0;transition:opacity 1.5s}
+  .asleep #zzz{opacity:1}
+  .zchar{animation:zfloat 3s ease-in-out infinite}
+  .zchar:nth-child(2){animation-delay:1s}.zchar:nth-child(3){animation-delay:2s}
+  @keyframes zfloat{0%{transform:translate(0,0);opacity:0}30%{opacity:.9}100%{transform:translate(10px,-18px);opacity:0}}
+
+  #breathzone{position:relative;width:min(47vw,178px);height:min(47vw,178px);
+    margin-top:2px;cursor:pointer;flex-shrink:0}
+  #breathzone:focus-visible{outline:2px dashed var(--lamp);outline-offset:8px;border-radius:50%}
+  .ring{position:absolute;inset:0;border-radius:50%;pointer-events:none}
+  #babyring{border:1.5px solid rgba(157,184,232,.5)}
+  #playerring{border:2px solid var(--lamp);
+    box-shadow:0 0 24px rgba(242,201,138,.15), inset 0 0 24px rgba(242,201,138,.08)}
+  #breathlabel{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;pointer-events:none;gap:3px;padding:0 14px}
+  #breathword{font-size:1rem;letter-spacing:.2em;color:var(--lamp)}
+  #breathhint{font-size:.6rem;color:var(--text-dim);line-height:1.45}
+
+  #actions{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;justify-content:center;max-width:100%}
+  #actions button{font-family:inherit;font-size:.73rem;color:var(--text);
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);
+    border-radius:999px;padding:10px 12px;cursor:pointer;transition:all .3s}
+  #actions button:hover,#actions button:focus-visible{border-color:var(--lamp);color:var(--lamp);outline:none}
+  #actions button.done{opacity:.35;pointer-events:none}
+  #actions .emoji{margin-right:4px}
+  #playhint{font-size:.67rem;color:var(--text-dim);margin-top:12px;opacity:.7}
+
+  /* ---- pause ---- */
+  #pause{background:rgba(10,12,24,.72);backdrop-filter:blur(3px);z-index:20}
+  #pause h2{font-family:'Kiwi Maru',serif;font-weight:500;font-size:1.6rem;
+    letter-spacing:.18em;color:var(--lamp);margin-bottom:32px}
+
+  /* ---- ending ---- */
+  #ending .stats{color:var(--text-dim);font-size:.87rem;line-height:2.3;margin:22px 0 32px}
+  #ending .stats b{color:var(--lamp);font-weight:500}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01s !important}
+    #playerring,#babyring{transition:none !important}
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ============ TITLE ============ -->
+  <div class="screen" id="title">
+    <div id="langbar">
+      <button data-lang="ja" class="on">日本語</button>
+      <button data-lang="zh">中文</button>
+      <button data-lang="en">EN</button>
+    </div>
+    <h1 id="gametitle">ねむりのいき</h1>
+    <p class="subtitle" data-i18n="subtitle"></p>
+    <button class="btn" id="startbtn" data-i18n="start"></button>
+    <button class="btn ghost" id="helpbtn" data-i18n="howto"></button>
+  </div>
+
+  <!-- ============ HELP ============ -->
+  <div class="screen hidden" id="help">
+    <h2 data-i18n="howto"></h2>
+    <div class="help-item">
+      <div class="lead" data-i18n="h1lead"></div>
+      <div class="sub" data-i18n="h1sub"></div>
+    </div>
+    <div class="help-item">
+      <div class="lead" data-i18n="h2lead"></div>
+      <div class="sub" data-i18n="h2sub"></div>
+    </div>
+    <div class="help-item">
+      <div class="lead" data-i18n="h3lead"></div>
+      <div class="sub" data-i18n="h3sub1"></div>
+      <div class="sub" data-i18n="h3sub2"></div>
+    </div>
+    <div class="help-meaning">
+      <div class="tag" data-i18n="meaningTag"></div>
+      <p data-i18n="meaningBody"></p>
+    </div>
+    <button class="btn" id="helpbackbtn" data-i18n="back"></button>
+  </div>
+
+  <!-- ============ PLAY ============ -->
+  <div class="screen hidden" id="play">
+    <div id="topbar">
+      <span id="moon">🌙</span>
+      <div id="calmbar"><div id="calmfill"></div></div>
+      <button id="pausebtn" aria-label="pause">⏸</button>
+    </div>
+    <div id="cuetext">&nbsp;</div>
+
+    <div id="babywrap">
+      <svg id="babysvg" viewBox="0 0 200 190" aria-label="baby">
+        <g id="babygroup">
+          <path d="M52 108 Q40 165 100 172 Q160 165 148 108 Q140 84 100 82 Q60 84 52 108Z" fill="var(--swaddle)"/>
+          <path d="M72 100 Q100 132 128 100 Q118 152 100 158 Q82 152 72 100Z" fill="#96a8cc" opacity=".55"/>
+          <g id="arms">
+            <ellipse cx="58" cy="118" rx="11" ry="16" fill="var(--skin)" transform="rotate(18 58 118)"/>
+            <ellipse cx="142" cy="118" rx="11" ry="16" fill="var(--skin)" transform="rotate(-18 142 118)"/>
+          </g>
+          <g id="head">
+            <circle cx="100" cy="58" r="42" fill="var(--skin)"/>
+            <path d="M66 44 Q78 18 100 20 Q122 18 134 44 Q120 30 100 30 Q80 30 66 44Z" fill="#8a6f5a" opacity=".8"/>
+            <path d="M96 18 Q100 8 106 16" stroke="#8a6f5a" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+            <circle cx="82" cy="72" r="6.5" fill="var(--blush)" opacity=".55"/>
+            <circle cx="118" cy="72" r="6.5" fill="var(--blush)" opacity=".55"/>
+            <g id="eyes-cry">
+              <path d="M76 60 Q82 55 88 60" stroke="#5a4636" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M112 60 Q118 55 124 60" stroke="#5a4636" stroke-width="3" fill="none" stroke-linecap="round"/>
+            </g>
+            <g id="eyes-calm" opacity="0">
+              <circle cx="82" cy="60" r="3.4" fill="#5a4636"/>
+              <circle cx="118" cy="60" r="3.4" fill="#5a4636"/>
+            </g>
+            <g id="eyes-sleep" opacity="0">
+              <path d="M76 61 Q82 66 88 61" stroke="#5a4636" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M112 61 Q118 66 124 61" stroke="#5a4636" stroke-width="3" fill="none" stroke-linecap="round"/>
+            </g>
+            <g id="eyes-drowsy" opacity="0">
+              <ellipse cx="82" cy="61" rx="4.2" ry="1.9" fill="#5a4636"/>
+              <ellipse cx="118" cy="61" rx="4.2" ry="1.9" fill="#5a4636"/>
+              <path d="M76 58 Q82 56 88 58" stroke="#5a4636" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".7"/>
+              <path d="M112 58 Q118 56 124 58" stroke="#5a4636" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".7"/>
+            </g>
+            <ellipse id="tearL" cx="72" cy="68" rx="2.6" ry="4" fill="#bcd8f5"/>
+            <ellipse id="tearR" cx="128" cy="68" rx="2.6" ry="4" fill="#bcd8f5"/>
+            <path id="mouth" d="M92 82 Q100 92 108 82 Q100 88 92 82Z" fill="#c47a6a"/>
+          </g>
+        </g>
+        <g id="zzz" font-family="'Kiwi Maru',serif" fill="var(--lamp)" font-size="15">
+          <text class="zchar" x="146" y="34">z</text>
+          <text class="zchar" x="158" y="22" font-size="12">z</text>
+          <text class="zchar" x="168" y="12" font-size="9">z</text>
+        </g>
+      </svg>
+    </div>
+
+    <div id="breathzone" tabindex="0" role="button">
+      <div class="ring" id="babyring"></div>
+      <div class="ring" id="playerring"></div>
+      <div id="breathlabel">
+        <div id="breathword"></div>
+        <div id="breathhint"></div>
+      </div>
+    </div>
+
+    <div id="actions">
+      <button data-act="blanket"><span class="emoji">🧣</span><span data-i18n="actBlanket"></span></button>
+      <button data-act="contain"><span class="emoji">🤲</span><span data-i18n="actContain"></span></button>
+      <button data-act="hold"><span class="emoji">🫂</span><span data-i18n="actHold"></span></button>
+    </div>
+    <div id="playhint" data-i18n="playhint"></div>
+  </div>
+
+  <!-- ============ PAUSE ============ -->
+  <div class="screen hidden" id="pause">
+    <h2 data-i18n="paused"></h2>
+    <button class="btn" id="resumebtn" data-i18n="resume"></button>
+    <button class="btn ghost" id="pausetitlebtn" data-i18n="toTitle"></button>
+  </div>
+
+  <!-- ============ ENDING ============ -->
+  <div class="screen hidden" id="ending">
+    <h1 style="font-size:1.4rem;letter-spacing:.18em" data-i18n="endTitle"></h1>
+    <p class="subtitle" data-i18n="endBody"></p>
+    <div class="stats" id="stats"></div>
+    <button class="btn" id="againbtn" data-i18n="again"></button>
+    <button class="btn ghost" id="endtitlebtn" data-i18n="toTitle"></button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+
+  /* =====================================================
+   * 多言語テキスト / 多语言文本 / Localized strings
+   * ===================================================== */
+  const LANG = {
+    ja:{
+      title:'ねむりのいき',
+      subtitle:'泣いている赤ちゃんを、<br>あなたの呼吸で眠りへ。',
+      start:'はじめる', howto:'あそびかた', back:'もどる',
+      h1lead:'● 呼吸のまるを長押しして息を吸い、はなして吐く',
+      h1sub:'吸う3〜4秒・吐く4〜6秒くらいが、いちばん届く',
+      h2lead:'● 金の輪＝あなたの呼吸　青の輪＝赤ちゃんの呼吸',
+      h2sub:'あなたが落ち着くほど、青の輪もゆっくり重なっていく',
+      h3lead:'● しぐさを見て、泣く理由を見抜く',
+      h3sub1:'震え＝寒い　手がひらく＝驚き　すり寄る＝抱っこ',
+      h3sub2:'下の3つから合うケアを選ぶと、もっと深く眠れる',
+      meaningTag:'― 勝ち負けのないゲームです ―',
+      meaningBody:'急かさず、失敗もありません。呼吸を合わせるうちに、ひとつの小さな命がすこしずつ整っていく――その時間を、ただ一緒に過ごすための遊びです。',
+      breathIdle:'いき', breathIn:'すう…', breathOut:'はく…',
+      breathHint:'おして 吸う / はなして 吐く',
+      actBlanket:'毛布をかける', actContain:'そっと手を包む', actHold:'胸に抱き寄せる',
+      cueBlanket:'ぶるっと…小さく震えている',
+      cueContain:'手がびくっとひらいた',
+      cueHold:'顔をこちらにすり寄せてくる',
+      yawn:'ふぁ……ちいさなあくび',
+      solved:'……泣き声が、すこし小さくなった',
+      wrong:'まだ落ち着かないみたい。しぐさを見てみよう',
+      slower:'もっと、ゆっくり……',
+      cap:'呼吸だけでは、届かないなにかがある',
+      playhint:'右上の ⏸ でひとやすみ',
+      paused:'ひとやすみ', resume:'つづける', toTitle:'タイトルへ',
+      endTitle:'すやすや……',
+      endBody:'赤ちゃんは眠りにつきました。<br>あなたの呼吸が、ゆりかごでした。',
+      statTime:(m,s)=>`ねむりにつくまで <b>${m}分${s}秒</b>`,
+      statBreath:n=>`あなたの深い呼吸 <b>${n}回</b>`,
+      again:'もういちど',
+    },
+    zh:{
+      title:'安眠之息',
+      subtitle:'用你的呼吸,<br>哄哭泣的宝宝入睡。',
+      start:'开始', howto:'玩法说明', back:'返回',
+      h1lead:'● 长按呼吸圆圈吸气,松开呼气',
+      h1sub:'吸气3~4秒、呼气4~6秒,最能传达到他',
+      h2lead:'● 金色圆环＝你的呼吸　蓝色圆环＝宝宝的呼吸',
+      h2sub:'你越平静,蓝环也会渐渐慢下来、与你重合',
+      h3lead:'● 观察他的动作,看出他为什么哭',
+      h3sub1:'发抖＝冷　张手＝受惊　蹭你＝想抱抱',
+      h3sub2:'从下面三项选出合适的照护,他能睡得更沉',
+      meaningTag:'― 这是一个没有输赢的游戏 ―',
+      meaningBody:'不催促,也没有失败。在呼吸渐渐相合的过程中,一个小小的生命会慢慢安定下来——这个游戏,只是为了陪他一起度过那段时间。',
+      breathIdle:'呼吸', breathIn:'吸…', breathOut:'呼…',
+      breathHint:'按住 吸气 / 松开 呼气',
+      actBlanket:'盖上毯子', actContain:'轻轻包住小手', actHold:'抱进怀里',
+      cueBlanket:'微微地……在发抖',
+      cueContain:'小手猛地张开了',
+      cueHold:'把脸往你这边蹭过来',
+      yawn:'呼啊……打了个小小的哈欠',
+      solved:'……哭声,小了一些',
+      wrong:'好像还没安定下来。再看看他的动作',
+      slower:'再慢一点……',
+      cap:'光靠呼吸,有些地方还够不到',
+      playhint:'点右上角 ⏸ 可以暂停',
+      paused:'稍作休息', resume:'继续', toTitle:'回到标题',
+      endTitle:'睡着了……',
+      endBody:'宝宝睡着了。<br>你的呼吸,就是摇篮。',
+      statTime:(m,s)=>`入睡用时 <b>${m}分${s}秒</b>`,
+      statBreath:n=>`你的深呼吸 <b>${n}次</b>`,
+      again:'再玩一次',
+    },
+    en:{
+      title:'Breath of Sleep',
+      subtitle:'Soothe a crying baby to sleep<br>with your own breathing.',
+      start:'Start', howto:'How to play', back:'Back',
+      h1lead:'● Hold the circle to breathe in, release to breathe out',
+      h1sub:'About 3–4s in and 4–6s out reaches them best',
+      h2lead:'● Gold ring = your breath.  Blue ring = the baby\'s',
+      h2sub:'The calmer you get, the more the blue ring slows to meet yours',
+      h3lead:'● Read their gestures to find why they\'re crying',
+      h3sub1:'Shivering = cold.  Hands flying open = startled.  Nuzzling = wants holding',
+      h3sub2:'Pick the matching care below and they\'ll sleep deeper',
+      meaningTag:'— A game with no winning or losing —',
+      meaningBody:'Nothing is rushed and nothing can be failed. As your breathing falls into step, one small life slowly settles into itself — this game is simply about staying with them for that while.',
+      breathIdle:'breathe', breathIn:'in…', breathOut:'out…',
+      breathHint:'hold to inhale / release to exhale',
+      actBlanket:'Cover with a blanket', actContain:'Cup their hands gently', actHold:'Hold them close',
+      cueBlanket:'A small shiver runs through them',
+      cueContain:'Their hands fly open with a start',
+      cueHold:'They nuzzle their face toward you',
+      yawn:'A tiny yawn escapes them…',
+      solved:'…the crying softens a little',
+      wrong:'Still unsettled. Watch what they\'re doing',
+      slower:'Slower… gentler…',
+      cap:'Breathing alone can\'t quite reach it',
+      playhint:'Tap ⏸ (top right) to pause',
+      paused:'Paused', resume:'Resume', toTitle:'Back to title',
+      endTitle:'Fast asleep…',
+      endBody:'The baby has fallen asleep.<br>Your breathing was the cradle.',
+      statTime:(m,s)=>`Time to sleep <b>${m}m ${s}s</b>`,
+      statBreath:n=>`Your deep breaths <b>${n}</b>`,
+      again:'Play again',
+    }
+  };
+  let L = LANG.ja, game = null;
+
+  function applyLang(code){
+    L = LANG[code];
+    document.documentElement.lang = code;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const v = L[el.dataset.i18n];
+      if(typeof v === 'string') el.innerHTML = v;
+    });
+    const gt = $('gametitle');
+    gt.textContent = L.title;
+    gt.classList.toggle('en', code === 'en');
+    $('breathhint').textContent = L.breathHint;
+    if(!game || !game.breath.holding) $('breathword').textContent = L.breathIdle;
+    document.querySelectorAll('#langbar button').forEach(b=>
+      b.classList.toggle('on', b.dataset.lang === code));
+  }
+  document.querySelectorAll('#langbar button').forEach(b=>{
+    b.onclick = () => applyLang(b.dataset.lang);
+  });
+
+  /* ---------- 星（背景） ---------- */
+  const stageEl = $('stage');
+  for(let i=0;i<26;i++){
+    const s=document.createElement('div'); s.className='star';
+    const size=Math.random()*2+1;
+    s.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*60}%;animation-delay:${Math.random()*4}s`;
+    stageEl.appendChild(s);
+  }
+
+  const CONFIG={
+    idealInhale:3.7, inhaleSigma:1.6, idealExhale:5.0, exhaleSigma:2.2,
+    minCycle:3.5, gainPerCycle:8, panicGain:0.5,
+    capBeforeSolved:58, solveBonus:22,
+    thSettle:42, thDrowsy:66,
+    cryCycle:1.6, sleepCycle:9.1,
+    cueFirst:2500, cueInterval:6500, gestureMs:1400, cueTextMs:3500,
+  };
+  const CAUSES={
+    blanket:{cueKey:'cueBlanket', cls:'shiver'},
+    contain:{cueKey:'cueContain', cls:'startle'},
+    hold:{cueKey:'cueHold', cls:'nuzzle'}
+  };
+
+  /* =====================================================
+   * Baby — 表情段階・まばたき・しぐさ
+   * ===================================================== */
+  class Baby{
+    constructor(){ this.wrap=$('babywrap'); this.stage=''; this.blinkTimer=null; }
+    reset(){ this.stage=''; this.wrap.className=''; clearTimeout(this.blinkTimer); this.setStage('cry'); }
+    setEyes(m){
+      ['cry','calm','drowsy','sleep'].forEach(k=>$('eyes-'+k).style.opacity=0);
+      $('eyes-'+(m==='closed'?'sleep':m)).style.opacity=1;
+    }
+    setMouth(m){
+      const mo=$('mouth');
+      if(m==='cry'){
+        mo.setAttribute('d','M92 82 Q100 92 108 82 Q100 88 92 82Z');
+        mo.setAttribute('fill','#c47a6a'); mo.setAttribute('stroke','none');
+      }else if(m==='yawn'){
+        mo.setAttribute('d','M95 79 Q100 76 105 79 Q107 87 100 89 Q93 87 95 79Z');
+        mo.setAttribute('fill','#c47a6a'); mo.setAttribute('stroke','none');
+      }else{
+        mo.setAttribute('fill','none'); mo.setAttribute('stroke','#c47a6a');
+        mo.setAttribute('stroke-width','2.6'); mo.setAttribute('stroke-linecap','round');
+        mo.setAttribute('d', m==='smile' ? 'M93 83 Q100 89 107 83' : 'M94 84 Q100 88 106 84');
+      }
+    }
+    scheduleBlink(){
+      clearTimeout(this.blinkTimer);
+      if(this.stage!=='settle' && this.stage!=='drowsy') return;
+      const d = this.stage==='settle' ? 2000+Math.random()*2200 : 2800+Math.random()*2600;
+      this.blinkTimer=setTimeout(()=>{
+        if(this.stage!=='settle' && this.stage!=='drowsy') return;
+        this.setEyes('closed');
+        const r = this.stage==='settle' ? 140 : 480;   // 困倦時はゆっくり長く閉じる
+        setTimeout(()=>{
+          if(this.stage==='settle') this.setEyes('calm');
+          else if(this.stage==='drowsy') this.setEyes('drowsy');
+          this.scheduleBlink();
+        }, r);
+      }, d);
+    }
+    yawn(onMsg){
+      this.setEyes('closed'); this.setMouth('yawn'); onMsg(L.yawn, 2600);
+      setTimeout(()=>{
+        if(this.stage!=='drowsy') return;
+        this.setEyes('drowsy'); this.setMouth('smile'); this.scheduleBlink();
+      }, 1500);
+    }
+    setStage(s, onMsg=()=>{}){
+      if(this.stage===s) return;
+      this.stage=s;
+      this.wrap.classList.remove('crying','settle','drowsy');
+      clearTimeout(this.blinkTimer);
+      if(s==='cry'){ this.wrap.classList.add('crying'); this.setEyes('cry'); this.setMouth('cry'); }
+      else if(s==='settle'){ this.wrap.classList.add('settle'); this.setEyes('calm'); this.setMouth('neutral'); this.scheduleBlink(); }
+      else if(s==='drowsy'){ this.wrap.classList.add('drowsy'); this.yawn(onMsg); }
+      else if(s==='asleep'){ this.setEyes('sleep'); this.setMouth('smile'); }
+    }
+    playGesture(k){
+      const c=CAUSES[k].cls;
+      this.wrap.classList.add(c);
+      setTimeout(()=>this.wrap.classList.remove(c), CONFIG.gestureMs);
+    }
+    pause(){ clearTimeout(this.blinkTimer); }
+    resume(){ this.scheduleBlink(); }
+  }
+
+  /* =====================================================
+   * BreathInput — 押す=吸う / 離す=吐く / 次に押した瞬間に1周期確定
+   * ===================================================== */
+  class BreathInput{
+    constructor(zone, onCycle){
+      this.zone=zone; this.onCycle=onCycle;
+      this.holding=false; this.exhaleStart=0; this.pendingInhale=0; this.enabled=false;
+      zone.addEventListener('pointerdown', e=>{ e.preventDefault(); this.press(); });
+      window.addEventListener('pointerup', ()=>this.release());
+      window.addEventListener('pointercancel', ()=>this.release());
+      zone.addEventListener('keydown', e=>{ if(e.code==='Space'&&!e.repeat){ e.preventDefault(); this.press(); } });
+      zone.addEventListener('keyup',   e=>{ if(e.code==='Space'){ e.preventDefault(); this.release(); } });
+    }
+    reset(){ this.holding=false; this.exhaleStart=0; this.pendingInhale=0; }
+    press(){
+      if(this.holding || !this.enabled) return;
+      if(this.exhaleStart){
+        const ex=(performance.now()-this.exhaleStart)/1000;
+        this.exhaleStart=0;
+        this.onCycle(this.pendingInhale, ex);
+      }
+      this.holding=true; this.holdStart=performance.now();
+      $('breathword').textContent=L.breathIn;
+    }
+    release(){
+      if(!this.holding) return;
+      this.holding=false;
+      this.pendingInhale=(performance.now()-this.holdStart)/1000;
+      this.exhaleStart=performance.now();
+      $('breathword').textContent=L.breathOut;
+    }
+  }
+
+  /* =====================================================
+   * Game — 状態・ループ・画面遷移
+   * ===================================================== */
+  class Game{
+    constructor(){
+      this.baby=new Baby();
+      this.breath=new BreathInput($('breathzone'), (i,e)=>this.onBreathCycle(i,e));
+      this.playerR=0.5; this.babyPhase=0;
+      this.rafId=0; this.paused=false; this.phase='title';
+
+      $('startbtn').onclick     = ()=>this.start();
+      $('helpbtn').onclick      = ()=>this.show('title','help');
+      $('helpbackbtn').onclick  = ()=>this.show('help','title');
+      $('againbtn').onclick     = ()=>this.start();
+      $('endtitlebtn').onclick  = ()=>{ this.phase='title'; this.show('ending','title'); };
+      $('pausebtn').onclick     = ()=>this.pause();
+      $('resumebtn').onclick    = ()=>this.resume();
+      $('pausetitlebtn').onclick= ()=>this.toTitle();
+      document.querySelectorAll('#actions button').forEach(b=> b.onclick=()=>this.onAction(b));
+
+      window.addEventListener('keydown', e=>{
+        if(e.code==='Escape'){
+          if(this.phase==='play' && !this.asleep) this.pause();
+          else if(this.phase==='pause') this.resume();
+        }
+      });
+    }
+    show(from,to){ $(from).classList.add('hidden'); $(to).classList.remove('hidden'); }
+
+    start(){
+      const keys=Object.keys(CAUSES);
+      this.cause=keys[Math.floor(Math.random()*keys.length)];
+      this.causeSolved=false; this.calm=0; this.breathCount=0; this.asleep=false;
+      this.startTime=Date.now(); this.babyPhase=0;
+      this.playerR=0.5; this.paused=false; this.phase='play';
+
+      $('calmfill').style.width='0%';
+      $('moon').style.filter='grayscale(.4)';
+      $('breathword').textContent=L.breathIdle;
+      document.querySelectorAll('#actions button').forEach(b=>b.classList.remove('done'));
+
+      this.baby.reset(); this.breath.reset(); this.breath.enabled=true;
+
+      ['title','help','ending','pause'].forEach(s=>$(s).classList.add('hidden'));
+      $('play').classList.remove('hidden');
+      this.scheduleCue(CONFIG.cueFirst);
+      cancelAnimationFrame(this.rafId); this.tick();
+    }
+
+    pause(){
+      if(this.phase!=='play' || this.asleep) return;
+      this.paused=true; this.phase='pause';
+      this.breath.enabled=false; this.breath.release();
+      this.baby.pause();
+      clearTimeout(this.cueTimer);
+      this.pauseStart=Date.now();
+      $('pause').classList.remove('hidden');
+    }
+    resume(){
+      if(this.phase!=='pause') return;
+      this.paused=false; this.phase='play';
+      this.breath.enabled=true; this.baby.resume();
+      this.startTime += (Date.now()-this.pauseStart);   // 一時停止中の時間はプレイ時間に数えない
+      this.scheduleCue(CONFIG.cueInterval);
+      $('pause').classList.add('hidden');
+    }
+    toTitle(){
+      this.phase='title'; this.paused=false;
+      this.breath.enabled=false; this.baby.pause();
+      clearTimeout(this.cueTimer); cancelAnimationFrame(this.rafId);
+      $('pause').classList.add('hidden'); $('play').classList.add('hidden');
+      $('title').classList.remove('hidden');
+    }
+
+    onAction(btn){
+      if(this.asleep || this.paused) return;
+      if(btn.dataset.act===this.cause && !this.causeSolved){
+        this.causeSolved=true; clearTimeout(this.cueTimer);
+        this.calm=Math.min(100, this.calm+CONFIG.solveBonus);
+        this.msg(L.solved, 3600);
+        btn.classList.add('done');
+      }else{
+        this.msg(L.wrong, 3200);   // 失敗ペナルティなし：観察を促すだけ
+      }
+    }
+
+    scheduleCue(delay){
+      clearTimeout(this.cueTimer);
+      this.cueTimer=setTimeout(()=>this.showCue(), delay);
+    }
+    showCue(){
+      if(this.causeSolved || this.asleep || this.paused) return;
+      this.baby.playGesture(this.cause);
+      const t=$('cuetext');
+      t.textContent=L[CAUSES[this.cause].cueKey];
+      t.classList.add('show');
+      setTimeout(()=>{ t.classList.remove('show'); if(!this.causeSolved) t.innerHTML='&nbsp;'; }, CONFIG.cueTextMs);
+      this.scheduleCue(CONFIG.cueInterval);
+    }
+    msg(text, ms=3000){
+      const t=$('cuetext');
+      t.textContent=text; t.classList.add('show');
+      setTimeout(()=>{ t.classList.remove('show'); t.innerHTML='&nbsp;'; }, ms);
+    }
+
+    onBreathCycle(inhale, exhale){
+      if(this.asleep || this.paused) return;
+      this.breathCount++;
+      const g=(x,mu,s)=>Math.exp(-((x-mu)**2)/(2*s*s));
+      const qIn=g(inhale, CONFIG.idealInhale, CONFIG.inhaleSigma);
+      const qEx=g(exhale, CONFIG.idealExhale, CONFIG.exhaleSigma);
+      let gain=((qIn+qEx)/2)*CONFIG.gainPerCycle;
+      if(inhale+exhale < CONFIG.minCycle){
+        gain=CONFIG.panicGain;
+        if(Math.random()<0.5) this.msg(L.slower);
+      }
+      const cap=this.causeSolved ? 100 : CONFIG.capBeforeSolved;
+      this.calm=Math.min(cap, this.calm+gain);
+      if(!this.causeSolved && this.calm>=cap-2 && Math.random()<0.6) this.msg(L.cap);
+    }
+
+    tick(){
+      this.rafId=requestAnimationFrame(()=>this.tick());
+      if(this.phase==='title' || this.phase==='ending') return;
+
+      // プレイヤーの輪：押している間ふくらみ、離すとしぼむ
+      const target=this.breath.holding ? 1 : 0.35;
+      this.playerR += (target-this.playerR) * (this.breath.holding ? 0.010 : 0.007);
+      $('playerring').style.transform=`scale(${0.55+this.playerR*0.45})`;
+
+      if(!this.paused){
+        // 赤ちゃんの輪：安らぐほど周期が伸びる（泣き1.6秒 → 眠り約9秒）
+        const f=this.calm/100;
+        const cyc=CONFIG.cryCycle + f*f*(CONFIG.sleepCycle-CONFIG.cryCycle);
+        this.babyPhase += (16.7/1000)/cyc;
+      }
+      const bs=0.55 + (0.5+0.5*Math.sin(this.babyPhase*Math.PI*2 - Math.PI/2))*0.38;
+      $('babyring').style.transform=`scale(${bs})`;
+
+      if(this.paused) return;
+
+      $('calmfill').style.width=this.calm+'%';
+      if(this.calm>40) $('moon').style.filter='grayscale(0)';
+
+      if(!this.asleep){
+        if(this.calm>=100){ this.fallAsleep(); }
+        else if(this.calm>=CONFIG.thDrowsy){ this.baby.setStage('drowsy',(t,ms)=>this.msg(t,ms)); }
+        else if(this.calm>=CONFIG.thSettle){ this.baby.setStage('settle'); }
+        else { this.baby.setStage('cry'); }
+      }
+    }
+
+    fallAsleep(){
+      this.asleep=true; this.breath.enabled=false;
+      clearTimeout(this.cueTimer);
+      this.baby.setStage('asleep'); this.baby.wrap.classList.add('asleep');
+      this.msg('……', 1000);
+      setTimeout(()=>{
+        if(this.phase==='title') return;   // 途中でタイトルへ戻っていたら中断
+        const sec=Math.round((Date.now()-this.startTime)/1000);
+        const m=Math.floor(sec/60), s=String(sec%60).padStart(2,'0');
+        $('stats').innerHTML = L.statTime(m,s) + '<br>' + L.statBreath(this.breathCount);
+        this.phase='ending';
+        $('play').classList.add('hidden');
+        $('ending').classList.remove('hidden');
+      }, 3800);
+    }
+  }
+
+  game = new Game();
+  applyLang('ja');
+})();
+</script>
+</body>
+</html>
