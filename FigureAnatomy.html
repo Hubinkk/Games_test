@@ -1,0 +1,462 @@
+<title>人偶机体图</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 版式：左边是可旋转的人偶 X 光模型（主角），右边是部件说明和按发育阶段排列的清单 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --hard:#b9800f; --no:#cf3b3d;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+.f-ok{--c:var(--ok)} .f-hard{--c:var(--hard)} .f-no{--c:var(--no)}
+header h1{font-family:var(--f-display);font-size:28px;margin:0;letter-spacing:.04em;line-height:1.25}
+header p{margin:4px 0 0;color:var(--ink-2);max-width:70ch;text-wrap:pretty}
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.ctl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--panel)}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink-2);padding:5px 11px;cursor:pointer;border-right:1px solid var(--rule)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+#stage{accent-color:var(--calm);width:150px}
+#stageName{font-weight:500;color:var(--ink);min-width:7em}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:12.5px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:999px;padding:3px 10px;cursor:pointer}
+.chip[aria-pressed="false"]{color:var(--ink-2);opacity:.55;text-decoration:line-through}
+.chip .sw{width:10px;height:10px;border-radius:50%;background:var(--c,var(--ink-2))}
+.chip.f-no .sw{background:transparent;border:2px dashed var(--c)}
+.chip .n{font-family:var(--f-data);font-size:11.5px;color:var(--ink-2)}
+.ghost{font:inherit;font-size:13px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 11px;cursor:pointer}
+
+.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+.viewer{position:relative;background:var(--stage);border:1px solid var(--rule);border-radius:14px;overflow:hidden;height:min(76vh,760px);min-height:420px;touch-action:none;cursor:grab}
+.viewer.drag{cursor:grabbing}
+.viewer canvas{display:block;width:100%;height:100%}
+.legend{position:absolute;left:12px;bottom:10px;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--ink-2);pointer-events:none;max-width:calc(100% - 24px)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:11px;height:11px;border-radius:3px;background:var(--c);display:inline-block}
+.legend .f-no i{background:transparent;border:2px dashed var(--c)}
+.hintv{position:absolute;right:12px;top:10px;font-size:12px;color:var(--ink-2);pointer-events:none}
+#tip{position:absolute;pointer-events:none;background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:3px 8px;font-size:12.5px;white-space:nowrap;transform:translate(10px,-130%)}
+#nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink-2)}
+
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:16px}
+.sum{display:flex;flex-direction:column;gap:8px}
+.sumbar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--rule)}
+.sumbar div{height:100%;background:var(--c)}
+.sumtxt{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}
+.sumtxt b{font-family:var(--f-data);font-weight:500;color:var(--c)}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--ink-2)}
+#detail h2{font-family:var(--f-display);font-size:21px;margin:2px 0 6px;line-height:1.35;text-wrap:balance}
+.badge{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--c);font-size:14px}
+.badge::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.f-no.badge::before{background:transparent;border:2px dashed var(--c);width:7px;height:7px}
+.dl{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.dl section{display:flex;flex-direction:column;gap:2px}
+.dl .k{font-size:11.5px;letter-spacing:.1em;color:var(--ink-2)}
+.dl p{margin:0;max-width:62ch}
+.dl .lim p{color:var(--ink)}
+.intro p{margin:6px 0 0;color:var(--ink-2)}
+.list{display:flex;flex-direction:column;gap:12px}
+.list h3{font-size:12.5px;margin:0 0 4px;font-weight:700;display:flex;gap:8px;align-items:baseline}
+.list h3 .sn{font-family:var(--f-data);font-size:11.5px;color:var(--ink-2);font-weight:400}
+.list h3.off{color:var(--ink-2);font-weight:500}
+.list ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:5px}
+.list li button{font:inherit;font-size:12.5px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:transparent;color:var(--ink);border-radius:7px;padding:3px 8px;cursor:pointer}
+.list li button .d{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.list li button.f-no .d{background:transparent;border:1.5px dashed var(--c)}
+.list li button[aria-current="true"]{border-color:var(--calm);background:color-mix(in srgb,var(--calm) 12%,transparent)}
+.list li button.dim{opacity:.4}
+footer{font-size:12px;color:var(--ink-2);max-width:90ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>人偶机体图</h1>
+    <p>一个 55 cm 的二次元人偶机器人，从神经主干一路长到外形。每个部件都按今天的技术标出：现在能做到、很难、还是目前做不到。拖动旋转，滚轮或双指缩放，点部件看原因。</p>
+  </header>
+
+  <div class="bar">
+    <div class="ctl"><label for="stage">发育阶段</label><input type="range" id="stage" min="1" max="9" step="1" value="9"><span id="stageName"></span></div>
+    <div class="ctl">视图<div class="seg" id="view"><button data-v="xray" aria-pressed="true">X 光</button><button data-v="look">外观</button></div></div>
+    <div class="ctl">动作<div class="seg" id="pose"><button data-v="stand" aria-pressed="true">站立</button><button data-v="wave">歪头挥手</button><button data-v="squat">深蹲</button></div></div>
+    <button class="ghost" id="reset">重置视角</button>
+  </div>
+  <div class="bar">
+    <div class="chips" id="feasChips"></div>
+    <div class="chips" id="layerChips"></div>
+  </div>
+
+  <main class="grid">
+    <section class="viewer" id="viewer" aria-label="人偶三维模型">
+      <div class="legend"><span class="f-ok"><i></i>能实现</span><span class="f-hard"><i></i>很难</span><span class="f-no"><i></i>目前做不到（红色网格）</span><span>半透明外壳 = 角色外形</span></div>
+      <div class="hintv">原创造型 · 高 55 cm</div>
+      <div id="tip" hidden></div>
+    </section>
+    <aside class="side">
+      <div class="card sum" id="sum"></div>
+      <div class="card" id="detail"></div>
+      <div class="card list" id="list"></div>
+    </aside>
+  </main>
+  <footer>可行性按 55 cm、约 3 kg 的人偶尺寸判断，依据是公开的技术水平，不考虑零件制作难度带来的时间和成本差别。模型是示意，比例和位置经过简化。造型为原创，不对应任何现有角色。</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const FEAS={ok:{name:'能实现',col:0x23897c},hard:{name:'很难',col:0xd2961c},no:{name:'目前做不到',col:0xe0484a}};
+const LAYERS={bone:'骨骼',joint:'关节与驱动',tendon:'肌腱',nerve:'神经线路',sense:'感觉',power:'能量',brain:'大脑',shell:'外形'};
+const STAGES=['',
+ '神经与能量主干','骨骼','关节','驱动','感觉','神经系统','能量与散热','大脑','外形'];
+const STAGE_D=['',
+ '每个部件都需要电和信号，所以最先长出来。',
+ '把力从脚传到全身，同时给线路和散热留出通道。',
+ '决定身体能怎样动，二次元角色的姿态魅力多半来自这里。',
+ '重新发明“肌肉”，替代为航模设计的方形舵机。',
+ '本体感觉、内感受、外感受，三种感觉。',
+ '反射在关节和脊髓完成，决策交给大脑。',
+ '电池放低，热量经骨头传到皮肤，“呼吸”在功能上是真的。',
+ '大脑放在胸腔，头只保留感觉器官。',
+ '角色的样子最后才长出来，而且不承力。'];
+
+const PARTS=[
+{id:'spinebus',st:1,layer:'nerve',f:'ok',name:'主干总线（两线制）',why:'全身每个部件都需要电和信号，所以最先出现。',how:'一对导体同时送电和传数据（电力线载波），沿脊柱贯穿全身。',can:'每条肢体只需两根导体，线束重量和故障点大幅减少。',limit:'电机启停时的电流噪声会干扰数据，需要做好滤波。'},
+{id:'bonewire',st:1,layer:'nerve',f:'hard',name:'骨内柔性线路',why:'线挂在骨头外面，会随动作被拉扯、磨损。',how:'中空骨骼的内壁贴柔性电路，线路藏在骨头里。',can:'外形干净，线路不会被外力碰到。',limit:'细骨内径只有几毫米，布线很紧；维修时要拆开骨骼。'},
+{id:'jointpass',st:1,layer:'nerve',f:'hard',name:'关节过线（空心轴＋滑环）',why:'跨关节弯折是线缆最容易坏的地方，身体地图里右后膝的问题就是这样产生的。',how:'线路穿过电机的空心轴，用微型滑环传递电力和信号。',can:'关节可以连续旋转，不缠线、不弯折。',limit:'这个尺寸的空心电机和微型滑环都要定制，滑环触点仍会慢慢磨损。'},
+{id:'bones',st:2,layer:'bone',f:'ok',name:'拓扑优化骨骼',why:'把力从脚传到全身，并给线路和散热留出通道。',how:'让计算机按受力方向生成外形，内部做成像骨小梁一样的晶格。碳纤尼龙为主，受力点用钛合金。',can:'骨架约占全身重量的 15%，同时兼做散热片。',limit:'晶格内部难以检查，出现裂纹时不容易发现。'},
+{id:'fbg',st:2,layer:'sense',f:'hard',name:'骨内应变光纤',why:'人感觉不到骨头哪里在受力，机器人可以。',how:'在骨骼通道里铺设光纤光栅，测量每一段的形变。',can:'直接感到哪根骨头受力集中、哪里可能出现微裂。',limit:'光纤本身很细，但读取光信号的解调设备目前又大又贵，难以装进 55 cm 的身体。'},
+{id:'hip',st:3,layer:'joint',f:'hard',name:'髋关节（三轴交汇）',why:'腿要能前后、左右、旋转三个方向活动。',how:'三个转轴交于一点，驱动器藏进骨盆，用并联连杆带动。',can:'腿根变细，活动范围接近人。',limit:'三个驱动器挤在骨盆里，空间和散热都很紧张。'},
+{id:'knee',st:3,layer:'joint',f:'ok',name:'膝关节（交叉四连杆）',why:'人的膝盖靠交叉韧带滚动加滑动，不是一根单纯的转轴。',how:'用交叉四连杆模仿前后交叉韧带，转动中心会随角度移动。',can:'可以深蹲、跪坐，弯曲的样子更像人。',limit:'多了几个铰接点，需要控制间隙。'},
+{id:'ankle',st:3,layer:'joint',f:'ok',name:'踝关节（双跟腱拉杆）',why:'二次元角色的脚很小，脚上装不下电机。',how:'两根拉杆像跟腱一样，由小腿上部的驱动器拉动脚掌。',can:'脚又小又轻，还能在两个方向上调整平衡。',limit:'拉杆在极限角度附近力量会下降。'},
+{id:'spine',st:3,layer:'joint',f:'hard',name:'分段脊柱',why:'撒娇、低头、挺胸这些姿态，都要靠脊柱弯曲和扭转。',how:'3–5 节椎骨，用 2–3 根拉线同时控制弯曲和扭转。',can:'有了自然的姿态变化和呼吸起伏。',limit:'拉线结构刚度低，负重时容易晃，控制也更复杂。'},
+{id:'shoulder',st:3,layer:'joint',f:'ok',name:'肩关节（三轴）',why:'手臂要能抬、展、转。',how:'三个转轴，驱动器尽量靠近胸腔。',can:'挥手、抱臂、举手都能做到。',limit:'举过头顶时容易和头发、外壳相互干涉。'},
+{id:'shrug',st:3,layer:'joint',f:'hard',name:'锁骨（耸肩）',why:'耸肩是二次元角色很常见的表情动作。',how:'锁骨处加一个小驱动器，让肩膀整体上提。',can:'能耸肩、缩肩，表现力明显提升。',limit:'多一个关节就多一份重量，而肩部空间本来就紧。'},
+{id:'neck',st:3,layer:'joint',f:'ok',name:'颈部（三支链并联）',why:'歪头、点头、转头是角色最重要的表情之一。',how:'三条小连杆从下方托住头部，驱动器放在胸腔顶部。',can:'动作快而稳，头部不承担电机的重量。',limit:'转头角度受连杆限制，大约左右各 60°。'},
+{id:'wrist',st:3,layer:'tendon',f:'hard',name:'腕关节（肌腱驱动）',why:'手腕细是二次元比例的特征，装不下电机。',how:'驱动器在前臂根部，用纤维肌腱拉动手腕。',can:'手腕细，动作灵活。',limit:'肌腱会伸长、有摩擦，需要定期张紧。'},
+{id:'hand',st:3,layer:'tendon',f:'hard',name:'欠驱动手',why:'要能握、捏、比手势。',how:'每只手用 2–3 个驱动器带动 5 根手指，手指会自动贴合物体形状。',can:'抓起小物件、比 V、挥手。',limit:'手指不能各自独立地动；握力很小。'},
+{id:'dexhand',st:3,layer:'tendon',f:'no',name:'人手级灵巧手指',why:'人手约有 20 个自由度，可以弹琴、写字。',how:'每根手指独立驱动，并带有指尖触觉。',can:'这个尺寸下做不到。',limit:'驱动器的体积、力量和自由度无法同时满足。即使是真人尺寸的灵巧手，现在也仍然昂贵、容易坏。'},
+{id:'qdd',st:4,layer:'joint',f:'hard',name:'关节即电机（准直驱）',why:'方形舵机让关节鼓出来；减速比太高，被推时不会顺从，摔倒时齿轮容易崩。',how:'扁圆形中空无刷电机直接嵌进关节，配 6–10 比 1 的低减速比。',can:'能被推动，知道自己用了多大力，摔倒时能吸收冲击。',limit:'电机缩小后力量下降得很快，在 55 cm 尺寸上扭矩余量很小，需要定制。'},
+{id:'tendon',st:4,layer:'tendon',f:'hard',name:'躯干肌肉＋肌腱传力',why:'让四肢末端像二次元角色一样细。',how:'驱动器集中在躯干、大腿和上臂，用超高分子量聚乙烯绳传力。',can:'手腕、脚踝、手指几乎没有电机的体积。',limit:'绳子会伸长，转弯处有摩擦损失，长期使用要张紧和更换。'},
+{id:'sea',st:4,layer:'joint',f:'ok',name:'串联弹性（跟腱弹簧）',why:'人走路时，跟腱会储存和释放能量。',how:'在膝和踝的传动里加入弹簧元件。',can:'更省电，走路有弹性，落地更柔和。',limit:'弹簧会降低位置精度，需要软件补偿。'},
+{id:'artmuscle',st:4,layer:'joint',f:'no',name:'人造肌肉替代电机',why:'形状和工作方式都最像真正的肌肉。',how:'介电弹性体、液压静电肌肉、扭曲尼龙纤维肌肉等。',can:'目前只适合表情、头发这类不需要力气的小动作。',limit:'力量不足、速度慢、效率低、寿命短，还撑不起一个会走路的身体。'},
+{id:'encoder',st:5,layer:'sense',f:'ok',name:'双编码器（本体感觉）',why:'要知道每个关节此刻的确切角度。',how:'电机端和输出端各装一个磁编码器。',can:'比人更精确地知道自己的姿态。',limit:'没有明显障碍。'},
+{id:'imu',st:5,layer:'sense',f:'ok',name:'IMU（平衡感）',why:'相当于内耳，感知倾斜和加速度。',how:'骨盆和头部各放一个。',can:'站立和行走时保持平衡，摔倒之前就能察觉。',limit:'长时间会漂移，需要和脚底信息融合。'},
+{id:'footforce',st:5,layer:'sense',f:'hard',name:'脚底三轴力阵列',why:'要知道踩在哪里、有没有打滑。',how:'脚底分区测量竖直和水平方向的力。',can:'提前感到打滑，分辨踩在台阶边缘还是中间。',limit:'这么小的三轴力传感器很少见。只测竖直压力的传感器则很容易做到。'},
+{id:'skin',st:5,layer:'sense',f:'ok',name:'电容触觉外壳',why:'要知道被摸了哪里。',how:'在外壳内侧贴电容感应电极。',can:'分辨摸头、握手、轻拍。',limit:'只能感知有没有接触，测不出力度。'},
+{id:'fullskin',st:5,layer:'sense',f:'no',name:'人类级全身皮肤',why:'人的皮肤能同时感到压力、温度、振动和疼痛，而且密度极高。',how:'高密度、多模态的柔性传感皮肤铺满全身。',can:'这个尺寸下做不到。',limit:'高密度布线、柔软和耐用目前无法同时满足，更难在全身铺开。'},
+{id:'camera',st:5,layer:'sense',f:'ok',name:'发夹摄像头',why:'眼睛是显示屏，看东西的工作交给发夹。',how:'把微型摄像头藏进角色的发夹饰品里。',can:'识别人脸、跟随视线、观察环境。',limit:'视角在头顶偏上，看脚下需要低头。'},
+{id:'mic',st:5,layer:'sense',f:'ok',name:'耳饰麦克风阵列',why:'要听见声音，并知道声音从哪里来。',how:'左右耳饰各放麦克风，组成阵列。',can:'找到说话的人，并转头看过去。',limit:'走路时电机的噪声会混进来，需要降噪。'},
+{id:'ganglia',st:6,layer:'nerve',f:'ok',name:'关节神经节',why:'反射必须快，不能等大脑来决定。',how:'每个关节里一颗小芯片，自己完成力矩控制和自我保护。',can:'检测到跌倒时让关节立刻变软；出问题时自动进入受损模式。',limit:'没有明显障碍。'},
+{id:'spinalcord',st:6,layer:'nerve',f:'ok',name:'脊髓控制器（骨盆）',why:'平衡每秒要算几百到上千次。',how:'骨盆里的实时控制器，靠近重心和 IMU。',can:'不依赖大脑也能站稳、保持平衡。',limit:'没有明显障碍。'},
+{id:'damage',st:6,layer:'nerve',f:'hard',name:'受损模式与重新分配',why:'某个部件坏了，整体仍要能动。',how:'各关节上报自身状态，脊髓层在预先训练好的几种身体形态之间切换。',can:'在有限的几种受损情况下仍能行走。',limit:'只能应对事先准备过的情况，适应任意组合仍是研究课题。'},
+{id:'battery',st:7,layer:'power',f:'ok',name:'骨盆电池',why:'人体的质量也集中在骨盆和大腿，重心低才稳。',how:'锂电池放在骨盆，可以从背后快速更换。',can:'行走约 30–60 分钟。',limit:'续航受电池能量密度限制，行走超过 2 小时目前做不到。'},
+{id:'structbatt',st:7,layer:'power',f:'no',name:'结构电池（骨骼即电池）',why:'如果骨骼本身能储电，身体就能更轻、续航更长。',how:'碳纤维结构电池，同时承力和储能。',can:'目前做不到实用化。',limit:'仍处在实验室阶段，能量密度远低于普通锂电池。'},
+{id:'breathfan',st:7,layer:'power',f:'ok',name:'胸腔呼吸散热',why:'小身体表面积小，热量散不出去。',how:'电机的热经骨头传到外壳；胸腔小风扇在热的时候排气，胸口随之起伏。',can:'越热呼吸越快，呼吸在功能上是真的。',limit:'风扇有声音，也会吸进灰尘。'},
+{id:'brain',st:8,layer:'brain',f:'hard',name:'胸腔大脑',why:'头要轻；胸腔空间最大、离电池近，散热也好。',how:'小型 AI 计算模块和存储放在胸腔。',can:'在本地完成行走、人脸识别、唤醒词和简单对话。',limit:'算力越强越热；离线时只能运行小模型。'},
+{id:'antenna',st:8,layer:'brain',f:'ok',name:'发梢天线（联网大脑）',why:'复杂对话和长期记忆需要更大的模型。',how:'Wi-Fi 天线放在发梢，位置最高，信号最好。',can:'联网后可以自然地长对话，拥有角色人格和记忆。',limit:'依赖网络，存在延迟和隐私问题。'},
+{id:'shell',st:9,layer:'shell',f:'ok',name:'角色外壳与发型',why:'角色的样子由这一层决定，它不承力。',how:'树脂或尼龙打印后上色，分块可拆；发型做成轻质的固定造型。',can:'外形可以和机械结构分开修改。',limit:'关节处的分缝很难完全藏住。'},
+{id:'softskin',st:9,layer:'shell',f:'hard',name:'关节软皮肤',why:'遮住关节的缝隙，又不能限制活动。',how:'硅胶或弹性织物覆盖在关节处。',can:'外观连续，动作时不露出机械。',limit:'反复拉伸会疲劳、起皱，还会挡住散热。',ext:0xe4e1ee},
+{id:'eyes',st:9,layer:'sense',f:'ok',name:'屏幕眼睛',why:'二次元的眼睛本来就是画出来的。',how:'两块直径 1–2 cm 的小圆屏。',can:'眨眼、做表情、视线跟着人走，而且不会有恐怖谷感。',limit:'强光下看不清；从侧面看会显得扁平。',ext:'eye'},
+{id:'mouth',st:9,layer:'joint',f:'hard',name:'嘴部表情',why:'说话时嘴不动，会显得很假。',how:'微型驱动器带动下唇，或者在脸上用小屏幕显示嘴型。',can:'简单的开合和微笑。',limit:'脸部空间极小，细腻的口型很难做出来。',ext:0xd9858c},
+{id:'ahoge',st:9,layer:'joint',f:'hard',name:'会动的呆毛',why:'二次元角色常用头发表达情绪。',how:'1–2 个微型驱动器或人造肌肉带动发束。',can:'开心时翘起来，失落时垂下去。',limit:'头部要尽量轻，每多一克都会影响平衡。',ext:0xb8b4d8},
+{id:'longhair',st:9,layer:'shell',f:'no',name:'自然飘动的长发',why:'长发是很多角色的标志。',how:'大量轻纤维自由摆动。',can:'目前只能用固定造型的硬发代替。',limit:'会缠进关节、挡住传感器、改变重心。'},
+];
+let renderer=null;
+const P={};PARTS.forEach(p=>{P[p.id]=p;p.meshes=[];});
+
+const S={stage:9,view:'xray',pose:'stand',sel:null,feas:{ok:true,hard:true,no:true},layers:Object.fromEntries(Object.keys(LAYERS).map(k=>[k,true]))};
+
+/* ---------- 界面：筛选 ---------- */
+const feasChips=$('#feasChips'),layerChips=$('#layerChips');
+feasChips.innerHTML=Object.entries(FEAS).map(([k,v])=>`<button class="chip f-${k}" data-f="${k}" aria-pressed="true"><span class="sw"></span>${v.name}<span class="n" data-n="${k}"></span></button>`).join('');
+layerChips.innerHTML=Object.entries(LAYERS).map(([k,v])=>`<button class="chip" data-l="${k}" aria-pressed="true">${v}</button>`).join('');
+feasChips.addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(!b)return;S.feas[b.dataset.f]=!S.feas[b.dataset.f];b.setAttribute('aria-pressed',S.feas[b.dataset.f]);refresh();});
+layerChips.addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(!b)return;S.layers[b.dataset.l]=!S.layers[b.dataset.l];b.setAttribute('aria-pressed',S.layers[b.dataset.l]);refresh();});
+$('#stage').addEventListener('input',e=>{S.stage=+e.target.value;refresh();});
+const segBind=(id,key)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S[key]=b.dataset.v;[...$(id).children].forEach(x=>x.setAttribute('aria-pressed',x===b));refresh();});
+segBind('#view','view');segBind('#pose','pose');
+
+function inFilter(p){return p.st<=S.stage&&S.layers[p.layer]&&S.feas[p.f];}
+function shown3D(p){
+  if(!inFilter(p))return false;
+  if(S.view==='look'&&S.stage>=9)return p.id==='shell'||(!!p.ext&&p.id!=='longhair');
+  return true;}
+
+/* ---------- 侧栏 ---------- */
+function renderSummary(){const vis=PARTS.filter(p=>p.st<=S.stage);const c={ok:0,hard:0,no:0};vis.forEach(p=>c[p.f]++);const t=vis.length||1;
+  $('#sum').innerHTML=`<div class="eyebrow">阶段 ${S.stage} / 9 · ${STAGES[S.stage]}</div><div>${STAGE_D[S.stage]}</div>
+   <div class="sumbar">${['ok','hard','no'].map(k=>`<div class="f-${k}" style="width:${c[k]/t*100}%"></div>`).join('')}</div>
+   <div class="sumtxt">${['ok','hard','no'].map(k=>`<span class="f-${k}">${FEAS[k].name} <b>${c[k]}</b></span>`).join('')}<span style="color:var(--ink-2)">共 ${vis.length} 个部件</span></div>`;
+  Object.keys(FEAS).forEach(k=>{const e=$(`[data-n="${k}"]`);if(e)e.textContent=c[k];});
+  $('#stageName').textContent=`${S.stage} · ${STAGES[S.stage]}`;}
+function renderDetail(){const d=$('#detail');const p=S.sel&&P[S.sel];
+  if(!p){d.innerHTML=`<div class="intro"><div class="eyebrow">怎么看</div><h2>点模型上的任意部件</h2>
+    <p>实心的青色部件现在就能做；琥珀色的技术已经存在，但在这个尺寸上很难；红色网格是想要、但目前做不到的部分。</p>
+    <p>拖动发育阶段的滑块，可以看到身体是怎样从一根神经主干一步步长出来的。</p></div>`;return;}
+  d.innerHTML=`<div class="eyebrow">阶段 ${p.st} · ${STAGES[p.st]} · ${LAYERS[p.layer]}</div><h2>${p.name}</h2>
+   <span class="badge f-${p.f}">${FEAS[p.f].name}</span>
+   <div class="dl"><section><span class="k">为什么需要它</span><p>${p.why}</p></section>
+   <section><span class="k">怎么做</span><p>${p.how}</p></section>
+   <section><span class="k">能做到的程度</span><p>${p.can}</p></section>
+   <section class="lim"><span class="k">${p.f==='ok'?'要注意的地方':'难在哪里'}</span><p>${p.limit}</p></section></div>
+   <p style="margin:12px 0 0"><button class="ghost" id="clearSel">取消选择</button></p>`;
+  $('#clearSel').addEventListener('click',()=>select(null));}
+function renderList(){const l=$('#list');let h='<div class="eyebrow">全部部件 · 按发育顺序</div>';
+  for(let s=1;s<=9;s++){const ps=PARTS.filter(p=>p.st===s);
+    h+=`<div><h3 class="${s>S.stage?'off':''}"><span class="sn">${s}</span>${STAGES[s]}</h3><ul>${ps.map(p=>`<li><button class="f-${p.f}${inFilter(p)?'':' dim'}" data-p="${p.id}" aria-current="${S.sel===p.id}"><span class="d"></span>${p.name}</button></li>`).join('')}</ul></div>`;}
+  l.innerHTML=h;}
+$('#list').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;const p=P[b.dataset.p];
+  if(p.st>S.stage){S.stage=p.st;$('#stage').value=p.st;}
+  if(!S.feas[p.f]){S.feas[p.f]=true;$(`[data-f="${p.f}"]`).setAttribute('aria-pressed','true');}
+  if(!S.layers[p.layer]){S.layers[p.layer]=true;$(`[data-l="${p.layer}"]`).setAttribute('aria-pressed','true');}
+  if(S.view==='look'&&!p.ext&&p.id!=='shell'){S.view='xray';[...$('#view').children].forEach(x=>x.setAttribute('aria-pressed',x.dataset.v==='xray'));}
+  select(p.id,true);});
+
+/* ---------- 三维场景 ---------- */
+const viewer=$('#viewer');
+if(!window.THREE){viewer.insertAdjacentHTML('beforeend','<div id="nogl">三维库没有加载成功。请检查网络后刷新页面；右侧的部件清单仍然可以浏览。</div>');renderSummary();renderDetail();renderList();return;}
+try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});}catch(e){viewer.insertAdjacentHTML('beforeend','<div id="nogl">这个浏览器不支持 WebGL，无法显示三维模型。右侧的部件清单仍然可以浏览。</div>');}
+const T=window.THREE;
+const scene=new T.Scene();
+const camera=new T.PerspectiveCamera(32,1,1,800);
+if(renderer){renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));viewer.prepend(renderer.domElement);}
+scene.add(new T.HemisphereLight(0xffffff,0x8a90a0,.95));
+const dl=new T.DirectionalLight(0xffffff,.75);dl.position.set(40,80,60);scene.add(dl);
+const dl2=new T.DirectionalLight(0xc8d0ff,.3);dl2.position.set(-50,20,-40);scene.add(dl2);
+const floor=new T.Mesh(new T.CircleGeometry(16,48),new T.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.08}));floor.rotation.x=-Math.PI/2;floor.position.y=.02;scene.add(floor);
+
+const root=new T.Group();scene.add(root);const G={};
+const grp=(n,par,pos)=>{const g=new T.Group();g.position.set(...pos);par.add(g);G[n]=g;return g;};
+grp('pelvis',root,[0,28.5,0]);grp('spine',G.pelvis,[0,3.5,0]);grp('chest',G.spine,[0,5,0]);grp('neck',G.chest,[0,7,0]);grp('head',G.neck,[0,2.2,0]);
+const SIDES=[['L',1],['R',-1]];
+SIDES.forEach(([k,s])=>{grp('sh'+k,G.chest,[s*5.6,4.6,0]);grp('el'+k,G['sh'+k],[0,-8.5,0]);grp('wr'+k,G['el'+k],[0,-7.5,0]);
+  grp('hip'+k,G.pelvis,[s*3.2,-1.5,0]);grp('kn'+k,G['hip'+k],[0,-11.5,0]);grp('an'+k,G['kn'+k],[0,-11.5,0]);});
+
+/* 材料 */
+const feasMat={};PARTS.forEach(p=>{
+  p.mat=p.f==='no'?new T.MeshBasicMaterial({color:FEAS.no.col,wireframe:true,transparent:true,opacity:.8})
+    :new T.MeshStandardMaterial({color:FEAS[p.f].col,roughness:.5,metalness:.12,transparent:true,opacity:1});
+  if(typeof p.ext==='number')p.extMat=new T.MeshStandardMaterial({color:p.ext,roughness:.6,transparent:true,opacity:1});});
+const shellMats=[];
+const smat=(c,o={})=>{const m=new T.MeshStandardMaterial(Object.assign({color:c,roughness:.6,metalness:.02,transparent:true,opacity:.14,depthWrite:false},o));shellMats.push(m);return m;};
+const SUIT=smat(0xe9e6f2),SKIN=smat(0xf2d8c8),HAIR=smat(0xb8b4d8),BOOT=smat(0x5d6280),ACC=smat(0x8d7fd0);
+
+/* 几何辅助 */
+const V=(a)=>new T.Vector3(...a);
+function add(id,mesh,g){mesh.userData.part=id;g.add(mesh);P[id].meshes.push(mesh);return mesh;}
+function cylB(id,g,a,b,r,mat){const A=V(a),B=V(b),d=B.clone().sub(A),len=d.length();const m=new T.Mesh(new T.CylinderGeometry(r,r,len,10),mat||P[id].mat);
+  m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());return add(id,m,g);}
+function box(id,g,size,pos,mat,rot){const m=new T.Mesh(new T.BoxGeometry(...size),mat||P[id].mat);m.position.set(...pos);if(rot)m.rotation.set(...rot);return add(id,m,g);}
+function sph(id,g,r,pos,scale,mat){const m=new T.Mesh(new T.SphereGeometry(r,20,14),mat||P[id].mat);m.position.set(...pos);if(scale)m.scale.set(...scale);return add(id,m,g);}
+function tor(id,g,R,r,pos,rot,scale,mat){const m=new T.Mesh(new T.TorusGeometry(R,r,8,32),mat||P[id].mat);m.position.set(...pos);if(rot)m.rotation.set(...rot);if(scale)m.scale.set(...scale);return add(id,m,g);}
+function disc(id,g,r,h,pos,axis){const m=new T.Mesh(new T.CylinderGeometry(r,r,h,24),P[id].mat);m.position.set(...pos);if(axis==='x')m.rotation.z=Math.PI/2;if(axis==='z')m.rotation.x=Math.PI/2;return add(id,m,g);}
+function limbGeo(r1,r2,len){const pts=[],n=6;
+  for(let i=0;i<=n;i++){const a=-Math.PI/2+i/n*Math.PI/2;pts.push(new T.Vector2(Math.max(.001,Math.cos(a)*r2),-len+Math.sin(a)*r2));}
+  for(let i=0;i<=n;i++){const a=i/n*Math.PI/2;pts.push(new T.Vector2(Math.max(.001,Math.cos(a)*r1),Math.sin(a)*r1));}
+  return new T.LatheGeometry(pts,24);}
+function lathe(prof){return new T.LatheGeometry(prof.map(([y,r])=>new T.Vector2(Math.max(.001,r),y)),28);}
+function tube(id,g,pts,r,mat){const c=new T.CatmullRomCurve3(pts.map(V));const m=new T.Mesh(new T.TubeGeometry(c,40,r,8,false),mat||P[id].mat);return add(id,m,g);}
+const breathMeshes=[];
+
+/* ---------- 搭建身体 ---------- */
+// 1 神经主干
+cylB('spinebus',G.pelvis,[0,-2,-1.4],[0,3.5,-1.4],.28);cylB('spinebus',G.spine,[0,0,-1.6],[0,5,-1.6],.28);
+cylB('spinebus',G.chest,[0,0,-1.6],[0,7,-1.1],.28);cylB('spinebus',G.neck,[0,0,-.6],[0,2.2,-.6],.24);
+SIDES.forEach(([k,s])=>{cylB('spinebus',G.pelvis,[0,-1.3,-1.4],[s*3,-1.5,-.5],.2);cylB('spinebus',G.chest,[0,5.6,-1.2],[s*5.3,4.6,-.4],.2);
+  [['hip'+k,11.5],['kn'+k,11.5],['sh'+k,8.5],['el'+k,7.5]].forEach(([gn,len])=>cylB('bonewire',G[gn],[s*.5,-.9,-.3],[s*.5,-len+.9,-.3],.13));
+  ['hip'+k,'kn'+k,'an'+k,'sh'+k,'el'+k,'wr'+k].forEach(gn=>tor('jointpass',G[gn],.85,.17,[0,-.9,0],[Math.PI/2,0,0]));});
+// 2 骨骼
+SIDES.forEach(([k,s])=>{cylB('bones',G['hip'+k],[0,0,0],[0,-11.5,0],.62);cylB('bones',G['kn'+k],[0,0,0],[0,-11.5,0],.55);
+  cylB('bones',G['sh'+k],[0,0,0],[0,-8.5,0],.48);cylB('bones',G['el'+k],[0,0,0],[0,-7.5,0],.42);
+  cylB('bones',G['an'+k],[0,-2.9,-.6],[0,-2.9,2.6],.45);
+  cylB('bones',G.chest,[0,5.3,.7],[s*5.3,4.8,0],.3);
+  cylB('fbg',G['hip'+k],[0,-1,.78],[0,-10.5,.78],.12);cylB('fbg',G['kn'+k],[0,-1,.7],[0,-10.5,.7],.12);});
+box('bones',G.pelvis,[6.8,1.8,3.2],[0,-.9,-.2]);
+[1,2.6,4.2].forEach(y=>{const m=tor('bones',G.chest,3.1,.2,[0,y,0],[Math.PI/2,0,0],[1,.72,1]);breathMeshes.push(m);});
+// 3 关节
+SIDES.forEach(([k,s])=>{
+  sph('hip',G['hip'+k],1.2,[0,0,0]);tor('hip',G['hip'+k],1.6,.2,[0,0,0],[Math.PI/2,0,0]);
+  cylB('knee',G['kn'+k],[-.55,1.3,.95],[.55,-1.3,.95],.22);cylB('knee',G['kn'+k],[.55,1.3,.95],[-.55,-1.3,.95],.22);
+  [.6,-.6].forEach(x=>{cylB('ankle',G['kn'+k],[x,-4,-.95],[x,-11.1,-.95],.16);sph('ankle',G['kn'+k],.3,[x,-11.1,-.95]);});
+  sph('shoulder',G['sh'+k],1.1,[0,0,0]);
+  box('shrug',G.chest,[1.3,.8,.9],[s*3.3,5.6,.2]);
+  sph('wrist',G['wr'+k],.5,[0,0,0]);
+  box('hand',G['wr'+k],[1.5,1.9,.6],[0,-1.2,0]);
+  [-.55,-.18,.18,.55].forEach((x,i)=>{cylB('hand',G['wr'+k],[x,-2.1,0],[x*1.1,-3.5+Math.abs(i-1.5)*.25,.1],.17);
+    cylB('dexhand',G['wr'+k],[x,-2.1,.05],[x*1.1,-3.5+Math.abs(i-1.5)*.25,.15],.3);});
+  cylB('hand',G['wr'+k],[s*-.7,-1,.25],[s*-1.2,-2.2,.7],.18);cylB('dexhand',G['wr'+k],[s*-.7,-1,.3],[s*-1.2,-2.2,.75],.3);
+  // 4 驱动
+  disc('qdd',G['hip'+k],1.5,.7,[s*1.75,0,0],'x');disc('qdd',G['kn'+k],1.25,.6,[s*1.25,0,0],'x');
+  disc('qdd',G['sh'+k],1.2,.6,[s*1.25,0,0],'x');disc('qdd',G['el'+k],1,.5,[s*1,0,0],'x');
+  [.45,-.45].forEach(z=>cylB('tendon',G['el'+k],[.3,-.8,z],[.2,-7.2,z*.8],.07));
+  [-.5,0,.5].forEach(x=>cylB('tendon',G['wr'+k],[x*.8,-.4,.33],[x*1.1,-3.3,.33],.05));
+  const hp=[];for(let i=0;i<=60;i++){const a=i/60*Math.PI*2*5;hp.push([Math.cos(a)*.42,-1.2-i/60*2.4,-.95+Math.sin(a)*.42]);}tube('sea',G['kn'+k],hp,.07);
+  sph('artmuscle',G['hip'+k],1,[0,-5.5,1.05],[1.15,4,.75]);
+  // 5 感觉
+  box('encoder',G['hip'+k],[.6,.6,.6],[-s*1.35,0,0]);box('encoder',G['kn'+k],[.55,.55,.55],[-s*1.05,0,0]);
+  box('encoder',G['sh'+k],[.5,.5,.5],[-s*.4,.9,.6]);box('encoder',G['el'+k],[.45,.45,.45],[-s*.95,0,0]);
+  [[.55,.15],[-.55,.15],[.55,2.35],[-.55,2.35]].forEach(([x,z])=>box('footforce',G['an'+k],[.8,.14,.9],[x,-3.97,z]));
+  box('skin',G['sh'+k],[.14,1.7,1.7],[s*1.25,-1.4,0]);
+  sph('mic',G.head,.42,[s*4.5,4,0]);
+  // 6 神经系统
+  ['hip'+k,'kn'+k,'an'+k,'sh'+k,'el'+k,'wr'+k].forEach(gn=>box('ganglia',G[gn],[.5,.5,.25],[0,-.3,-.95]));
+  // 7 能量
+  cylB('structbatt',G['hip'+k],[0,-1.5,0],[0,-10,0],.95);
+  // 9 外形
+  add('shell',new T.Mesh(limbGeo(2.25,1.5,11.5),SUIT),G['hip'+k]);
+  add('shell',new T.Mesh(limbGeo(1.5,1.0,11.5),SUIT),G['kn'+k]);
+  add('shell',new T.Mesh(limbGeo(1.2,.92,8.5),SUIT),G['sh'+k]);
+  add('shell',new T.Mesh(limbGeo(.92,.68,7.5),SKIN),G['el'+k]);
+  const boot=new T.Mesh(new T.SphereGeometry(1,20,14),BOOT);boot.scale.set(1.35,1.05,2.75);boot.position.set(0,-2.95,.95);add('shell',boot,G['an'+k]);
+  const bootT=new T.Mesh(limbGeo(1.12,1.05,4),BOOT);bootT.position.set(0,1,0);add('shell',bootT,G['an'+k]);
+  tor('softskin',G['kn'+k],1.55,.32,[0,0,0],[Math.PI/2,0,0]);tor('softskin',G['el'+k],1.0,.26,[0,0,0],[Math.PI/2,0,0]);
+});
+const sp=[];[.6,1.8,3.0,4.2].forEach(y=>sp.push(disc('spine',G.spine,1.0,.5,[0,y,-.4],'y')));
+[90,210,330].forEach(d=>{const a=d*Math.PI/180;cylB('neck',G.neck,[Math.cos(a)*1,0,Math.sin(a)*1],[Math.cos(a)*.55,2.3,Math.sin(a)*.55],.14);});
+box('imu',G.pelvis,[.9,.5,.9],[0,.7,.85]);box('imu',G.head,[.7,.4,.7],[0,3.2,-1.4]);
+box('skin',G.head,[2.4,.14,2.2],[0,9.05,.2]);
+// 发夹摄像头（角色左侧）
+box('camera',G.head,[1.6,.6,.55],[2.8,7.5,2.3],null,[0,.5,.6]);sph('camera',G.head,.28,[3.0,7.3,2.75]);
+tor('damage',G.pelvis,4.3,.1,[0,.4,0],[Math.PI/2,0,0],[1,.72,1]);
+box('spinalcord',G.pelvis,[2.2,1.1,.8],[0,.8,-1]);
+box('battery',G.pelvis,[4.2,1.6,1.8],[0,-1.4,.35]);
+const fan=disc('breathfan',G.chest,1.3,.45,[0,2.4,-2.1],'z');
+box('brain',G.chest,[3.2,2.2,1.5],[0,3.3,.25]);
+tube('antenna',G.head,[[0,6,-4.2],[0,3,-4.9],[0,.5,-4.6],[0,-1.3,-4.0]],.1);
+// 躯干外壳
+const pelvisShell=new T.Mesh(lathe([[-3.6,.2],[-3.3,2.6],[-2.2,4.1],[-.5,4.5],[1.5,4.2],[3.6,3.5]]),SUIT);pelvisShell.scale.z=.72;add('shell',pelvisShell,G.pelvis);
+const abd=new T.Mesh(lathe([[-.2,3.5],[2.5,3.3],[5.2,3.7]]),SUIT);abd.scale.z=.7;add('shell',abd,G.spine);
+const chestShell=new T.Mesh(lathe([[-.2,3.7],[1.2,4.1],[2.6,4.5],[4.2,4.3],[5.6,3.9],[6.7,2.8],[7.4,1.2],[7.6,.2]]),SUIT);chestShell.scale.z=.72;add('shell',chestShell,G.chest);breathMeshes.push(chestShell);
+const collar=new T.Mesh(new T.TorusGeometry(1.5,.28,8,24),ACC);collar.rotation.x=Math.PI/2;collar.position.y=.3;add('shell',collar,G.neck);
+add('shell',new T.Mesh(new T.CylinderGeometry(1.05,1.15,2.6,16),SKIN),G.neck).position.y=1.1;
+// 头部
+const headM=new T.Mesh(new T.SphereGeometry(4.6,32,24),SKIN);headM.position.set(0,4.4,0);headM.scale.set(1,1.04,.96);add('shell',headM,G.head);
+const jaw=new T.Mesh(new T.SphereGeometry(2.6,20,14),SKIN);jaw.position.set(0,1.9,1.1);jaw.scale.set(1.1,.95,1);add('shell',jaw,G.head);
+const cap=new T.Mesh(new T.SphereGeometry(4.95,32,16,0,Math.PI*2,0,1.95),HAIR);cap.position.set(0,4.55,-.2);cap.rotation.x=-.25;add('shell',cap,G.head);
+const bob=new T.Mesh(new T.SphereGeometry(1,24,16),HAIR);bob.scale.set(5.15,4.6,4.5);bob.position.set(0,3.6,-.9);add('shell',bob,G.head);
+[[-2.8,.5],[-1.4,.2],[0,.0],[1.4,.2],[2.8,.5]].forEach(([x,r])=>{const b=new T.Mesh(new T.SphereGeometry(1,14,10),HAIR);b.scale.set(1.05,2.1,.55);b.position.set(x,6.4-r,3.7-Math.abs(x)*.25);b.rotation.set(.35,0,-x*.08);add('shell',b,G.head);});
+SIDES.forEach(([k,s])=>{const b=new T.Mesh(new T.SphereGeometry(1,14,10),HAIR);b.scale.set(.85,3.4,1.1);b.position.set(s*4.15,2.4,1.2);b.rotation.z=s*.08;add('shell',b,G.head);});
+// 长发（做不到）
+sph('longhair',G.head,1,[0,-4.6,-3.4],[3.8,8.5,1.6]);
+sph('longhair',G.head,1,[2.4,-8,-3.0],[1.4,6,1.1]);sph('longhair',G.head,1,[-2.4,-8,-3.0],[1.4,6,1.1]);
+// 呆毛
+tube('ahoge',G.head,[[0,9.1,.6],[.2,10.6,1.2],[1.1,11.3,.6],[1.7,10.7,-.1]],.22);
+// 嘴
+sph('mouth',G.head,.5,[0,1.75,3.55],[1,.35,.4]);
+// 眼睛（屏幕）
+function eyeTex(){const c=document.createElement('canvas');c.width=128;c.height=160;const x=c.getContext('2d');
+  x.fillStyle='#fdfcff';x.beginPath();x.ellipse(64,86,52,66,0,0,Math.PI*2);x.fill();
+  const g=x.createLinearGradient(0,30,0,150);g.addColorStop(0,'#3a2f7a');g.addColorStop(.6,'#7b68d6');g.addColorStop(1,'#c4b8ff');
+  x.fillStyle=g;x.beginPath();x.ellipse(64,92,40,56,0,0,Math.PI*2);x.fill();
+  x.fillStyle='#1d1640';x.beginPath();x.ellipse(64,92,16,24,0,0,Math.PI*2);x.fill();
+  x.fillStyle='#ffffff';x.beginPath();x.ellipse(46,66,12,15,0,0,Math.PI*2);x.fill();x.beginPath();x.arc(80,118,6,0,Math.PI*2);x.fill();
+  x.strokeStyle='#2a2238';x.lineWidth=10;x.lineCap='round';x.beginPath();x.ellipse(64,86,54,68,0,Math.PI*1.08,Math.PI*1.92);x.stroke();
+  const t=new T.CanvasTexture(c);return t;}
+const eyeMat=new T.MeshBasicMaterial({map:eyeTex(),transparent:true});P.eyes.extMat=eyeMat;P.eyes.mat=eyeMat;
+const eyes=[];SIDES.forEach(([k,s])=>{const m=new T.Mesh(new T.PlaneGeometry(1.55,1.95),eyeMat);m.position.set(s*1.6,3.75,4.2);m.rotation.y=s*.33;eyes.push(add('eyes',m,G.head));});
+
+/* ---------- 显示与高亮 ---------- */
+function applyMaterials(){
+  const look=S.view==='look'&&S.stage>=9;
+  shellMats.forEach(m=>{m.opacity=look?1:.14;m.depthWrite=look;m.needsUpdate=true;});
+  PARTS.forEach(p=>{const vis=shown3D(p);
+    const useExt=look&&p.extMat;const mat=p.id==='shell'?null:(useExt?p.extMat:p.mat);
+    p.meshes.forEach(m=>{m.visible=!!vis;if(mat)m.material=mat;});
+    if(p.id==='shell')return;
+    const sel=S.sel;const base=p.f==='no'?.8:1;
+    const m=useExt?p.extMat:p.mat;
+    if(p.id==='eyes'){m.opacity=1;return;}
+    m.opacity=sel&&sel!==p.id?(p.f==='no'?.18:.16):base;m.depthWrite=!(sel&&sel!==p.id);
+    if(m.emissive){m.emissive.setHex(sel===p.id?0x333333:0x000000);}
+  });}
+function refresh(){if(S.sel&&!inFilter(P[S.sel]))S.sel=null;renderSummary();renderDetail();renderList();if(renderer)applyMaterials();}
+function select(id,focus){S.sel=id;refresh();if(id&&focus&&renderer)focusOn(id);}
+
+/* ---------- 动作 ---------- */
+const POSES={
+ stand:{shL:[0,0,.13],shR:[0,0,-.13],elL:[-.15,0,0],elR:[-.15,0,0]},
+ wave:{shL:[0,0,.16],elL:[-.25,0,0],shR:[0,0,-2.5],elR:[0,0,-.45],neck:[0,0,.08],head:[.05,.15,.24],spine:[0,0,-.04]},
+ squat:{hipL:[-1.3,0,.06],hipR:[-1.3,0,-.06],knL:[2.2,0,0],knR:[2.2,0,0],anL:[-.9,0,0],anR:[-.9,0,0],spine:[.42,0,0],chest:[.12,0,0],head:[-.35,0,0],shL:[-1.2,0,.12],shR:[-1.2,0,-.12],elL:[-.35,0,0],elR:[-.35,0,0]}};
+const cur={};Object.keys(G).forEach(k=>cur[k]=[0,0,0]);
+const anchor=new T.Vector3();
+function updatePose(dt,t){const tgt=POSES[S.pose];const k=Math.min(1,dt*4);
+  Object.keys(G).forEach(n=>{const g=tgt[n]||[0,0,0];const c=cur[n];for(let i=0;i<3;i++)c[i]+=(g[i]-c[i])*k;
+    let z=c[2];if(S.pose==='wave'&&n==='elR')z+=Math.sin(t*7)*.35;
+    G[n].rotation.set(c[0],c[1],z);});
+  root.position.set(0,0,0);root.updateMatrixWorld(true);G.anL.getWorldPosition(anchor);
+  root.position.y=4-anchor.y;root.position.z=-anchor.z;}
+
+/* ---------- 相机 ---------- */
+const cam={az:.55,el:.12,dist:122,ty:28,tx:0,tz:0,gaz:.55,gel:.12,gdist:122,gty:28,gtx:0,gtz:0};
+function resetView(){Object.assign(cam,{gaz:.55,gel:.12,gdist:122,gty:28,gtx:0,gtz:0});}
+$('#reset').addEventListener('click',resetView);
+const tmp=new T.Vector3();
+function focusOn(id){const m=P[id].meshes.find(x=>x.visible)||P[id].meshes[0];if(!m)return;m.getWorldPosition(tmp);
+  cam.gtx=tmp.x*.6;cam.gty=tmp.y;cam.gtz=tmp.z*.6;cam.gdist=52;}
+function updateCam(dt){const k=Math.min(1,dt*5);['az','el','dist','ty','tx','tz'].forEach(p=>cam[p]+=(cam['g'+p]-cam[p])*k);
+  camera.position.set(cam.tx+cam.dist*Math.cos(cam.el)*Math.sin(cam.az),cam.ty+cam.dist*Math.sin(cam.el),cam.tz+cam.dist*Math.cos(cam.el)*Math.cos(cam.az));
+  camera.lookAt(cam.tx,cam.ty,cam.tz);}
+
+/* ---------- 交互 ---------- */
+const ray=new T.Raycaster(),ndc=new T.Vector2();const ptrs=new Map();let downAt=null,moved=0,pinch0=0;const tip=$('#tip');
+function pick(cx,cy){const r=renderer.domElement.getBoundingClientRect();ndc.set((cx-r.left)/r.width*2-1,-(cy-r.top)/r.height*2+1);ray.setFromCamera(ndc,camera);
+  const objs=[];PARTS.forEach(p=>p.meshes.forEach(m=>{if(m.visible)objs.push(m);}));
+  const hits=ray.intersectObjects(objs,false);const look=S.view==='look'&&S.stage>=9;
+  const h=hits.find(x=>look||x.object.userData.part!=='shell')||hits[0];return h?h.object.userData.part:null;}
+if(renderer){const el=renderer.domElement;
+ el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);downAt=[e.clientX,e.clientY];moved=0;
+   if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch0=Math.hypot(a[0]-b[0],a[1]-b[1]);}});
+ el.addEventListener('pointermove',e=>{
+   if(ptrs.has(e.pointerId)){const p=ptrs.get(e.pointerId);const dx=e.clientX-p[0],dy=e.clientY-p[1];ptrs.set(e.pointerId,[e.clientX,e.clientY]);moved+=Math.abs(dx)+Math.abs(dy);
+     if(ptrs.size===2){const [a,b]=[...ptrs.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch0){cam.gdist=Math.min(190,Math.max(30,cam.gdist*pinch0/d));}pinch0=d;}
+     else if(moved>4){viewer.classList.add('drag');cam.gaz-=dx*.008;cam.gel=Math.min(1.2,Math.max(-.35,cam.gel+dy*.006));}
+     tip.hidden=true;return;}
+   if(e.pointerType==='mouse'){const id=pick(e.clientX,e.clientY);if(id){const r=viewer.getBoundingClientRect();tip.hidden=false;tip.textContent=`${P[id].name} · ${FEAS[P[id].f].name}`;tip.style.left=(e.clientX-r.left)+'px';tip.style.top=(e.clientY-r.top)+'px';el.style.cursor='pointer';}else{tip.hidden=true;el.style.cursor='';}}});
+ const up=e=>{if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);viewer.classList.remove('drag');if(ptrs.size<2)pinch0=0;
+   if(moved<=4&&e.type==='pointerup'){const id=pick(e.clientX,e.clientY);select(id,false);}};
+ el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+ el.addEventListener('pointerleave',()=>{tip.hidden=true;});
+ el.addEventListener('wheel',e=>{e.preventDefault();cam.gdist=Math.min(190,Math.max(30,cam.gdist*(1+e.deltaY*.0012)));},{passive:false});}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')select(null);});
+
+/* ---------- 主题 ---------- */
+function applyTheme(){if(!renderer)return;const cs=getComputedStyle(document.documentElement);const bg=cs.getPropertyValue('--stage').trim()||'#dfe3e8';
+  renderer.setClearColor(new T.Color(bg),1);const dark=cs.colorScheme==='dark'||matchMedia('(prefers-color-scheme: dark)').matches&&document.documentElement.dataset.theme!=='light';
+  floor.material.color.setHex(dark?0x000000:0x1c2430);floor.material.opacity=dark?.35:.08;}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* ---------- 循环 ---------- */
+function resize(){if(!renderer)return;const w=viewer.clientWidth,h=viewer.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(viewer);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+let last=performance.now(),t=0,blinkT=3;
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
+  updatePose(dt,t);
+  const br=reduce.matches?0:Math.sin(t*1.6);breathMeshes.forEach(m=>{m.scale.x=(m.geometry.type==='TorusGeometry'?1:1)*(1+br*.018);m.scale.y=(m.geometry.type==='TorusGeometry'?.72:1)*(1+br*.012);});
+  fan.rotation.y+=dt*6;
+  blinkT-=dt;const bl=blinkT<0&&blinkT>-.14;if(blinkT<-.14)blinkT=2.5+Math.random()*3;eyes.forEach(m=>m.scale.y=bl?.12:1);
+  updateCam(dt);renderer.render(scene,camera);requestAnimationFrame(frame);}
+refresh();
+if(renderer){applyTheme();resize();requestAnimationFrame(frame);}
+})();
+</script>
