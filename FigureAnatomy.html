@@ -178,7 +178,7 @@ const PARTS=[
 {id:'eyes',st:9,layer:'sense',f:'ok',name:'屏幕眼睛',why:'二次元的眼睛本来就是画出来的。',how:'两块直径 1–2 cm 的小圆屏。',can:'眨眼、做表情、视线跟着人走，而且不会有恐怖谷感。',limit:'强光下看不清；从侧面看会显得扁平。',ext:'eye'},
 {id:'mouth',st:9,layer:'joint',f:'hard',name:'嘴部表情',why:'说话时嘴不动，会显得很假。',how:'微型驱动器带动下唇，或者在脸上用小屏幕显示嘴型。',can:'简单的开合和微笑。',limit:'脸部空间极小，细腻的口型很难做出来。',ext:0xd9858c},
 {id:'ahoge',st:9,layer:'joint',f:'hard',name:'会动的呆毛',why:'二次元角色常用头发表达情绪。',how:'1–2 个微型驱动器或人造肌肉带动发束。',can:'开心时翘起来，失落时垂下去。',limit:'头部要尽量轻，每多一克都会影响平衡。',ext:0xb8b4d8},
-{id:'longhair',st:9,layer:'shell',f:'no',name:'自然飘动的长发',why:'长发是很多角色的标志。',how:'大量轻纤维自由摆动。',can:'目前只能用固定造型的硬发代替。',limit:'会缠进关节、挡住传感器、改变重心。'},
+{id:'longhair',st:9,layer:'shell',f:'ok',name:'尼龙发束（二次元式长发）',why:'长发是很多角色的标志。二次元的头发本来就是一束一束的，不需要像真人头发那样一根根飘。',how:'用柔性尼龙打印成几大束发束，或者用尼龙假发纤维做成成束的发片；发根用柔性铰接固定在头上，并限制摆动范围。',can:'走路时发束会轻轻摆动，总重只有几十克，对平衡影响很小。',limit:'要限制摆动角度，避免扫到肩关节和发夹摄像头；尼龙容易起静电、吸灰。',ext:0xb8b4d8},
 ];
 let renderer=null;
 const P={};PARTS.forEach(p=>{P[p.id]=p;p.meshes=[];});
@@ -198,7 +198,7 @@ segBind('#view','view');segBind('#pose','pose');
 function inFilter(p){return p.st<=S.stage&&S.layers[p.layer]&&S.feas[p.f];}
 function shown3D(p){
   if(!inFilter(p))return false;
-  if(S.view==='look'&&S.stage>=9)return p.id==='shell'||(!!p.ext&&p.id!=='longhair');
+  if(S.view==='look'&&S.stage>=9)return p.id==='shell'||!!p.ext;
   return true;}
 
 /* ---------- 侧栏 ---------- */
