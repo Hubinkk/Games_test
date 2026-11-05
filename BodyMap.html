@@ -1,0 +1,601 @@
+<title>四足身体地图</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 版式：像一张解剖图版。左边是机器人的俯视身体图（主角），右边是一层层往里看的读数面板 */
+:root{
+  --paper:#eceee8; --panel:#f6f7f3; --ink:#1d2633; --ink-2:#596474; --rule:#cfd4d2;
+  --quiet:#8a94a1; --bone:#a3abb4; --calm:#2f6896;
+  --warn:#b97a0c; --strain:#cf4f22; --stop:#b0182c;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f141b; --panel:#151c26; --ink:#e2e7ee; --ink-2:#97a3b3; --rule:#263140;
+  --quiet:#6f7b8c; --bone:#4a5768; --calm:#86b6e4;
+  --warn:#e3ab4c; --strain:#f27b4b; --stop:#ff5d6c; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0f141b; --panel:#151c26; --ink:#e2e7ee; --ink-2:#97a3b3; --rule:#263140;
+  --quiet:#6f7b8c; --bone:#4a5768; --calm:#86b6e4;
+  --warn:#e3ab4c; --strain:#f27b4b; --stop:#ff5d6c; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:16px}
+.lv0{--c:var(--quiet)} .lv1{--c:var(--warn)} .lv2{--c:var(--strain)} .lv3{--c:var(--stop)}
+
+/* 顶部 */
+.top{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:14px;align-items:center;min-width:0;flex:1 1 380px}
+#breath{flex:0 0 auto;width:58px;height:58px}
+#breath .r{fill:none;stroke:var(--c);stroke-width:2.5}
+#breath .core{fill:var(--c);opacity:.16}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:26px;margin:0;letter-spacing:.04em;line-height:1.2}
+.brand .sub{margin:2px 0 0;color:var(--ink);font-size:15px;text-wrap:balance}
+.brand .meta{font-family:var(--f-data);font-size:11.5px;color:var(--ink-2);letter-spacing:.02em}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--panel)}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink-2);padding:6px 11px;cursor:pointer;border-right:1px solid var(--rule)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg button.autorest[aria-pressed="true"]{background:var(--calm);color:var(--paper)}
+.seg button:focus-visible,.tg input:focus-visible+span,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.tg{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);font-size:13px;cursor:pointer;user-select:none}
+.tg input{accent-color:var(--calm);width:15px;height:15px;margin:0}
+
+/* 主体 */
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.mapcard{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:12px 12px 10px;min-width:0}
+.crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:13px;color:var(--ink-2);min-height:26px}
+.crumbs button{font:inherit;border:0;background:none;color:var(--calm);cursor:pointer;padding:2px 4px;border-radius:4px}
+.crumbs .here{color:var(--ink);font-weight:500;padding:2px 4px}
+.crumbs .sep{opacity:.5}
+#map{display:block;width:100%;height:auto;max-height:68vh;margin:0 auto;touch-action:manipulation}
+.gait{border-top:1px solid var(--rule);margin-top:6px;padding-top:8px}
+.gait .gl{font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#gait{display:block;width:100%;height:76px}
+
+/* 身体图元素 */
+.torso{fill:var(--paper);stroke:var(--bone);stroke-width:1.5}
+.head{fill:var(--paper);stroke:var(--bone);stroke-width:1.5}
+.bone{stroke:var(--bone);stroke-width:7;stroke-linecap:round;fill:none}
+.bonehit{stroke:transparent;stroke-width:26;fill:none;cursor:pointer}
+.part{cursor:pointer;transition:opacity .35s}
+.part:focus{outline:none}.part:focus-visible .core{stroke-width:4}
+.part .core{fill:var(--paper);stroke:var(--c);stroke-width:2.5}
+.part .glow{fill:var(--c);opacity:0}
+.part.lv1 .glow{opacity:.18}.part.lv2 .glow{opacity:.26}.part.lv3 .glow{opacity:.34;animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.08}}
+.wire .w{stroke:var(--c);stroke-width:1.6;fill:none;stroke-linecap:round}
+.wire.lv0 .w{stroke:var(--quiet)}
+.wire.lv2 .w,.wire.lv3 .w{stroke-width:2.6;stroke-dasharray:6 4;animation:flick .6s linear infinite}
+@keyframes flick{to{stroke-dashoffset:-20}}
+.wire .hit{stroke:transparent;stroke-width:16;fill:none}
+.fiber .w{stroke:var(--calm);stroke-width:1.4;stroke-dasharray:2 5;fill:none}
+.fiber.lv1 .w,.fiber.lv2 .w{stroke:var(--c);stroke-width:2}
+.box .core{fill:var(--paper);stroke:var(--c);stroke-width:2}
+.box .fillbar{fill:var(--c);opacity:.5}
+.lbl{font-family:var(--f-body);font-size:12.5px;fill:var(--ink);paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+.lbl .v{font-family:var(--f-data);fill:var(--ink-2);font-size:11.5px}
+.lbl.say{font-weight:500;fill:var(--c)}
+.cap{font-family:var(--f-body);font-size:11px;fill:var(--ink-2);pointer-events:none}
+#selRing{fill:none;stroke:var(--calm);stroke-width:2;stroke-dasharray:3 3;pointer-events:none}
+.rel{stroke:var(--calm);stroke-width:1.3;stroke-dasharray:4 4;fill:none;opacity:.8;pointer-events:none}
+
+/* 侧栏 */
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.pv{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:12px}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--ink-2)}
+.pv h2{font-family:var(--f-display);font-size:21px;margin:0;line-height:1.35;text-wrap:balance}
+.feel{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--c);font-size:17px}
+.chip::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.why{color:var(--ink-2);font-size:13px}
+.rows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.rows li+li{border-top:1px solid var(--rule)}
+.rows button{width:100%;display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:center;font:inherit;text-align:left;background:none;border:0;color:var(--ink);padding:8px 2px;cursor:pointer;border-radius:6px}
+.rows button:hover{background:color-mix(in srgb,var(--calm) 8%,transparent)}
+.rows .dot{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.rows .lv0 .dot,.rows .dot.lv0{opacity:.45}
+.rows .nm{min-width:0;overflow-wrap:anywhere}
+.rows .wd{font-size:13px;color:var(--c);font-weight:500;text-align:right}
+.rows .wd.lv0{color:var(--ink-2);font-weight:400}
+.rows .val{font-family:var(--f-data);font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;margin-left:8px}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;margin:0}
+.metrics div{min-width:0}
+.metrics dt{font-size:12px;color:var(--ink-2)}
+.metrics dd{margin:0;font-family:var(--f-data);font-size:17px;font-variant-numeric:tabular-nums}
+.metrics dd small{font-size:11.5px;color:var(--ink-2);margin-left:3px}
+.spark{display:block;width:100%;height:64px}
+.spark .ln{fill:none;stroke:var(--ink);stroke-width:1.6}
+.spark .ar{fill:var(--calm);opacity:.12}
+.spark .th{stroke-width:1;stroke-dasharray:3 3}
+.spark .grid{stroke:var(--rule);stroke-width:1}
+.sl{font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;gap:8px}
+h3{font-size:13px;margin:0;font-weight:700;letter-spacing:.04em}
+.note{margin:0;font-size:13.5px;color:var(--ink);max-width:62ch}
+.notes{display:flex;flex-direction:column;gap:10px}
+.notes section{display:flex;flex-direction:column;gap:3px}
+.tag{font-size:11.5px;letter-spacing:.1em;color:var(--ink-2)}
+.act{align-self:flex-start;font:inherit;font-size:13px;border:1px solid var(--calm);color:var(--calm);background:transparent;border-radius:7px;padding:5px 12px;cursor:pointer}
+.act:hover{background:color-mix(in srgb,var(--calm) 10%,transparent)}
+.ideal{font-size:12.5px;color:var(--calm);border:1px dashed var(--calm);border-radius:8px;padding:8px 10px}
+.hint{font-size:13px;color:var(--ink-2);margin:0}
+.logcard{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+#log{list-style:none;margin:8px 0 0;padding:0;max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:5px;font-size:13px}
+#log li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px}
+#log time{font-family:var(--f-data);font-size:11.5px;color:var(--ink-2);padding-top:2px}
+#log .lv1 span{color:var(--ink)} #log .lv2 span,#log .lv3 span{color:var(--c);font-weight:500}
+#log .ok span{color:var(--ink-2)} #log .breath span{color:var(--calm);font-weight:500}
+footer{font-size:12px;color:var(--ink-2);max-width:80ch}
+@media (prefers-reduced-motion:reduce){.part.lv3 .glow,.wire .w{animation:none!important}.part{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg id="breath" viewBox="0 0 60 60" aria-hidden="true"><g class="lv0" id="breathG"><circle class="core" cx="30" cy="30" r="17"/><circle class="r" id="breathR" cx="30" cy="30" r="20"/></g></svg>
+      <div style="min-width:0">
+        <h1>身体地图</h1>
+        <p class="sub" id="overall">一切安静。</p>
+        <div class="meta" id="clock">模拟 00:00</div>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="seg" id="scen" role="group" aria-label="场景">
+        <button data-s="flat">平地</button><button data-s="slope">爬坡</button><button data-s="load">负重爬坡</button><button data-s="rest" class="autorest">停下呼吸</button>
+      </div>
+      <label class="tg"><input type="checkbox" id="auto" checked><span>自动演示</span></label>
+      <label class="tg"><input type="checkbox" id="quiet" checked><span>只在有问题时发声</span></label>
+      <label class="tg"><input type="checkbox" id="fiber"><span>设想层：应变光纤</span></label>
+      <div class="seg" id="spd" role="group" aria-label="速度"><button data-v="1" aria-pressed="true">1×</button><button data-v="3">3×</button></div>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="mapcard" aria-label="身体图">
+      <nav class="crumbs" id="crumbs" aria-label="层级"></nav>
+      <svg id="map" viewBox="0 0 600 640" role="img" aria-label="四足机器人俯视身体图"></svg>
+      <div class="gait"><div class="gl"><span>步态 · 对角小跑（左前+右后 / 右前+左后）</span><span>深色 = 着地 · 越淡 = 越不敢承重</span></div><canvas id="gait"></canvas></div>
+    </section>
+    <aside class="side">
+      <div id="panel"></div>
+      <div class="logcard"><h3>感受日志</h3><ol id="log"></ol></div>
+    </aside>
+  </main>
+
+  <footer>模拟数据，不是真机读数。尺寸和扭矩上限参考 Go2 这一级的四足机器人；发热、线缆磨损和应变光纤是为了验证"身体地图"的手感而建的简化模型。</footer>
+</div>
+
+<script>
+(()=>{
+const NS='http://www.w3.org/2000/svg';
+const $=s=>document.querySelector(s);
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------- 身体结构 ---------- */
+const LEGS=[
+ {id:'FL',name:'左前',sx:-1,sy:-1},{id:'FR',name:'右前',sx:1,sy:-1},
+ {id:'RL',name:'左后',sx:-1,sy:1},{id:'RR',name:'右后',sx:1,sy:1}];
+const legName=id=>LEGS.find(l=>l.id===id).name;
+const endMate=id=>id[0]+(id[1]==='L'?'R':'L');      // 同一端另一侧
+const sideMate=id=>(id[0]==='F'?'R':'F')+id[1];     // 同一侧另一端
+const diag={FL:'RR',RR:'FL',FR:'RL',RL:'FR'};
+const JOINTS=[{j:'hip',name:'髋外展电机',max:23.7,base:.18},{j:'thigh',name:'大腿电机',max:23.7,base:.30},{j:'calf',name:'小腿电机（膝）',max:35.5,base:.34}];
+const JN=['hip','thigh','calf'];
+const SEGN=['主控→髋','髋→大腿','大腿→膝'];
+const C={x:300,y:330};
+const geo={};
+LEGS.forEach(L=>{const P=(dx,dy)=>[C.x+L.sx*dx,C.y+L.sy*dy];
+  geo[L.id]={hip:P(62,108),thigh:P(112,122),calf:P(165,165),foot:P(205,225)};});
+const BRAIN=[300,348],BATT=[300,412],IMU=[300,292],CAM=[300,148],LIDAR=[300,184];
+
+const SYSTEMS=[{id:'FL',name:'左前腿'},{id:'FR',name:'右前腿'},{id:'RL',name:'左后腿'},{id:'RR',name:'右后腿'},
+ {id:'power',name:'能量'},{id:'sense',name:'感知'},{id:'brain',name:'主控'}];
+const sysName=id=>SYSTEMS.find(s=>s.id===id).name;
+
+const parts={},order=[];
+const add=p=>{Object.assign(p,{lv:0,peak:0,word:'安静',why:'',hist:[]});parts[p.id]=p;order.push(p.id);return p;};
+LEGS.forEach(L=>{
+  JOINTS.forEach(J=>add({id:`${L.id}-${J.j}`,sys:L.id,leg:L.id,kind:'motor',joint:J.j,name:`${L.name} · ${J.name}`,short:J.name,
+    max:J.max,base:J.base,temp:30+Math.random()*2,tq:0,r:0,ema:J.base,cur:0,tLv:0,qLv:0}));
+  [0,1,2].forEach(i=>add({id:`${L.id}-bus${i+1}`,sys:L.id,leg:L.id,kind:'wire',seg:i,name:`${L.name} · 线缆 ${SEGN[i]}`,short:`线缆 ${SEGN[i]}`,
+    wear:(L.id==='RR'&&i===2)?.16:Math.random()*.02,loss:0,lossEma:0,spike:0,amp:0}));
+  add({id:`${L.id}-foot`,sys:L.id,leg:L.id,kind:'foot',name:`${L.name} · 足底接触`,short:'足底接触',force:0,stance:true});
+  add({id:`${L.id}-fiber`,sys:L.id,leg:L.id,kind:'fiber',name:`${L.name} · 应变光纤（设想）`,short:'应变光纤（设想）',strain:0,ideal:true});
+});
+add({id:'battery',sys:'power',kind:'battery',name:'电池',short:'电池',soc:64,volt:32,btemp:29,amp:0});
+add({id:'powerline',sys:'power',kind:'powerline',name:'主电源线',short:'主电源线',drop:0});
+add({id:'camera',sys:'sense',kind:'camera',name:'前置相机',short:'前置相机',blur:0});
+add({id:'lidar',sys:'sense',kind:'lidar',name:'激光雷达',short:'激光雷达',pts:21600});
+add({id:'imu',sys:'sense',kind:'imu',name:'惯性测量单元（IMU）',short:'IMU',tilt:0,jit:0});
+add({id:'brain',sys:'brain',kind:'controller',name:'主控计算机',short:'主控计算机',cpu:40,lat:1,ctemp:44});
+
+/* ---------- 文字：值得优化 / 不完善 ---------- */
+const NOTES={
+ hip:['横向摆动时负载很小，可以降一档功率省电。','外展角度范围有限，横着走时容易碰到限位。'],
+ thigh:['爬坡时后腿大腿负载明显高于前腿，前后腿可以用不同规格的电机。','前后腿用同一型号电机，后腿余量偏小。'],
+ calf:['膝关节承受最大扭矩，减速比和散热面积最值得优化。','读不到绕组温度，只能用外壳温度去估。'],
+ wire0:['走线在躯干内，最安全。可以把三条腿的线合并减重。','只能看到丢包率，看不到具体哪一段导线出了问题。'],
+ wire1:['跨过髋关节，转动幅度不大。','接头处没有独立的松动检测。'],
+ wire2:['这段线跨过膝关节，弯折次数最多，是磨损最集中的位置。走线改到关节轴心会好很多。','只能看到丢包率，看不到导线磨到了什么程度。'],
+ foot:['只测竖直方向的力。加上切向力，就能提前感到打滑。','单点传感，分不清踩在台阶边缘还是正中。'],
+ fiber:['沿骨骼铺设的光纤能直接感到结构哪里受力集中、哪里出现微裂。','现有机器人没有这一层，这是设想。'],
+ battery:['把电量和发热一起放进路线规划，可以少停下来呼吸几次。','没有单体电芯级的温度监测。'],
+ powerline:['电流大时压降会让电机电压偏低，线径值得复核。','压降只能从电池端估算。'],
+ camera:['可以和落脚点规划共用一帧，减少重复计算。','没有镜头脏污和起雾检测。'],
+ lidar:['可以按速度调扫描密度，慢走时省电。','脚下 20 cm 内是盲区。'],
+ imu:['和足底接触信息融合，可以减少漂移。','长时间运行会有积分漂移。'],
+ controller:['补偿计算占用升高时，可以把一部分交给腿部驱动器本地处理。','日志只记录它做了什么，不记录当时为什么这么决定。'],
+};
+const notesFor=p=>p.kind==='motor'?NOTES[p.joint]:p.kind==='wire'?NOTES['wire'+p.seg]:NOTES[p.kind];
+
+/* ---------- 场景 ---------- */
+const SCEN={flat:{name:'平地行走',speed:.8,slope:0,payload:0},slope:{name:'爬坡',speed:.6,slope:14,payload:0},
+ load:{name:'负重爬坡',speed:.5,slope:14,payload:6},rest:{name:'停下呼吸',speed:0,slope:0,payload:0}};
+const AUTO=[['flat',16],['slope',22],['load',48],['flat',16]];
+const S={t:0,phase:0,scenario:'flat',auto:true,autoIdx:0,autoT:0,resting:false,quiet:true,fiber:false,speed:1,charging:false,
+ def:{FL:0,FR:0,RL:0,RR:0},share:{FL:1,FR:1,RL:1,RR:1},maxDef:0,walking:true,sel:{sys:null,part:null},bphase:0,histT:0,maxT:30};
+const visible=p=>p.kind!=='fiber'||S.fiber;
+
+/* ---------- 等级（带回差，避免来回跳） ---------- */
+function hyst(v,prev,th,h){let lv=0;th.forEach((t,i)=>{if(v>=t)lv=i+1});if(lv<prev&&v>=th[prev-1]-h)lv=prev;return lv;}
+const W={motorT:['安静','有点热','累了','过热'],motorQ:['安静','在用力','吃力','疼'],wire:['安静','发麻','断续','感觉不到'],
+ bat:['安静','饿','很饿','快没力气了'],imu:['稳','有点晃','失衡','失衡'],ctl:['从容','很忙','忙不过来','忙不过来'],fiber:['安静','受力集中','受力集中','受力集中']};
+
+/* ---------- 模拟 ---------- */
+function step(dt){
+  S.t+=dt;
+  if(S.auto&&!S.resting){S.autoT+=dt;if(S.autoT>AUTO[S.autoIdx][1]){S.autoT=0;S.autoIdx=(S.autoIdx+1)%AUTO.length;S.scenario=AUTO[S.autoIdx][0];}}
+  const sc=SCEN[S.resting?'rest':S.scenario];
+  const walking=S.walking=sc.speed>0;
+  if(walking)S.phase=(S.phase+dt*1.9)%1;
+
+  // 线缆状态 → 哪条腿不敢用力 → 负载转移
+  LEGS.forEach(L=>{const w=Math.max(...[1,2,3].map(i=>parts[`${L.id}-bus${i}`].lossEma));S.def[L.id]=clamp(w/20,0,.4);});
+  LEGS.forEach(L=>S.share[L.id]=1-S.def[L.id]);
+  LEGS.forEach(L=>{const d=S.def[L.id];S.share[endMate(L.id)]+=d*.65;S.share[sideMate(L.id)]+=d*.35;});
+  S.maxDef=Math.max(...Object.values(S.def));
+
+  const stanceOf=id=>{if(!walking)return true;const ph=(S.phase+(id==='FL'||id==='RR'?0:.5))%1;return ph<.6;};
+  let sumR=0,amp=2.2,maxT=0,hottest=null;
+  order.forEach(id=>{const p=parts[id];
+    if(p.kind==='motor'){
+      const L=LEGS.find(l=>l.id===p.leg),rear=L.sy>0,st=stanceOf(p.leg);
+      const slopeF=p.joint==='hip'?sc.slope/60:(rear?sc.slope/20:sc.slope/50);
+      let r;
+      if(!walking)r=p.base*.25*(1+sc.payload/12);
+      else{r=p.base*(1+sc.payload/12)*(1+slopeF)*S.share[p.leg];if(!st)r*=.3;}
+      r=clamp(r+(Math.random()-.5)*.03,0,.98);
+      p.r=r;p.tq=r*p.max;p.cur=p.tq*.42+.3;amp+=p.cur;sumR+=r;
+      if(st)p.ema+=(r-p.ema)*Math.min(1,dt*1.5);
+      const cool=walking?.03:.06;
+      p.temp+=(3.6*r*r-(p.temp-25)*cool)*dt;
+      if(p.temp>maxT){maxT=p.temp;hottest=p;}
+    }
+  });
+  S.maxT=maxT;
+  const load=walking?(sc.slope>0?1:.25)*(1+sc.payload/10):0;
+  order.forEach(id=>{const p=parts[id];
+    switch(p.kind){
+    case 'wire':{
+      if(p.seg===2)p.wear=Math.min(1.2,p.wear+dt*.0045*load*(p.leg==='RR'?1:.05));
+      if(walking&&p.wear>.2&&Math.random()<dt*p.wear*1.2)p.spike=p.wear*25;
+      p.spike=Math.max(0,p.spike-dt*p.spike*4);
+      p.loss=Math.max(0,p.wear*6*(walking?1:.3)+p.spike+(Math.random()-.5)*.2);
+      p.lossEma+=(p.loss-p.lossEma)*Math.min(1,dt*.5);
+      const ms=JN.slice(p.seg).map(j=>parts[`${p.leg}-${j}`].cur);p.amp=ms.reduce((a,b)=>a+b,0);
+      break;}
+    case 'foot':p.stance=stanceOf(p.leg);p.force=p.stance?(15+sc.payload)*9.8/(walking?2:4)*S.share[p.leg]:0;break;
+    case 'fiber':p.strain=Math.max(parts[`${p.leg}-calf`].ema,parts[`${p.leg}-thigh`].ema)*1050;break;
+    case 'battery':
+      if(S.charging){p.soc=Math.min(100,p.soc+dt*1.5);if(p.soc>=100){S.charging=false;logMsg('电池充满了。','ok');}}
+      else p.soc=Math.max(0,p.soc-dt*(.025+(sumR/12)*.25));
+      p.amp=amp;p.volt=29.2+4.4*p.soc/100-amp*.012;p.btemp+=((28+amp*.08)-p.btemp)*dt*.02;break;
+    case 'powerline':p.drop=amp*.012;break;
+    case 'camera':p.blur=sc.speed*.4+sc.slope*.01;break;
+    case 'imu':p.tilt=sc.slope*.9+Math.sin(S.t*2.3)*.4;{const j=.3+S.maxDef*9+parts['RR-bus3'].spike*.12;p.jit+=(j-p.jit)*Math.min(1,dt*.8);}break;
+    case 'controller':p.cpu=34+sc.speed*12+S.maxDef*120;p.lat=1+S.maxDef*4;p.ctemp+=((40+p.cpu*.25)-p.ctemp)*dt*.05;break;
+    }
+  });
+
+  // 呼吸：过热就自己停下
+  if(!S.resting&&walking&&maxT>=75){S.resting=true;logMsg(`${hottest.name} ${maxT.toFixed(0)}°C，它停下来呼吸。`,'breath');}
+  if(S.resting&&maxT<52){S.resting=false;logMsg('呼吸平稳了，继续走。','breath');}
+
+  S.histT+=dt;
+  if(S.histT>=.25){S.histT=0;order.forEach(id=>{const p=parts[id];p.hist.push(mainMetric(p).v);if(p.hist.length>240)p.hist.shift();});}
+  feelAll();
+}
+
+function feelAll(){
+  order.forEach(id=>{const p=parts[id],prev=p.lv;let lv=0,word='安静',why='';
+    switch(p.kind){
+    case 'motor':{p.tLv=hyst(p.temp,p.tLv,[50,62,72],2);p.qLv=hyst(p.ema,p.qLv,[.6,.72,.9],.04);
+      lv=Math.max(p.tLv,p.qLv);word=lv===0?'安静':(p.tLv>=p.qLv?W.motorT[p.tLv]:W.motorQ[p.qLv]);
+      why=`外壳 ${p.temp.toFixed(0)}°C · 扭矩用到上限的 ${(p.ema*100).toFixed(0)}%`;break;}
+    case 'wire':lv=hyst(p.lossEma,prev,[1,4,10],1.2);word=W.wire[lv];why=`丢包 ${p.lossEma.toFixed(1)}% · 磨损 ${(p.wear*100).toFixed(0)}/100`;break;
+    case 'foot':lv=hyst(1-S.share[p.leg],prev,[.2],.03);word=lv?'不敢踩实':'安静';why=`承重 ${(S.share[p.leg]*100).toFixed(0)}%（正常为 100%）`;break;
+    case 'fiber':lv=hyst(p.strain,prev,[750,950],30);word=W.fiber[lv];why=`应变 ${p.strain.toFixed(0)} µε`;break;
+    case 'battery':lv=hyst(-p.soc,prev,[-35,-20,-10],2);word=S.charging?'在充电':W.bat[lv];why=`电量 ${p.soc.toFixed(0)}%`;break;
+    case 'imu':lv=hyst(p.jit,prev,[1.5,3],.5);word=W.imu[lv];why=`姿态抖动 ${p.jit.toFixed(1)}°`;break;
+    case 'controller':lv=hyst(p.cpu,prev,[65,85],7);word=W.ctl[lv];why=`计算占用 ${p.cpu.toFixed(0)}%`;break;
+    default:word='清楚';why='工作正常';
+    }
+    p.lv=lv;p.word=word;p.why=why;
+    if(visible(p)){
+      const L=p.lastLog||{lv:-1,t:-99};
+      if(lv>prev&&lv>=1&&!(L.lv>=lv&&S.t-L.t<25)){logMsg(`${p.name}：${word}`,'lv'+lv);p.lastLog={lv,t:S.t};}
+      else if(lv===0&&p.peak>=2&&S.t-L.t>5){logMsg(`${p.name} 恢复安静`,'ok');p.lastLog={lv:0,t:S.t};}
+    }
+    p.peak=lv===0?0:Math.max(p.peak,lv);
+  });
+}
+
+function mainMetric(p){switch(p.kind){
+  case 'motor':return{v:p.temp,label:'外壳温度',unit:'°C',min:20,max:85,th:[50,62,72]};
+  case 'wire':return{v:p.lossEma,label:'丢包率',unit:'%',min:0,max:15,th:[1,4,10]};
+  case 'foot':return{v:p.force,label:'接触力',unit:'N',min:0,max:140,th:[]};
+  case 'fiber':return{v:p.strain,label:'应变',unit:'µε',min:0,max:1200,th:[750,950]};
+  case 'battery':return{v:p.soc,label:'电量',unit:'%',min:0,max:100,th:[35,20,10]};
+  case 'powerline':return{v:p.drop,label:'压降',unit:'V',min:0,max:2,th:[]};
+  case 'camera':return{v:p.blur,label:'运动模糊',unit:'',min:0,max:1,th:[]};
+  case 'lidar':return{v:p.pts/1000,label:'点云',unit:'千点/秒',min:0,max:30,th:[]};
+  case 'imu':return{v:p.jit,label:'姿态抖动',unit:'°',min:0,max:5,th:[1.5,3]};
+  case 'controller':return{v:p.cpu,label:'计算占用',unit:'%',min:0,max:100,th:[65,85]};
+}}
+function metrics(p){const f=(v,d=1)=>v.toFixed(d);switch(p.kind){
+  case 'motor':return[['外壳温度',f(p.temp),'°C'],['扭矩',`${f(p.tq)} / ${p.max}`,'N·m'],['扭矩占用',f(p.ema*100,0),'%'],['电流',f(p.cur),'A']];
+  case 'wire':return[['丢包率',f(p.lossEma,2),'%'],['磨损指数',f(p.wear*100,0),'/ 100'],['通过电流',f(p.amp),'A'],['位置',['躯干内','髋部','跨过膝关节'][p.seg],'']];
+  case 'foot':return[['接触力',f(p.force,0),'N'],['此刻',S.walking?(p.stance?'着地':'抬起'):'站立',''],['承重',f(S.share[p.leg]*100,0),'%'],['传感方向','竖直','']];
+  case 'fiber':return[['应变',f(p.strain,0),'µε'],['性质','设想中的传感','']];
+  case 'battery':return[['电量',f(p.soc),'%'],['电压',f(p.volt),'V'],['总电流',f(p.amp),'A'],['电池温度',f(p.btemp),'°C']];
+  case 'powerline':return[['压降',f(p.drop,2),'V'],['电流',f(parts.battery.amp),'A']];
+  case 'camera':return[['帧率','30','fps'],['运动模糊',f(p.blur,2),'']];
+  case 'lidar':return[['点云',p.pts.toLocaleString(),'点/秒'],['近处盲区','约 20','cm']];
+  case 'imu':return[['俯仰',f(p.tilt),'°'],['抖动',f(p.jit,2),'°'],['更新频率','500','Hz']];
+  case 'controller':return[['计算占用',f(p.cpu,0),'%'],['控制延迟',f(p.lat),'ms'],['温度',f(p.ctemp,0),'°C']];
+}}
+
+/* ---------- 关联 ---------- */
+function worstWire(leg){return [1,2,3].map(i=>parts[`${leg}-bus${i}`]).sort((a,b)=>b.lossEma-a.lossEma)[0];}
+function relations(p){const R=[];const push=(id,why)=>{if(id!==p.id&&parts[id]&&visible(parts[id])&&!R.find(r=>r.id===id))R.push({id,why});};
+  const pct=v=>(v*100).toFixed(0);
+  const incoming=leg=>LEGS.forEach(K=>{const d=S.def[K.id];if(d<.02)return;
+    const g=endMate(K.id)===leg?.65:sideMate(K.id)===leg?.35:0;
+    if(g)push(worstWire(K.id).id,`${K.name}腿的线${worstWire(K.id).word}，这里多扛了 ${pct(d*g)}% 负载`);});
+  switch(p.kind){
+  case 'motor':{const i=JN.indexOf(p.joint);
+    push(`${p.leg}-bus${i+1}`,'控制信号和电流从这条线进来');incoming(p.leg);
+    if(i<2)push(`${p.leg}-${JN[i+1]}`,'同一条腿的下一级关节，姿态互相牵连');
+    if(i>0)push(`${p.leg}-${JN[i-1]}`,'同一条腿的上一级关节，姿态互相牵连');
+    push(`${diag[p.leg]}-${p.joint}`,'对角腿，同时着地、一起承重');
+    push('battery',`从电池取电 ${p.cur.toFixed(1)} A`);break;}
+  case 'wire':{push(`${p.leg}-${JN[p.seg]}`,'这条线给它送信号和电');
+    const d=S.def[p.leg];
+    if(d>=.02){push(`${endMate(p.leg)}-calf`,`替${legName(p.leg)}腿多扛 ${pct(d*.65)}% 负载`);push(`${endMate(p.leg)}-thigh`,`替${legName(p.leg)}腿多扛 ${pct(d*.65)}% 负载`);
+      push(`${sideMate(p.leg)}-calf`,`替${legName(p.leg)}腿多扛 ${pct(d*.35)}% 负载`);push(`${p.leg}-foot`,'这条腿因此不敢踩实');
+      push('imu',`身体跟着晃，抖动 ${parts.imu.jit.toFixed(1)}°`);push('brain',`补偿计算让主控占用升到 ${parts.brain.cpu.toFixed(0)}%`);}
+    else push(p.seg>0?`${p.leg}-bus${p.seg}`:'brain',p.seg>0?'上一段线缆':'信号从主控出发');break;}
+  case 'foot':push(`${p.leg}-calf`,'着地的冲击先传到膝');if(S.def[p.leg]>=.02)push(worstWire(p.leg).id,'线断续，这条腿不敢用力');push('imu','着地信息帮它判断身体姿态');break;
+  case 'fiber':push(`${p.leg}-calf`,'同一根骨头上，受力直接相关');push(`${p.leg}-thigh`,'同一根骨头上，受力直接相关');break;
+  case 'battery':order.map(id=>parts[id]).filter(x=>x.kind==='motor').sort((a,b)=>b.cur-a.cur).slice(0,3).forEach(m=>push(m.id,`此刻取电最多 · ${m.cur.toFixed(1)} A`));push('powerline','所有电流都经过这里');break;
+  case 'powerline':push('battery','电流来源');push('brain','给主控供电');break;
+  case 'imu':push('brain','姿态估计送到主控');LEGS.forEach(L=>{if(S.def[L.id]>=.02)push(worstWire(L.id).id,'晃动的来源');});break;
+  case 'controller':LEGS.forEach(L=>{if(S.def[L.id]>=.02)push(worstWire(L.id).id,'正在为这条线的断续做补偿');});push('imu','读姿态');push('camera','读画面，规划落脚点');push('battery','供电');break;
+  case 'camera':case 'lidar':push('brain','数据送到主控规划落脚点');break;
+  }
+  return R;}
+
+/* ---------- 画身体图 ---------- */
+const svg=$('#map');const refs={};
+const gBody=el('g',{},svg),gWires=el('g',{},svg),gRel=el('g',{},svg),gParts=el('g',{},svg),gLbl=el('g',{},svg);
+el('ellipse',{class:'head',cx:300,cy:168,rx:52,ry:36},gBody);
+el('rect',{class:'torso',x:226,y:198,width:148,height:268,rx:30},gBody);
+el('text',{class:'cap',x:300,y:112,'text-anchor':'middle'},gBody).textContent='前';
+el('text',{class:'cap',x:300,y:620,'text-anchor':'middle'},gBody).textContent='后';
+const torsoHit=gBody.querySelector('.torso');torsoHit.style.cursor='pointer';torsoHit.addEventListener('click',()=>select(null,null));
+const bones={};
+LEGS.forEach(L=>{const g=geo[L.id];const d=`M${g.hip}L${g.thigh}L${g.calf}L${g.foot}`;
+  bones[L.id]=el('path',{class:'bone',d},gBody);
+  const hit=el('path',{class:'bonehit',d},gBody);hit.addEventListener('click',()=>select(L.id,null));});
+
+function mkPart(p,g){g.classList.add('part');g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',p.name);
+  g.addEventListener('click',e=>{e.stopPropagation();select(p.sys,p.id);});
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(p.sys,p.id);}});return g;}
+const off=(a,b,o)=>{const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;return[-dy/l*o,dx/l*o];};
+order.forEach(id=>{const p=parts[id];let g,anchor,lblPos,anchorTxt='middle';
+  if(p.kind==='motor'){const pt=geo[p.leg][p.joint];g=mkPart(p,el('g',{},gParts));
+    el('circle',{class:'glow',cx:pt[0],cy:pt[1],r:24},g);el('circle',{class:'core',cx:pt[0],cy:pt[1],r:12},g);
+    anchor=pt;const L=LEGS.find(l=>l.id===p.leg);lblPos=[pt[0]+L.sx*(p.joint==='hip'?-22:20),pt[1]+(p.joint==='hip'?L.sy*22:4)];anchorTxt=p.joint==='hip'?'middle':(L.sx<0?'end':'start');
+    if(p.joint==='hip'){anchorTxt=L.sx<0?'start':'end';lblPos=[pt[0]-L.sx*-0+(L.sx<0?16:-16),pt[1]+L.sy*26];}}
+  else if(p.kind==='wire'){const g0=geo[p.leg];const a=p.seg===0?BRAIN:g0[JN[p.seg-1]],b=g0[JN[p.seg]];const o=off(a,b,p.seg===0?0:9);
+    const A=[a[0]+o[0],a[1]+o[1]],B=[b[0]+o[0],b[1]+o[1]];
+    const d=p.seg===0?`M${A}Q${(A[0]+B[0])/2},${A[1]} ${B}`:`M${A}L${B}`;
+    g=mkPart(p,el('g',{class:'wire'},gWires));el('path',{class:'w',d},g);el('path',{class:'hit',d},g);
+    anchor=[(A[0]+B[0])/2,(A[1]+B[1])/2+(p.seg===0?(B[1]-A[1])*.15:0)];const L=LEGS.find(l=>l.id===p.leg);
+    lblPos=[anchor[0]+L.sx*6,anchor[1]-L.sy*12];anchorTxt=L.sx<0?'end':'start';}
+  else if(p.kind==='foot'){const pt=geo[p.leg].foot;g=mkPart(p,el('g',{},gParts));
+    el('circle',{class:'glow',cx:pt[0],cy:pt[1],r:18},g);refs[id+'c']=el('circle',{class:'core',cx:pt[0],cy:pt[1],r:7},g);
+    anchor=pt;const L=LEGS.find(l=>l.id===p.leg);lblPos=[pt[0],pt[1]+L.sy*24+4];}
+  else if(p.kind==='fiber'){const g0=geo[p.leg];const o=off(g0.hip,g0.foot,-10);
+    const d=`M${g0.hip[0]+o[0]},${g0.hip[1]+o[1]}L${g0.thigh[0]+o[0]},${g0.thigh[1]+o[1]}L${g0.calf[0]+o[0]},${g0.calf[1]+o[1]}L${g0.foot[0]+o[0]},${g0.foot[1]+o[1]}`;
+    g=mkPart(p,el('g',{class:'wire fiber'},gWires));el('path',{class:'w',d},g);el('path',{class:'hit',d},g);
+    anchor=[(g0.calf[0]+g0.foot[0])/2+o[0],(g0.calf[1]+g0.foot[1])/2+o[1]];lblPos=[anchor[0],anchor[1]];}
+  else{const pos={battery:BATT,powerline:[300,382],camera:CAM,lidar:LIDAR,imu:IMU,brain:BRAIN}[p.id];g=mkPart(p,el('g',{class:'box'},gParts));
+    if(p.kind==='battery'){el('rect',{class:'glow',x:256,y:396,width:88,height:40,rx:8},g);el('rect',{class:'core',x:264,y:400,width:72,height:28,rx:5},g);refs.batbar=el('rect',{class:'fillbar',x:268,y:404,width:64,height:20,rx:3},g);el('rect',{class:'core',x:336,y:408,width:5,height:12,rx:1.5},g);}
+    else if(p.kind==='powerline'){el('path',{class:'core',d:'M300,400L300,366',style:'fill:none'},g);el('path',{d:'M300,400L300,366',stroke:'transparent','stroke-width':14},g);}
+    else if(p.kind==='controller'){el('rect',{class:'glow',x:262,y:326,width:76,height:44,rx:8},g);el('rect',{class:'core',x:270,y:332,width:60,height:32,rx:5},g);}
+    else if(p.kind==='imu'){el('rect',{class:'glow',x:282,y:274,width:36,height:36,rx:6},g);el('rect',{class:'core',x:290,y:282,width:20,height:20,rx:3,transform:'rotate(45 300 292)'},g);}
+    else if(p.kind==='camera'){el('circle',{class:'glow',cx:pos[0],cy:pos[1],r:18},g);el('rect',{class:'core',x:284,y:141,width:32,height:14,rx:4},g);}
+    else{el('circle',{class:'glow',cx:pos[0],cy:pos[1],r:16},g);el('circle',{class:'core',cx:pos[0],cy:pos[1],r:9},g);}
+    anchor=pos;lblPos=[pos[0]+(p.kind==='powerline'?10:44),pos[1]+4];anchorTxt='start';
+    if(p.kind==='camera'){lblPos=[pos[0]+60,pos[1]+4];}}
+  const t=el('text',{class:'lbl',x:lblPos[0],y:lblPos[1],'text-anchor':anchorTxt},gLbl);
+  refs[id]={g,anchor,t};
+});
+const selRing=el('circle',{id:'selRing',r:20,cx:-99,cy:-99},svg);
+
+/* ---------- 交互 ---------- */
+function select(sys,part){S.sel={sys,part};buildPanel();renderCrumbs();drawRel();}
+$('#map').addEventListener('click',e=>{if(e.target===svg)select(null,null);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(S.sel.part)select(S.sel.sys,null);else select(null,null);}});
+function renderCrumbs(){const c=$('#crumbs');const {sys,part}=S.sel;let h='';
+  h+=sys?`<button data-goto="root">整体</button>`:`<span class="here">整体</span>`;
+  if(sys){h+=`<span class="sep">›</span>`+(part?`<button data-goto-sys="${sys}">${sysName(sys)}</button>`:`<span class="here">${sysName(sys)}</span>`);}
+  if(part)h+=`<span class="sep">›</span><span class="here">${parts[part].short}</span>`;
+  if(!sys)h+=`<span class="sep" style="margin-left:6px">点身体任意部位往里看</span>`;
+  c.innerHTML=h;}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-goto],[data-goto-sys],[data-goto-part],[data-act]');if(!b)return;
+  if(b.dataset.goto==='root')select(null,null);
+  else if(b.dataset.gotoSys)select(b.dataset.gotoSys,null);
+  else if(b.dataset.gotoPart){const p=parts[b.dataset.gotoPart];select(p.sys,p.id);}
+  else if(b.dataset.act==='repair'){const p=parts[S.sel.part];p.wear=.01;p.spike=0;logMsg(`${p.name} 已检修。`,'ok');}
+  else if(b.dataset.act==='charge'){S.charging=true;logMsg('接上充电桩。','ok');}
+});
+$('#scen').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.scenario=b.dataset.s;S.resting=false;S.auto=false;$('#auto').checked=false;syncScen();});
+$('#auto').addEventListener('change',e=>{S.auto=e.target.checked;if(S.auto){S.autoT=0;S.autoIdx=0;S.scenario=AUTO[0][0];}});
+$('#quiet').addEventListener('change',e=>{S.quiet=e.target.checked;});
+$('#fiber').addEventListener('change',e=>{S.fiber=e.target.checked;if(!S.fiber&&S.sel.part&&parts[S.sel.part].kind==='fiber')select(S.sel.sys,null);else buildPanel();});
+$('#spd').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.speed=+b.dataset.v;[...$('#spd').children].forEach(x=>x.setAttribute('aria-pressed',x===b));});
+function syncScen(){const cur=S.resting?'rest':S.scenario;[...$('#scen').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===cur));
+  const rb=$('#scen [data-s="rest"]');rb.textContent=S.resting?'停下呼吸（自己停的）':'停下呼吸';}
+
+/* ---------- 面板 ---------- */
+const panel=$('#panel');let relSig='';
+function rowHTML(p){return `<li><button data-goto-part="${p.id}"><span class="dot" data-lv="${p.id}"></span><span class="nm">${p.short}<span class="val" data-v="val-${p.id}"></span></span><span class="wd" data-w="${p.id}"></span></button></li>`;}
+function buildPanel(){const {sys,part}=S.sel;relSig='';
+  if(!sys){panel.innerHTML=`<div class="pv"><div class="eyebrow">整体</div><h2 data-v="ov"></h2>
+    <ul class="rows">${SYSTEMS.map(s=>`<li><button data-goto-sys="${s.id}"><span class="dot" data-slv="${s.id}"></span><span class="nm">${s.name}</span><span class="wd" data-sw="${s.id}"></span></button></li>`).join('')}</ul>
+    <p class="hint">平时它是安静的。哪里不舒服，哪里才会在图上亮起来、说出一个词。想看得更细，就点进去。</p></div>`;}
+  else if(!part){const ps=order.map(id=>parts[id]).filter(p=>p.sys===sys&&visible(p));
+    panel.innerHTML=`<div class="pv"><div class="eyebrow">系统</div><h2>${sysName(sys)}</h2>
+    <div class="feel"><span class="chip" data-slv2="${sys}" data-sw="${sys}"></span></div>
+    <ul class="rows">${ps.map(rowHTML).join('')}</ul></div>`;}
+  else{const p=parts[part];const n=notesFor(p);const m=metrics(p);const mm=mainMetric(p);
+    panel.innerHTML=`<div class="pv"><div class="eyebrow">${sysName(p.sys)}</div><h2>${p.name}</h2>
+    <div class="feel"><span class="chip" data-lv2="${p.id}" data-w="${p.id}"></span><span class="why" data-v="why"></span></div>
+    <dl class="metrics">${m.map((x,i)=>`<div><dt>${x[0]}</dt><dd><span data-v="m${i}"></span><small>${x[2]}</small></dd></div>`).join('')}</dl>
+    <div><div class="sl"><span>过去 60 秒 · ${mm.label}</span><span data-v="sparkv"></span></div><svg class="spark" id="spark" viewBox="0 0 300 64" preserveAspectRatio="none"></svg></div>
+    <div class="notes"><h3>关联</h3><ul class="rows" id="rel"></ul></div>
+    <div class="notes"><section><span class="tag">值得优化</span><p class="note">${n[0]}</p></section><section><span class="tag">不完善</span><p class="note">${n[1]}</p></section></div>
+    ${p.kind==='wire'?`<button class="act" data-act="repair">标记为已检修</button>`:''}
+    ${p.kind==='battery'?`<button class="act" data-act="charge">接上充电桩</button>`:''}
+    ${p.ideal?`<div class="ideal">这一层是设想：现有机器人没有沿骨骼的应变光纤。它代表"人做不到的感受"之一，能直接感到骨头哪里在受力。</div>`:''}
+    </div>`;
+    buildSpark(p);}
+  tickPanel();}
+let spk={};
+function buildSpark(p){const s=$('#spark');const mm=mainMetric(p);const y=v=>64-4-(clamp(v,mm.min,mm.max)-mm.min)/(mm.max-mm.min)*56;
+  s.innerHTML='';el('line',{class:'grid',x1:0,x2:300,y1:60,y2:60},s);
+  const cols=['var(--warn)','var(--strain)','var(--stop)'];
+  mm.th.forEach((t,i)=>el('line',{class:'th',x1:0,x2:300,y1:y(t),y2:y(t),stroke:cols[i]},s));
+  spk={ar:el('path',{class:'ar'},s),ln:el('polyline',{class:'ln'},s),y};}
+function drawSpark(p){if(!spk.ln||!$('#spark'))return;const h=p.hist;if(h.length<2)return;const n=240;
+  const pts=h.map((v,i)=>`${(300*(i+n-h.length)/(n-1)).toFixed(1)},${spk.y(v).toFixed(1)}`);
+  spk.ln.setAttribute('points',pts.join(' '));spk.ar.setAttribute('d',`M${pts[0].split(',')[0]},60L${pts.join('L')}L300,60Z`);}
+
+function sysState(sid){const ps=order.map(id=>parts[id]).filter(p=>p.sys===sid&&visible(p));const w=ps.reduce((a,b)=>b.lv>a.lv?b:a,ps[0]);return{lv:w.lv,word:w.lv?`${w.short}${w.word}`:'安静',p:w};}
+const setLv=(e,lv)=>{e.classList.remove('lv0','lv1','lv2','lv3');e.classList.add('lv'+lv);};
+function shortVal(p){const mm=mainMetric(p);return p.kind==='motor'?`${p.temp.toFixed(0)}°C`:p.kind==='wire'?`${p.lossEma.toFixed(1)}%`:p.kind==='battery'?`${p.soc.toFixed(0)}%`:p.kind==='foot'?`${p.force.toFixed(0)} N`:p.kind==='fiber'?`${p.strain.toFixed(0)} µε`:p.kind==='controller'?`${p.cpu.toFixed(0)}%`:p.kind==='imu'?`${p.jit.toFixed(1)}°`:'';}
+function sayName(p){const l=p.leg?legName(p.leg):'';if(p.kind==='motor')return l+{hip:'髋',thigh:'大腿',calf:'膝'}[p.joint]+'电机';if(p.kind==='wire')return l+['躯干线缆','髋部线缆','膝部线缆'][p.seg];if(p.kind==='foot')return l+'脚';if(p.kind==='fiber')return l+'腿骨';return p.short;}
+function overallText(){const sc=SCEN[S.resting?'rest':S.scenario];
+  const hot=order.map(id=>parts[id]).filter(p=>visible(p)&&p.lv>0).sort((a,b)=>b.lv-a.lv||(b.kind==='wire')-(a.kind==='wire')).slice(0,3);
+  const pre=S.resting?'停下来呼吸中。':'';
+  if(!hot.length)return pre+(S.walking?`一切安静，它在${sc.name}。`:'一切安静，它站着。');
+  return pre+hot.map(p=>`${sayName(p)}${p.word}`).join('；')+'。';}
+function tickPanel(){
+  const ov=overallText();$('#overall').textContent=ov;
+  const sec=Math.floor(S.t);$('#clock').textContent=`模拟 ${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')} · ${SCEN[S.resting?'rest':S.scenario].name}${S.auto?' · 自动演示':''}`;
+  panel.querySelectorAll('[data-v="ov"]').forEach(e=>e.textContent=ov);
+  panel.querySelectorAll('[data-slv],[data-slv2]').forEach(e=>setLv(e,sysState(e.dataset.slv||e.dataset.slv2).lv));
+  panel.querySelectorAll('[data-sw]').forEach(e=>{const s=sysState(e.dataset.sw);e.textContent=s.word;setLv(e,s.lv);});
+  panel.querySelectorAll('[data-lv],[data-lv2]').forEach(e=>setLv(e,parts[e.dataset.lv||e.dataset.lv2].lv));
+  panel.querySelectorAll('[data-w]').forEach(e=>{const p=parts[e.dataset.w];e.textContent=p.word;setLv(e,p.lv);});
+  panel.querySelectorAll('[data-v^="val-"]').forEach(e=>e.textContent=shortVal(parts[e.dataset.v.slice(4)]));
+  if(S.sel.part){const p=parts[S.sel.part];const m=metrics(p);
+    panel.querySelectorAll('[data-v^="m"]').forEach(e=>{const i=+e.dataset.v.slice(1);if(m[i])e.textContent=m[i][1];});
+    const w=panel.querySelector('[data-v="why"]');if(w)w.textContent=p.why;
+    const sv=panel.querySelector('[data-v="sparkv"]');if(sv){const mm=mainMetric(p);sv.textContent=`${mm.v.toFixed(mm.max>20?0:1)} ${mm.unit}`;}
+    drawSpark(p);
+    const R=relations(p);const sig=R.map(r=>r.id).join(',');const rel=$('#rel');
+    if(rel){if(sig!==relSig){relSig=sig;rel.innerHTML=R.map(r=>{const q=parts[r.id];return `<li><button data-goto-part="${q.id}"><span class="dot" data-lv="${q.id}"></span><span class="nm">${q.name}<br><span class="why" data-rw="${q.id}"></span></span><span class="wd" data-w="${q.id}"></span></button></li>`;}).join('');}
+      R.forEach(r=>{const e=rel.querySelector(`[data-rw="${r.id}"]`);if(e)e.textContent=r.why;});
+      rel.querySelectorAll('[data-lv]').forEach(e=>setLv(e,parts[e.dataset.lv].lv));
+      rel.querySelectorAll('[data-w]').forEach(e=>{const q=parts[e.dataset.w];e.textContent=q.word;setLv(e,q.lv);});}
+  }
+  syncScen();}
+
+/* ---------- 日志 ---------- */
+const logEl=$('#log');
+function logMsg(text,cls){const li=document.createElement('li');const sec=Math.floor(S.t);
+  li.className=cls+(cls.startsWith('lv')?' '+cls:'');
+  li.innerHTML=`<time>${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}</time><span></span>`;li.querySelector('span').textContent=text;
+  logEl.prepend(li);while(logEl.children.length>60)logEl.lastChild.remove();}
+
+/* ---------- 渲染身体图 ---------- */
+let relIds=new Set();
+function drawRel(){gRel.innerHTML='';relIds=new Set();const {part}=S.sel;
+  if(!part){selRing.setAttribute('cx',-99);return;}
+  const a=refs[part].anchor;selRing.setAttribute('cx',a[0]);selRing.setAttribute('cy',a[1]);selRing.setAttribute('r',parts[part].kind==='wire'?14:22);
+  relations(parts[part]).forEach(r=>{relIds.add(r.id);const b=refs[r.id].anchor;const mx=(a[0]+b[0])/2+(b[1]-a[1])*.12,my=(a[1]+b[1])/2-(b[0]-a[0])*.12;
+    el('path',{class:'rel',d:`M${a}Q${mx},${my} ${b}`},gRel);});}
+function renderMap(){const {sys,part}=S.sel;
+  LEGS.forEach(L=>{bones[L.id].style.opacity=sys&&sys!==L.id?.25:(S.quiet?.55:1);});
+  order.forEach(id=>{const p=parts[id],r=refs[id];
+    if(!visible(p)){r.g.style.display='none';r.t.textContent='';return;}r.g.style.display='';
+    setLv(r.g,p.lv);setLv(r.t,p.lv);
+    const focus=part===id||relIds.has(id);
+    let op=1;if(sys&&p.sys!==sys&&!focus)op=.13;else if(S.quiet&&p.lv===0&&!focus&&!(sys&&p.sys===sys))op=.32;
+    r.g.style.opacity=op;
+    const say=p.lv>0&&op>.2;const showVal=!S.quiet||focus||(sys&&p.sys===sys);
+    if(say){r.t.classList.add('say');r.t.innerHTML='';r.t.textContent=p.word+(p.kind==='motor'?` ${p.temp.toFixed(0)}°`:'');}
+    else if(showVal&&op>.2&&(p.kind==='motor'||p.kind==='battery')){r.t.classList.remove('say');r.t.innerHTML=`<tspan class="v">${shortVal(p)}</tspan>`;}
+    else r.t.textContent='';
+  });
+  LEGS.forEach(L=>{const f=parts[`${L.id}-foot`],c=refs[`${L.id}-footc`];c.setAttribute('r',f.stance?8:5);c.style.fill=f.stance?'var(--c)':'var(--paper)';c.style.fillOpacity=f.stance?S.share[L.id]*.5:1;});
+  refs.batbar.setAttribute('width',(64*parts.battery.soc/100).toFixed(1));
+  // 呼吸环
+  const worst=Math.max(...order.map(id=>visible(parts[id])?parts[id].lv:0));
+  setLv($('#breathG'),S.resting?0:worst);}
+
+/* ---------- 步态图 ---------- */
+const cv=$('#gait'),cx=cv.getContext('2d');const gh=[];let tok={},tokT=0;
+function readTok(){const cs=getComputedStyle(document.documentElement);['--ink','--ink-2','--rule','--strain','--calm'].forEach(k=>tok[k]=cs.getPropertyValue(k).trim());}
+function drawGait(){const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,w,h);const lw=40,rh=(h-4)/4,span=3;
+  cx.font='11px "Noto Sans SC",sans-serif';cx.textBaseline='middle';
+  LEGS.forEach((L,i)=>{const y=2+i*rh;cx.fillStyle=tok['--ink-2'];cx.fillText(L.name,0,y+rh/2);
+    cx.fillStyle=tok['--rule'];cx.fillRect(lw,y+rh/2-.5,w-lw,1);
+    for(let k=1;k<gh.length;k++){const s=gh[k];if(!s.c[i])continue;const x0=lw+(1-(S.t-gh[k-1].t)/span)*(w-lw),x1=lw+(1-(S.t-s.t)/span)*(w-lw);
+      cx.globalAlpha=.25+.75*clamp(s.sh[i],0,1.3)/1.3;cx.fillStyle=s.sh[i]<.85?tok['--strain']:tok['--ink'];cx.fillRect(x0,y+3,Math.max(1,x1-x0+.5),rh-6);}
+    cx.globalAlpha=1;});}
+
+/* ---------- 主循环 ---------- */
+let last=performance.now(),pT=0,rT=0;
+readTok();feelAll();order.forEach(id=>parts[id].lv=0);logEl.innerHTML='';
+logMsg('开始。它在平地上走。','ok');
+renderCrumbs();buildPanel();
+function frame(now){const real=Math.min(.05,(now-last)/1000);last=now;
+  const dt=real*S.speed;const n=S.speed>1?3:1;for(let i=0;i<n;i++)step(dt/n);
+  gh.push({t:S.t,c:LEGS.map(L=>parts[`${L.id}-foot`].stance),sh:LEGS.map(L=>S.share[L.id])});while(gh.length&&S.t-gh[0].t>3.2)gh.shift();
+  // 呼吸环：越热越急，停下时深而慢
+  const per=S.resting?5.5:clamp(4.2-(S.maxT-32)/40*2.6,1.5,4.2);S.bphase=(S.bphase+real/per)%1;
+  const amp=matchMedia('(prefers-reduced-motion: reduce)').matches?.02:(S.resting?.16:.08);
+  $('#breathR').setAttribute('r',(20*(1+amp*Math.sin(S.bphase*Math.PI*2))).toFixed(2));
+  renderMap();tokT+=real;if(tokT>1){tokT=0;readTok();}
+  drawGait();
+  pT+=real;if(pT>.25){pT=0;tickPanel();}
+  rT+=real;if(rT>.5){rT=0;if(S.sel.part)drawRel();}
+  requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+})();
+</script>
