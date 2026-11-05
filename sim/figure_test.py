@@ -67,8 +67,8 @@ class Sim:
         self.limit = {n: float(self.m.actuator_forcerange[i][1]) for n, i in self.act.items()}
         self.view = None
         if view:
-            import mujoco.viewer
-            self.view = mujoco.viewer.launch_passive(self.m, self.d)
+            from mujoco import viewer as mjv
+            self.view = mjv.launch_passive(self.m, self.d)
         self.reset()
 
     def reset(self):
