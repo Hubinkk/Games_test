@@ -1,0 +1,226 @@
+<!--
+  55 cm 二次元人偶机器人 · MuJoCo 物理模型 v0.1
+  - 单位：米、千克、牛·米、弧度
+  - 朝向：+x 向前，+y 向左，+z 向上
+  - 质量预算约 2.95 kg，对应 FigureAnatomy.html 的设计
+  - 扭矩上限（forcerange）取自 docs/knee-joint-v1.md 的估算：
+    膝、髋俯仰峰值约 2.8 N·m
+  - 踝关节在设计上由跟腱拉杆驱动，这里先简化为直接驱动
+  - 所有机器人几何体之间不互相碰撞，只和地面碰撞
+-->
+<mujoco model="figure55">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.002" integrator="implicitfast"/>
+
+  <default>
+    <joint damping="0.03" armature="0.003" frictionloss="0.01"/>
+    <geom contype="2" conaffinity="1" friction="1.0 0.02 0.001" rgba="0.91 0.9 0.95 1"/>
+    <default class="vis">
+      <geom contype="0" conaffinity="0" density="0" group="1"/>
+    </default>
+    <!-- 大关节：准直驱电机，减速比约 15:1，反射惯量较大 -->
+    <default class="big">
+      <joint armature="0.0045"/>
+    </default>
+    <default class="small">
+      <joint armature="0.001" damping="0.01"/>
+    </default>
+  </default>
+
+  <visual>
+    <headlight ambient="0.45 0.45 0.45" diffuse="0.5 0.5 0.5"/>
+  </visual>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="256" height="256" rgb1="0.86 0.88 0.9" rgb2="0.78 0.8 0.84"/>
+    <material name="grid" texture="grid" texrepeat="8 8"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0.5 0.5 1.5" dir="-0.3 -0.3 -1" directional="true"/>
+    <geom name="floor" type="plane" size="2 2 0.05" material="grid" contype="1" conaffinity="1"/>
+
+    <body name="pelvis" pos="0 0 0.285">
+      <freejoint name="root"/>
+      <!-- 骨盆：电池约 0.4 kg + 脊髓控制器 + 结构 -->
+      <geom name="pelvis" type="box" size="0.022 0.042 0.022" mass="0.75" rgba="0.36 0.62 0.58 1"/>
+      <site name="imu" pos="0 0 0" size="0.005"/>
+
+      <body name="abdomen" pos="0 0 0.035">
+        <joint name="waist_yaw" axis="0 0 1" range="-0.8 0.8" class="big"/>
+        <joint name="waist_pitch" axis="0 1 0" range="-0.3 0.6" class="big"/>
+        <geom type="capsule" fromto="0 0 0 0 0 0.045" size="0.03" mass="0.15"/>
+
+        <body name="chest" pos="0 0 0.05">
+          <!-- 胸腔：大脑、散热风扇、肩部驱动器 -->
+          <geom name="chest" type="box" pos="0 0 0.035" size="0.028 0.04 0.035" mass="0.55"/>
+
+          <body name="neck" pos="0 0 0.07">
+            <joint name="neck_yaw" axis="0 0 1" range="-1.0 1.0" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 0.02" size="0.011" mass="0.03"/>
+            <body name="head" pos="0 0 0.022">
+              <joint name="neck_pitch" axis="0 1 0" range="-0.5 0.6" class="small"/>
+              <geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.25" rgba="0.95 0.85 0.79 1"/>
+              <geom class="vis" type="ellipsoid" pos="-0.008 0 0.05" size="0.05 0.051 0.048" rgba="0.72 0.7 0.85 1"/>
+              <geom class="vis" type="ellipsoid" pos="0.041 0.016 0.037" size="0.004 0.008 0.01" rgba="0.45 0.38 0.8 1"/>
+              <geom class="vis" type="ellipsoid" pos="0.041 -0.016 0.037" size="0.004 0.008 0.01" rgba="0.45 0.38 0.8 1"/>
+            </body>
+          </body>
+
+          <!-- 左臂 -->
+          <body name="l_upper_arm" pos="0 0.056 0.041">
+            <joint name="l_shoulder_pitch" axis="0 1 0" range="-3.0 1.0" class="small"/>
+            <joint name="l_shoulder_roll" axis="1 0 0" range="-0.3 2.8" class="small"/>
+            <joint name="l_shoulder_yaw" axis="0 0 1" range="-1.5 1.5" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 -0.085" size="0.011" mass="0.09"/>
+            <body name="l_forearm" pos="0 0 -0.085">
+              <joint name="l_elbow" axis="0 1 0" range="-2.4 0" class="small"/>
+              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.05"/>
+              <body name="l_hand" pos="0 0 -0.075">
+                <geom type="box" pos="0 0 -0.016" size="0.007 0.012 0.016" mass="0.03" rgba="0.95 0.85 0.79 1"/>
+              </body>
+            </body>
+          </body>
+
+          <!-- 右臂 -->
+          <body name="r_upper_arm" pos="0 -0.056 0.041">
+            <joint name="r_shoulder_pitch" axis="0 1 0" range="-3.0 1.0" class="small"/>
+            <joint name="r_shoulder_roll" axis="1 0 0" range="-2.8 0.3" class="small"/>
+            <joint name="r_shoulder_yaw" axis="0 0 1" range="-1.5 1.5" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 -0.085" size="0.011" mass="0.09"/>
+            <body name="r_forearm" pos="0 0 -0.085">
+              <joint name="r_elbow" axis="0 1 0" range="-2.4 0" class="small"/>
+              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.05"/>
+              <body name="r_hand" pos="0 0 -0.075">
+                <geom type="box" pos="0 0 -0.016" size="0.007 0.012 0.016" mass="0.03" rgba="0.95 0.85 0.79 1"/>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- 左腿：髋 3 轴 + 膝 + 踝 2 轴 -->
+      <body name="l_hip_yaw_link" pos="0 0.032 -0.015">
+        <joint name="l_hip_yaw" axis="0 0 1" range="-0.6 0.6" class="big"/>
+        <geom type="sphere" size="0.012" mass="0.04"/>
+        <body name="l_hip_roll_link">
+          <joint name="l_hip_roll" axis="1 0 0" range="-0.4 0.6" class="big"/>
+          <geom class="vis" type="sphere" size="0.013"/>
+          <geom type="sphere" size="0.008" mass="0.03"/>
+          <body name="l_thigh">
+            <joint name="l_hip_pitch" axis="0 1 0" range="-2.2 0.7" class="big"/>
+            <geom name="l_thigh" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.02" mass="0.14"/>
+            <!-- 膝电机放在大腿根部（近端布置） -->
+            <geom type="sphere" pos="0 0 -0.02" size="0.019" mass="0.07" rgba="0.82 0.6 0.15 1"/>
+            <site name="l_spool_f" pos="0.012 0 -0.02" size="0.003"/>
+            <site name="l_spool_b" pos="-0.012 0 -0.02" size="0.003"/>
+            <site name="l_side_f" pos="0.03 0 -0.115" size="0.002"/>
+            <site name="l_side_b" pos="-0.03 0 -0.115" size="0.002"/>
+            <body name="l_shin" pos="0 0 -0.115">
+              <joint name="l_knee" axis="0 1 0" range="0 2.5" class="big"/>
+              <geom name="l_pulley" type="cylinder" size="0.01 0.008" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+              <site name="l_ins_f" pos="0.011 0 -0.03" size="0.003"/>
+              <site name="l_ins_b" pos="-0.011 0 -0.03" size="0.003"/>
+              <geom name="l_shin" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.013" mass="0.10"/>
+              <body name="l_ankle_link" pos="0 0 -0.115">
+                <joint name="l_ankle_pitch" axis="0 1 0" range="-1.0 1.0" class="big"/>
+                <geom type="sphere" size="0.007" mass="0.01"/>
+                <body name="l_foot">
+                  <joint name="l_ankle_roll" axis="1 0 0" range="-0.4 0.4" class="big"/>
+                  <geom name="l_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- 右腿 -->
+      <body name="r_hip_yaw_link" pos="0 -0.032 -0.015">
+        <joint name="r_hip_yaw" axis="0 0 1" range="-0.6 0.6" class="big"/>
+        <geom type="sphere" size="0.012" mass="0.04"/>
+        <body name="r_hip_roll_link">
+          <joint name="r_hip_roll" axis="1 0 0" range="-0.6 0.4" class="big"/>
+          <geom class="vis" type="sphere" size="0.013"/>
+          <geom type="sphere" size="0.008" mass="0.03"/>
+          <body name="r_thigh">
+            <joint name="r_hip_pitch" axis="0 1 0" range="-2.2 0.7" class="big"/>
+            <geom name="r_thigh" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.02" mass="0.14"/>
+            <geom type="sphere" pos="0 0 -0.02" size="0.019" mass="0.07" rgba="0.82 0.6 0.15 1"/>
+            <site name="r_spool_f" pos="0.012 0 -0.02" size="0.003"/>
+            <site name="r_spool_b" pos="-0.012 0 -0.02" size="0.003"/>
+            <site name="r_side_f" pos="0.03 0 -0.115" size="0.002"/>
+            <site name="r_side_b" pos="-0.03 0 -0.115" size="0.002"/>
+            <body name="r_shin" pos="0 0 -0.115">
+              <joint name="r_knee" axis="0 1 0" range="0 2.5" class="big"/>
+              <geom name="r_pulley" type="cylinder" size="0.01 0.008" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+              <site name="r_ins_f" pos="0.011 0 -0.03" size="0.003"/>
+              <site name="r_ins_b" pos="-0.011 0 -0.03" size="0.003"/>
+              <geom name="r_shin" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.013" mass="0.10"/>
+              <body name="r_ankle_link" pos="0 0 -0.115">
+                <joint name="r_ankle_pitch" axis="0 1 0" range="-1.0 1.0" class="big"/>
+                <geom type="sphere" size="0.007" mass="0.01"/>
+                <body name="r_foot">
+                  <joint name="r_ankle_roll" axis="1 0 0" range="-0.4 0.4" class="big"/>
+                  <geom name="r_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- 位置伺服：kp/kv 为 PD 增益，forcerange 为扭矩上限（N·m） -->
+  <tendon>
+    <spatial name="l_quad" width="0.0015" rgba="0.2 0.5 0.9 1">
+      <site site="l_spool_f"/><geom geom="l_pulley" sidesite="l_side_f"/><site site="l_ins_f"/>
+    </spatial>
+    <spatial name="l_ham" width="0.0015" rgba="0.2 0.5 0.9 1">
+      <site site="l_spool_b"/><geom geom="l_pulley" sidesite="l_side_b"/><site site="l_ins_b"/>
+    </spatial>
+    <spatial name="r_quad" width="0.0015" rgba="0.2 0.5 0.9 1">
+      <site site="r_spool_f"/><geom geom="r_pulley" sidesite="r_side_f"/><site site="r_ins_f"/>
+    </spatial>
+    <spatial name="r_ham" width="0.0015" rgba="0.2 0.5 0.9 1">
+      <site site="r_spool_b"/><geom geom="r_pulley" sidesite="r_side_b"/><site site="r_ins_b"/>
+    </spatial>
+  </tendon>
+
+  <actuator>
+    <position name="waist_yaw" joint="waist_yaw" kp="8" kv="0.3" forcerange="-1.5 1.5"/>
+    <position name="waist_pitch" joint="waist_pitch" kp="15" kv="0.4" forcerange="-2.0 2.0"/>
+    <position name="neck_yaw" joint="neck_yaw" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
+    <position name="neck_pitch" joint="neck_pitch" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
+
+    <position name="l_shoulder_pitch" joint="l_shoulder_pitch" kp="4" kv="0.1" forcerange="-1.0 1.0"/>
+    <position name="l_shoulder_roll" joint="l_shoulder_roll" kp="4" kv="0.1" forcerange="-1.0 1.0"/>
+    <position name="l_shoulder_yaw" joint="l_shoulder_yaw" kp="3" kv="0.08" forcerange="-0.6 0.6"/>
+    <position name="l_elbow" joint="l_elbow" kp="3" kv="0.08" forcerange="-0.6 0.6"/>
+    <position name="r_shoulder_pitch" joint="r_shoulder_pitch" kp="4" kv="0.1" forcerange="-1.0 1.0"/>
+    <position name="r_shoulder_roll" joint="r_shoulder_roll" kp="4" kv="0.1" forcerange="-1.0 1.0"/>
+    <position name="r_shoulder_yaw" joint="r_shoulder_yaw" kp="3" kv="0.08" forcerange="-0.6 0.6"/>
+    <position name="r_elbow" joint="r_elbow" kp="3" kv="0.08" forcerange="-0.6 0.6"/>
+
+    <position name="l_hip_yaw" joint="l_hip_yaw" kp="6" kv="0.15" forcerange="-1.0 1.0"/>
+    <position name="l_hip_roll" joint="l_hip_roll" kp="15" kv="0.4" forcerange="-2.0 2.0"/>
+    <position name="l_hip_pitch" joint="l_hip_pitch" kp="20" kv="0.5" forcerange="-2.8 2.8"/>
+    <motor name="l_quad" tendon="l_quad" ctrlrange="-400.0 0"/>
+    <motor name="l_ham" tendon="l_ham" ctrlrange="-400.0 0"/>
+    <position name="l_ankle_pitch" joint="l_ankle_pitch" kp="10" kv="0.25" forcerange="-1.5 1.5"/>
+    <position name="l_ankle_roll" joint="l_ankle_roll" kp="8" kv="0.2" forcerange="-1.5 1.5"/>
+    <position name="r_hip_yaw" joint="r_hip_yaw" kp="6" kv="0.15" forcerange="-1.0 1.0"/>
+    <position name="r_hip_roll" joint="r_hip_roll" kp="15" kv="0.4" forcerange="-2.0 2.0"/>
+    <position name="r_hip_pitch" joint="r_hip_pitch" kp="20" kv="0.5" forcerange="-2.8 2.8"/>
+    <motor name="r_quad" tendon="r_quad" ctrlrange="-400.0 0"/>
+    <motor name="r_ham" tendon="r_ham" ctrlrange="-400.0 0"/>
+    <position name="r_ankle_pitch" joint="r_ankle_pitch" kp="10" kv="0.25" forcerange="-1.5 1.5"/>
+    <position name="r_ankle_roll" joint="r_ankle_roll" kp="8" kv="0.2" forcerange="-1.5 1.5"/>
+  </actuator>
+
+  <sensor>
+    <framequat name="imu_quat" objtype="site" objname="imu"/>
+    <subtreecom name="com" body="pelvis"/>
+  </sensor>
+</mujoco>
