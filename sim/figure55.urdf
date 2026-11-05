@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<robot name="figure55">
+  <link name="pelvis">
+    <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.75"/><inertia ixx="0.000562" iyy="0.000242" izz="0.000562" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><box size="0.044 0.084 0.044"/></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><box size="0.044 0.084 0.044"/></geometry></collision>
+  </link>
+  <link name="abdomen__waist_yaw"><inertial><mass value="0.0001"/><inertia ixx="1e-8" iyy="1e-8" izz="1e-8" ixy="0" ixz="0" iyz="0"/></inertial></link>
+  <joint name="waist_yaw" type="revolute"><parent link="pelvis"/><child link="abdomen__waist_yaw"/><origin xyz="0 0 0.035" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-0.8" upper="0.8" effort="1.5" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="abdomen">
+    <inertial><origin xyz="0 0 0.0225" rpy="3.14159 0 0"/><mass value="0.15"/><inertia ixx="0.000128151" iyy="0.000128151" izz="6.11471e-05" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="waist_pitch" type="revolute"><parent link="abdomen__waist_yaw"/><child link="abdomen"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-0.3" upper="0.6" effort="2" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="chest">
+    <inertial><origin xyz="0 0 0.035" rpy="0 0 0"/><mass value="0.55"/><inertia ixx="0.000517917" iyy="0.000368317" izz="0.000437067" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0.035" rpy="0 0 0"/><geometry><box size="0.056 0.08 0.07"/></geometry></visual>
+    <collision><origin xyz="0 0 0.035" rpy="0 0 0"/><geometry><box size="0.056 0.08 0.07"/></geometry></collision>
+  </link>
+  <joint name="chest_fixed" type="fixed"><parent link="abdomen"/><child link="chest"/><origin xyz="0 0 0.05" rpy="0 0 0"/></joint>
+  <link name="neck">
+    <inertial><origin xyz="0 0 0.01" rpy="3.14159 0 0"/><mass value="0.03"/><inertia ixx="4.03113e-06" iyy="4.03113e-06" izz="1.66142e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="neck_yaw" type="revolute"><parent link="chest"/><child link="neck"/><origin xyz="0 0 0.07" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-1" upper="1" effort="0.3" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="head">
+    <inertial><origin xyz="0 0 0.044" rpy="0 0 0"/><mass value="0.25"/><inertia ixx="0.0002116" iyy="0.0002116" izz="0.0002116" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0.044" rpy="0 0 0"/><geometry><sphere radius="0.046"/></geometry></visual>
+    <collision><origin xyz="0 0 0.044" rpy="0 0 0"/><geometry><sphere radius="0.046"/></geometry></collision>
+    <visual><origin xyz="-0.008 0 0.05" rpy="0 0 0"/><geometry><sphere radius="0.051"/></geometry></visual>
+    <visual><origin xyz="0.041 0.016 0.037" rpy="0 0 0"/><geometry><sphere radius="0.01"/></geometry></visual>
+    <visual><origin xyz="0.041 -0.016 0.037" rpy="0 0 0"/><geometry><sphere radius="0.01"/></geometry></visual>
+  </link>
+  <joint name="neck_pitch" type="revolute"><parent link="neck"/><child link="head"/><origin xyz="0 0 0.022" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-0.5" upper="0.6" effort="0.3" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="l_upper_arm__l_shoulder_pitch"><inertial><mass value="0.0001"/><inertia ixx="1e-8" iyy="1e-8" izz="1e-8" ixy="0" ixz="0" iyz="0"/></inertial></link>
+  <joint name="l_shoulder_pitch" type="revolute"><parent link="chest"/><child link="l_upper_arm__l_shoulder_pitch"/><origin xyz="0 0.056 0.041" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-3" upper="1" effort="1" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="l_upper_arm__l_shoulder_roll"><inertial><mass value="0.0001"/><inertia ixx="1e-8" iyy="1e-8" izz="1e-8" ixy="0" ixz="0" iyz="0"/></inertial></link>
+  <joint name="l_shoulder_roll" type="revolute"><parent link="l_upper_arm__l_shoulder_pitch"/><child link="l_upper_arm__l_shoulder_roll"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="1 0 0"/><limit lower="-0.3" upper="2.8" effort="1" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="l_upper_arm">
+    <inertial><origin xyz="0 0 -0.0425" rpy="0 0 0"/><mass value="0.09"/><inertia ixx="7.77423e-05" iyy="7.77423e-05" izz="5.28475e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="l_shoulder_yaw" type="revolute"><parent link="l_upper_arm__l_shoulder_roll"/><child link="l_upper_arm"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-1.5" upper="1.5" effort="0.6" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="l_forearm">
+    <inertial><origin xyz="0 0 -0.0375" rpy="0 0 0"/><mass value="0.05"/><inertia ixx="3.2745e-05" iyy="3.2745e-05" izz="1.96914e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="l_elbow" type="revolute"><parent link="l_upper_arm"/><child link="l_forearm"/><origin xyz="0 0 -0.085" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-2.4" upper="0" effort="0.6" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="l_hand">
+    <inertial><origin xyz="0 0 -0.016" rpy="0 0 0"/><mass value="0.03"/><inertia ixx="4e-06" iyy="3.05e-06" izz="1.93e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 -0.016" rpy="0 0 0"/><geometry><box size="0.014 0.024 0.032"/></geometry></visual>
+    <collision><origin xyz="0 0 -0.016" rpy="0 0 0"/><geometry><box size="0.014 0.024 0.032"/></geometry></collision>
+  </link>
+  <joint name="l_hand_fixed" type="fixed"><parent link="l_forearm"/><child link="l_hand"/><origin xyz="0 0 -0.075" rpy="0 0 0"/></joint>
+  <link name="r_upper_arm__r_shoulder_pitch"><inertial><mass value="0.0001"/><inertia ixx="1e-8" iyy="1e-8" izz="1e-8" ixy="0" ixz="0" iyz="0"/></inertial></link>
+  <joint name="r_shoulder_pitch" type="revolute"><parent link="chest"/><child link="r_upper_arm__r_shoulder_pitch"/><origin xyz="0 -0.056 0.041" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-3" upper="1" effort="1" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="r_upper_arm__r_shoulder_roll"><inertial><mass value="0.0001"/><inertia ixx="1e-8" iyy="1e-8" izz="1e-8" ixy="0" ixz="0" iyz="0"/></inertial></link>
+  <joint name="r_shoulder_roll" type="revolute"><parent link="r_upper_arm__r_shoulder_pitch"/><child link="r_upper_arm__r_shoulder_roll"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="1 0 0"/><limit lower="-2.8" upper="0.3" effort="1" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="r_upper_arm">
+    <inertial><origin xyz="0 0 -0.0425" rpy="0 0 0"/><mass value="0.09"/><inertia ixx="7.77423e-05" iyy="7.77423e-05" izz="5.28475e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="r_shoulder_yaw" type="revolute"><parent link="r_upper_arm__r_shoulder_roll"/><child link="r_upper_arm"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-1.5" upper="1.5" effort="0.6" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="r_forearm">
+    <inertial><origin xyz="0 0 -0.0375" rpy="0 0 0"/><mass value="0.05"/><inertia ixx="3.2745e-05" iyy="3.2745e-05" izz="1.96914e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="r_elbow" type="revolute"><parent link="r_upper_arm"/><child link="r_forearm"/><origin xyz="0 0 -0.085" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-2.4" upper="0" effort="0.6" velocity="12"/><dynamics damping="0.01" friction="0.01"/></joint>
+  <link name="r_hand">
+    <inertial><origin xyz="0 0 -0.016" rpy="0 0 0"/><mass value="0.03"/><inertia ixx="4e-06" iyy="3.05e-06" izz="1.93e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 -0.016" rpy="0 0 0"/><geometry><box size="0.014 0.024 0.032"/></geometry></visual>
+    <collision><origin xyz="0 0 -0.016" rpy="0 0 0"/><geometry><box size="0.014 0.024 0.032"/></geometry></collision>
+  </link>
+  <joint name="r_hand_fixed" type="fixed"><parent link="r_forearm"/><child link="r_hand"/><origin xyz="0 0 -0.075" rpy="0 0 0"/></joint>
+  <link name="l_hip_yaw_link">
+    <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.04"/><inertia ixx="2.304e-06" iyy="2.304e-06" izz="2.304e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.012"/></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.012"/></geometry></collision>
+  </link>
+  <joint name="l_hip_yaw" type="revolute"><parent link="pelvis"/><child link="l_hip_yaw_link"/><origin xyz="0 0.032 -0.015" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-0.6" upper="0.6" effort="1" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="l_hip_roll_link">
+    <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.03"/><inertia ixx="7.68e-07" iyy="7.68e-07" izz="7.68e-07" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.013"/></geometry></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.008"/></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.008"/></geometry></collision>
+  </link>
+  <joint name="l_hip_roll" type="revolute"><parent link="l_hip_yaw_link"/><child link="l_hip_roll_link"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="1 0 0"/><limit lower="-0.4" upper="0.6" effort="2" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="l_thigh">
+    <inertial><origin xyz="0 0 -0.045" rpy="0 0 0"/><mass value="0.21"/><inertia ixx="0.000326422" iyy="0.000326422" izz="3.70539e-05" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 -0.02" rpy="0 0 0"/><geometry><sphere radius="0.019"/></geometry></visual>
+    <collision><origin xyz="0 0 -0.02" rpy="0 0 0"/><geometry><sphere radius="0.019"/></geometry></collision>
+  </link>
+  <joint name="l_hip_pitch" type="revolute"><parent link="l_hip_roll_link"/><child link="l_thigh"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-2.2" upper="0.7" effort="2.8" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="l_shin">
+    <inertial><origin xyz="0 0 -0.0575" rpy="0 0 0"/><mass value="0.1"/><inertia ixx="0.000150979" iyy="0.000150979" izz="8.22864e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="l_knee" type="revolute"><parent link="l_thigh"/><child link="l_shin"/><origin xyz="0 0 -0.115" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="0" upper="2.5" effort="2.8" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="l_ankle_link">
+    <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.01"/><inertia ixx="1.96e-07" iyy="1.96e-07" izz="1.96e-07" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.007"/></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.007"/></geometry></collision>
+  </link>
+  <joint name="l_ankle_pitch" type="revolute"><parent link="l_shin"/><child link="l_ankle_link"/><origin xyz="0 0 -0.115" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1" upper="1" effort="1.5" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="l_foot">
+    <inertial><origin xyz="0.012 0 -0.034" rpy="0 0 0"/><mass value="0.05"/><inertia ixx="8.66667e-06" iyy="1.56e-05" izz="2.30667e-05" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0.012 0 -0.034" rpy="0 0 0"/><geometry><box size="0.06 0.044 0.012"/></geometry></visual>
+    <collision><origin xyz="0.012 0 -0.034" rpy="0 0 0"/><geometry><box size="0.06 0.044 0.012"/></geometry></collision>
+  </link>
+  <joint name="l_ankle_roll" type="revolute"><parent link="l_ankle_link"/><child link="l_foot"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="1 0 0"/><limit lower="-0.4" upper="0.4" effort="1.5" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="r_hip_yaw_link">
+    <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.04"/><inertia ixx="2.304e-06" iyy="2.304e-06" izz="2.304e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.012"/></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.012"/></geometry></collision>
+  </link>
+  <joint name="r_hip_yaw" type="revolute"><parent link="pelvis"/><child link="r_hip_yaw_link"/><origin xyz="0 -0.032 -0.015" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-0.6" upper="0.6" effort="1" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="r_hip_roll_link">
+    <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.03"/><inertia ixx="7.68e-07" iyy="7.68e-07" izz="7.68e-07" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.013"/></geometry></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.008"/></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.008"/></geometry></collision>
+  </link>
+  <joint name="r_hip_roll" type="revolute"><parent link="r_hip_yaw_link"/><child link="r_hip_roll_link"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="1 0 0"/><limit lower="-0.6" upper="0.4" effort="2" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="r_thigh">
+    <inertial><origin xyz="0 0 -0.045" rpy="0 0 0"/><mass value="0.21"/><inertia ixx="0.000326422" iyy="0.000326422" izz="3.70539e-05" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 -0.02" rpy="0 0 0"/><geometry><sphere radius="0.019"/></geometry></visual>
+    <collision><origin xyz="0 0 -0.02" rpy="0 0 0"/><geometry><sphere radius="0.019"/></geometry></collision>
+  </link>
+  <joint name="r_hip_pitch" type="revolute"><parent link="r_hip_roll_link"/><child link="r_thigh"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-2.2" upper="0.7" effort="2.8" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="r_shin">
+    <inertial><origin xyz="0 0 -0.0575" rpy="0 0 0"/><mass value="0.1"/><inertia ixx="0.000150979" iyy="0.000150979" izz="8.22864e-06" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="r_knee" type="revolute"><parent link="r_thigh"/><child link="r_shin"/><origin xyz="0 0 -0.115" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="0" upper="2.5" effort="2.8" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="r_ankle_link">
+    <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.01"/><inertia ixx="1.96e-07" iyy="1.96e-07" izz="1.96e-07" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.007"/></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><sphere radius="0.007"/></geometry></collision>
+  </link>
+  <joint name="r_ankle_pitch" type="revolute"><parent link="r_shin"/><child link="r_ankle_link"/><origin xyz="0 0 -0.115" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1" upper="1" effort="1.5" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+  <link name="r_foot">
+    <inertial><origin xyz="0.012 0 -0.034" rpy="0 0 0"/><mass value="0.05"/><inertia ixx="8.66667e-06" iyy="1.56e-05" izz="2.30667e-05" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0.012 0 -0.034" rpy="0 0 0"/><geometry><box size="0.06 0.044 0.012"/></geometry></visual>
+    <collision><origin xyz="0.012 0 -0.034" rpy="0 0 0"/><geometry><box size="0.06 0.044 0.012"/></geometry></collision>
+  </link>
+  <joint name="r_ankle_roll" type="revolute"><parent link="r_ankle_link"/><child link="r_foot"/><origin xyz="0 0 0" rpy="0 0 0"/><axis xyz="1 0 0"/><limit lower="-0.4" upper="0.4" effort="1.5" velocity="12"/><dynamics damping="0.03" friction="0.01"/></joint>
+</robot>

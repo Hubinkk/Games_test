@@ -39,6 +39,8 @@ python -m mujoco.viewer --mjcf=figure55.xml
 | `figure55.xml` | 模型：24 个关节、约 2.95 kg、每个关节的活动范围和扭矩上限；脚宽 4.4 cm |
 | `figure_test.py` | 三项测试：站立、深蹲、推一下，并对照膝关节 v1 的设计目标 |
 | `figure_stress.py` | 压力测试：快速站起、有无平衡控制器的抗推、单腿站立 |
+| `mjcf_to_urdf.py` | 把模型转换成 URDF（`figure55.urdf`），供 Isaac Sim / Isaac Lab 使用 |
+| `isaac/figure55_cfg.py` | Isaac Lab 机器人配置草稿，详见 `docs/desktop-isaac.md` |
 | `balance.py` | 手写的重心反馈平衡控制器（"脊髓层"的最简版） |
 
 ## 模型里的估算值
