@@ -71,7 +71,8 @@ footer{font-size:12px;color:var(--ink-2);max-width:92ch}
     <p>55 cm 人偶尺寸的手（手掌约 2.2 cm 宽），14 个微型电机经绳驱带动 25 个关节。画面是 MuJoCo 物理仿真逐帧回放，所有指节、手掌、手机屏幕之间都有完整的碰撞计算。拖动画面可以旋转，滚轮或双指缩放。</p>
   </header>
   <div class="tabs" id="tabs">
-    <button data-s="typing" aria-pressed="true">打字 hello</button>
+    <button data-s="fast" aria-pressed="true">快速打字</button>
+    <button data-s="typing" aria-pressed="false">打字 hello（慢速）</button>
     <button data-s="gestures" aria-pressed="false">手势</button>
     <button data-s="pen" aria-pressed="false">握笔</button>
   </div>
@@ -82,7 +83,7 @@ footer{font-size:12px;color:var(--ink-2);max-width:92ch}
         <button id="play">暂停</button>
         <input type="range" id="scrub" min="0" max="0" step="1" value="0" aria-label="时间轴">
         <span class="t" id="time">0.00 / 0.00 s</span>
-        <button id="speed">0.5×</button>
+        <button id="speed">1×</button>
       </div>
     </div>
     <aside class="side">
@@ -121,7 +122,13 @@ function renderResult(scene){const r=$('#result');const sc=D.scenes[scene];
     r.innerHTML=`<div class="eyebrow">打字测试 · 手机屏幕键盘（键宽 5.5 mm）</div>
      <div class="big"><div><b>${hits}/${s.length}</b><span>按对的键</span></div><div><b>${avg.toFixed(2)} mm</b><span>平均误差</span></div><div><b>${mx.toFixed(2)} mm</b><span>最大误差</span></div></div>
      <div class="tw"><table><tr><th>键</th><th>按到</th><th>误差</th><th>按键力</th><th>食指张开</th><th>手腕转</th></tr>
-     ${s.map(x=>`<tr><td>${x.key.toUpperCase()}</td><td class="${x.hit===x.key?'okc':'badc'}">${x.hit?x.hit.toUpperCase():'没按到'}</td><td class="n">${x.error_mm==null?'—':x.error_mm.toFixed(2)+' mm'}</td><td class="n">${x.force_N.toFixed(2)} N</td><td class="n">${x.abd_deg.toFixed(0)}°</td><td class="n">${x.yaw_deg.toFixed(0)}°</td></tr>`).join('')}</table></div>`;}
+     ${s.map(x=>`<tr><td>${x.key==='space'?'空格':x.key.toUpperCase()}</td><td class="${x.hit===x.key?'okc':'badc'}">${x.hit?x.hit.toUpperCase():'没按到'}</td><td class="n">${x.error_mm==null?'—':x.error_mm.toFixed(2)+' mm'}</td><td class="n">${x.force_N.toFixed(2)} N</td><td class="n">${x.abd_deg.toFixed(0)}°</td><td class="n">${x.yaw_deg.toFixed(0)}°</td></tr>`).join('')}</table></div>`;}
+  else if(scene==='fast'){const s=sc.summary;const sp=s.speeds;
+    r.innerHTML=`<div class="eyebrow">快速打字 · "hello how are you" · 单根食指</div>
+     <div class="big"><div><b>${s.cps.toFixed(1)}</b><span>字符/秒</span></div><div><b>${Math.round(s.wpm)}</b><span>词/分</span></div><div><b>${s.hits}/${s.n}</b><span>按对</span></div><div><b>${s.mistouch.length}</b><span>误触</span></div></div>
+     <div class="tw"><table><tr><th>每键用时</th><th>速度</th><th>按对</th><th>误触</th><th>平均误差</th><th>最大误差</th></tr>
+     ${sp.map(x=>`<tr><td class="n">${x.t_key.toFixed(2)} s</td><td class="n">${x.cps.toFixed(1)} 字/秒（${Math.round(x.wpm)} 词/分）</td><td class="n ${x.hits===x.n?'okc':'badc'}">${x.hits}/${x.n}</td><td class="n ${x.mistouch?'badc':'okc'}">${x.mistouch}</td><td class="n">${x.err_mean.toFixed(2)} mm</td><td class="n">${x.err_max.toFixed(2)} mm</td></tr>`).join('')}</table></div>
+     <p class="note">正常聊天大约需要每秒 3–4 个字符。这里只用一根食指；再快就会按偏、按到邻键，或在移动途中擦到别的键（在触摸屏上等于打错字）。速度上限来自定位精度，不是电机转速。</p>`;}
   else if(scene==='gestures'){const ok=sc.events.find(e=>e.type==='ok');
     r.innerHTML=`<div class="eyebrow">手势</div><p class="note" style="color:var(--ink)">张开 → 握拳 → 比 V → 指 → 张开五指 → OK → 张开。</p>
      <div class="big"><div><b>${ok?ok.dist_mm.toFixed(1):'—'} mm</b><span>OK 时两指尖中心距离（小于 4.2 mm 即表面相碰）</span></div></div>
@@ -135,8 +142,8 @@ try{if(T)renderer=new T.WebGLRenderer({antialias:true});}catch(e){}
 if(!renderer)viewer.insertAdjacentHTML('beforeend','<div id="nogl">这个浏览器无法显示三维画面，右侧的测量结果仍然可以查看。</div>');
 let scene,camera,root,meshes=[],keyMeshes={},penIdx=-1;
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-function keyTex(ch){const c=document.createElement('canvas');c.width=88;c.height=64;const x=c.getContext('2d');
-  x.fillStyle='#d6dde8';x.fillRect(0,0,88,64);x.fillStyle='#1c2430';x.font='bold 40px sans-serif';x.textAlign='center';x.textBaseline='middle';
+function keyTex(ch){ch=ch==='space'?'空格':ch;const c=document.createElement('canvas');c.width=88;c.height=64;const x=c.getContext('2d');
+  x.fillStyle='#d6dde8';x.fillRect(0,0,88,64);x.fillStyle='#1c2430';x.font=ch.length>1?'bold 26px sans-serif':'bold 40px sans-serif';x.textAlign='center';x.textBaseline='middle';
   x.save();x.translate(44,32);x.rotate(Math.PI/2);x.fillText(ch.toUpperCase(),0,2);x.restore();return new T.CanvasTexture(c);}
 if(renderer){
   renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));viewer.prepend(renderer.domElement);
@@ -168,7 +175,7 @@ function mergeGeos(gs){ // 简单合并 BufferGeometry（位置与法线）
   const out=new T.BufferGeometry();out.setAttribute('position',new T.Float32BufferAttribute(pos,3));out.setAttribute('normal',new T.Float32BufferAttribute(nor,3));out.setIndex(idx);return out;}
 
 /* ---------- 回放 ---------- */
-const P={scene:'typing',i:0,playing:true,speed:.5,acc:0};
+const P={scene:'fast',i:0,playing:true,speed:1,acc:0};
 function frames(){return D.scenes[P.scene].frames;}
 function show(i){const f=frames()[i];if(!f)return;
   if(renderer){f.g.forEach((g,k)=>{const m=meshes[k];if(!m)return;m.position.set(g[0],g[1],g[2]);m.quaternion.set(g[4],g[5],g[6],g[3]);});
@@ -209,6 +216,6 @@ function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;
     if(P.i>=frames().length){P.i=0;}show(P.i);}
   if(renderer){updCam(dt);renderer.render(scene,camera);}
   requestAnimationFrame(frame);}
-setScene('typing');requestAnimationFrame(frame);
+setScene('fast');requestAnimationFrame(frame);
 })();
 </script>

@@ -51,7 +51,12 @@ def key_layout():
         for c, ch in enumerate(row):
             y = KB_ORIGIN[1] - (len(ROWS[0]) - 1) * KEY_PITCH / 2 + offset + c * KEY_PITCH
             keys[ch] = (x, y)
+    keys[" "] = (KB_ORIGIN[0] - 2 * ROW_PITCH, KB_ORIGIN[1])  # 空格键在最下一行中间
     return keys
+
+
+def key_name(ch):
+    return "space" if ch == " " else ch
 
 
 def cap(name, L, rad, rgba="0.95 0.85 0.79 1"):
@@ -85,8 +90,8 @@ def build():
     fingers = "".join(finger(n, f) for n, f in FINGERS.items())
     keys = key_layout()
     key_geoms = "".join(
-        f'      <geom name="key_{ch}" type="box" pos="{x} {y} 0.00025" size="{KEY_D/2} {KEY_W/2} 0.00025" rgba="0.82 0.86 0.92 1"/>\n'
-        f'      <site name="key_{ch}" pos="{x} {y} 0.0005" size="0.0006"/>\n'
+        f'      <geom name="key_{key_name(ch)}" type="box" pos="{x} {y} 0.00025" size="{KEY_D/2} {(5 * KEY_PITCH - (KEY_PITCH - KEY_W)) / 2 if ch == " " else KEY_W/2} 0.00025" rgba="0.82 0.86 0.92 1"/>\n'
+        f'      <site name="key_{key_name(ch)}" pos="{x} {y} 0.0005" size="0.0006"/>\n'
         for ch, (x, y) in keys.items())
     xml = f"""<mujoco model="hand2">
   <compiler angle="radian" autolimits="true"/>

@@ -45,6 +45,8 @@ class Hand2:
         self.pen = self.m.geom("pen").id
         self.frames, self.events = [], []
         self.min_dist = 0.0
+        self.recording = True
+        self.on_step = None
         self.q = {}  # 当前关节目标
         self.reset()
 
@@ -80,6 +82,8 @@ class Hand2:
         mujoco.mj_step(self.m, self.d)
         if self.d.ncon:
             self.min_dist = min(self.min_dist, float(self.d.contact.dist[:self.d.ncon].min()))
+        if self.on_step:
+            self.on_step()
 
     def run(self, seconds, label=""):
         """以 ctrl 平滑过渡到目标，并按 FPS 记录帧。"""
@@ -97,6 +101,8 @@ class Hand2:
                 self.record(label)
 
     def record(self, label):
+        if not self.recording:
+            return
         m, d = self.m, self.d
         g = []
         for i in range(m.ngeom):
@@ -293,10 +299,10 @@ def max_penetration(h):
     return None
 
 
-def main():
+def main(extra=()):
     h = Hand2()
     scenes = {}
-    for name, fn in (("gestures", scene_gestures), ("typing", scene_typing), ("pen", scene_pen)):
+    for name, fn in (("gestures", scene_gestures), ("typing", scene_typing), ("pen", scene_pen)) + tuple(extra):
         h.frames, h.events, h.min_dist = [], [], 0.0
         res = fn(h)
         print(f"  （{name}：仿真中最深穿透 {-h.min_dist*1000:.2f} mm）")
@@ -313,6 +319,8 @@ def main():
             errs = [r["error_mm"] for r in res if r["error_mm"] is not None]
             if errs:
                 print(f"  平均误差 {np.mean(errs):.2f} mm，最大 {max(errs):.2f} mm；键宽 {hb.KEY_W*1000:.1f} mm")
+            scenes[name]["summary"] = res
+        elif name != "pen":
             scenes[name]["summary"] = res
         else:
             print(f"【握笔】碰到笔的部位：{', '.join(res['touch']) or '无'}")
