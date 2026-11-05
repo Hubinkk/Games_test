@@ -114,8 +114,8 @@ def main():
           f"（手指半径 2.2 mm，两指尖表面{'相碰' if dist <= 4.6 else '没有碰到'}）")
     results["OK"] = {"pulls": {"thumb": pt, "index": pi, "middle": 0, "ringlittle": 0}, "tip_mm": dist}
 
-    print("\n【3】握住直径 11 mm 的圆柱（手指自动包住物体）")
-    grasp = {"thumb": 0, "index": FULL, "middle": FULL, "ringlittle": FULL}
+    print("\n【3】握住直径 10 mm 的圆柱（像握笔，手指自动包住物体）")
+    grasp = {"thumb": 0, "index": 5.0, "middle": 5.0, "ringlittle": 5.0}
     h.reset()
     h.run(grasp, 0.8)
     free = {f: h.joints(f) for f in ("index", "middle", "ring")}

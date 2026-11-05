@@ -1,0 +1,278 @@
+<title>人偶绳驱手</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 版式：左边是可旋转的手（主角），右边是手势按钮、4 个电机的控制和读数 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --m-thumb:#c9772a; --m-index:#2f78bd; --m-middle:#7a5cc4; --m-ring:#23897c; --warn:#cf3b3d;
+  --f-display:"Noto Serif SC","Songti SC",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --m-thumb:#e7a050; --m-index:#62a8ea; --m-middle:#a88cf0; --m-ring:#4cc2b2; --warn:#ff6a6a; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --m-thumb:#e7a050; --m-index:#62a8ea; --m-middle:#a88cf0; --m-ring:#4cc2b2; --warn:#ff6a6a; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+header h1{font-family:var(--f-display);font-size:28px;margin:0;letter-spacing:.04em;line-height:1.25}
+header p{margin:4px 0 0;color:var(--ink-2);max-width:72ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+.viewer{position:relative;background:var(--stage);border:1px solid var(--rule);border-radius:14px;overflow:hidden;height:min(72vh,700px);min-height:400px;touch-action:none;cursor:grab}
+.viewer.drag{cursor:grabbing}
+.viewer canvas{display:block;width:100%;height:100%}
+.ov{position:absolute;font-size:12px;color:var(--ink-2);pointer-events:none}
+.ov.tl{left:12px;top:10px;max-width:calc(100% - 24px)}
+.ov.bl{left:12px;bottom:10px;display:flex;flex-wrap:wrap;gap:4px 12px;max-width:calc(100% - 24px)}
+.ov.bl span{display:inline-flex;align-items:center;gap:5px}
+.ov.bl i{width:14px;height:3px;border-radius:2px;background:var(--c);display:inline-block}
+#status{font-family:var(--f-body);font-size:13px;color:var(--ink);background:color-mix(in srgb,var(--panel) 85%,transparent);border:1px solid var(--rule);border-radius:8px;padding:4px 9px;display:inline-block}
+#nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink-2)}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--ink-2)}
+.gest{display:flex;flex-wrap:wrap;gap:6px}
+.gest button,.ghost{font:inherit;font-size:13px;border:1px solid var(--rule);background:transparent;color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+.gest button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.motor{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:8px 0;border-top:1px solid var(--rule)}
+.motor:first-of-type{border-top:0}
+.motor .nm{display:flex;align-items:center;gap:8px;font-weight:500}
+.motor .nm::before{content:"";width:12px;height:4px;border-radius:2px;background:var(--c)}
+.motor .pl{font-size:12px;color:var(--ink-2);text-align:right}
+.motor input{grid-column:1/-1;width:100%;accent-color:var(--c)}
+.motor .rd{grid-column:1/-1;display:flex;gap:14px;flex-wrap:wrap;font-family:var(--f-data);font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.motor .rd b{color:var(--ink);font-weight:500}
+.bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--rule);overflow:hidden}
+.bar div{height:100%;background:var(--c);width:0}
+.bar div.max{background:var(--warn)}
+.tg{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);font-size:13px;cursor:pointer;margin-right:14px}
+.tg input{accent-color:var(--calm);width:15px;height:15px;margin:0}
+.note{margin:0;color:var(--ink-2);font-size:13px;max-width:62ch}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:5px 6px;border-top:1px solid var(--rule);vertical-align:top}
+th{font-weight:500;color:var(--ink-2);font-size:12px;border-top:0}
+td.n{font-family:var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tw{overflow-x:auto}
+footer{font-size:12px;color:var(--ink-2);max-width:90ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>人偶绳驱手</h1>
+    <p>55 cm 人偶的手：手掌约 2 cm 宽，4 个微型电机藏在前臂和上臂里，用肌腱线拉动手指，手背的弹性带让手指伸直。点手势，或者拖动电机滑块；打开圆柱，可以看到手指如何自动包住物体。拖动画面可以旋转。</p>
+  </header>
+  <main class="grid">
+    <section class="viewer" id="viewer" aria-label="绳驱手三维模型">
+      <div class="ov tl"><span id="status">张开</span></div>
+      <div class="ov bl" id="legend"></div>
+    </section>
+    <aside class="side">
+      <div class="card">
+        <div class="eyebrow">手势</div>
+        <div class="gest" id="gest"></div>
+        <div><label class="tg"><input type="checkbox" id="cyl">显示圆柱（直径 10 mm，像握笔）</label><label class="tg"><input type="checkbox" id="xray" checked>半透明皮肤</label></div>
+      </div>
+      <div class="card" id="motors"><div class="eyebrow">4 个电机 · 拉线长度和线上拉力</div></div>
+      <div class="card">
+        <div class="eyebrow">和 MuJoCo 物理仿真对照</div>
+        <div class="tw"><table>
+          <tr><th>测试</th><th>MuJoCo 结果</th></tr>
+          <tr><td>握拳（拉线 9 mm）</td><td class="n">各关节约 89°，线拉力 15.9 N</td></tr>
+          <tr><td>OK（食指拉 4.5 mm）</td><td class="n">两指尖相碰</td></tr>
+          <tr><td>握直径 10 mm 的圆柱（拉线 5 mm）</td><td class="n">中指、无名指三节都贴住圆柱，线拉力约 9–10 N；食指被拇指挤开</td></tr>
+          <tr><td>电机要求</td><td class="n">绳轮半径 3 mm 时约 50 mN·m</td></tr>
+        </table></div>
+        <p class="note">网页里的手用同一套参数（节长、力臂、弹性带刚度），按静力平衡实时计算。它没有算手指之间的碰撞，所以数值会和 MuJoCo 有几 N 的差别。无名指和小指共用一个电机，中间用一根"平衡杆"分力，两根手指的拉力相等。</p>
+      </div>
+    </aside>
+  </main>
+  <footer>模型来自仓库里的 sim/hand_build.py 和 sim/hand_test.py。尺寸按 55 cm 人偶估算：手指半径 2.2 mm，关节力臂 2.2 / 1.8 / 1.4 mm，绳轮半径 3 mm，电机最大拉力 30 N。</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+/* ---------- 参数（与 sim/hand_params.json 一致，单位 mm） ---------- */
+const F={
+ index:{y:-7.5,len:[7.0,5.0,4.0],r:[2.2,1.8,1.4],max:[1.6,1.8,1.4]},
+ middle:{y:-2.5,len:[7.5,5.5,4.2],r:[2.2,1.8,1.4],max:[1.6,1.8,1.4]},
+ ring:{y:2.5,len:[7.0,5.0,4.0],r:[2.2,1.8,1.4],max:[1.6,1.8,1.4]},
+ little:{y:7.5,len:[5.6,4.2,3.5],r:[2.0,1.6,1.2],max:[1.6,1.8,1.4],rad:1.98},
+ thumb:{y:-11,len:[8.0,6.0],r:[2.0,1.6],max:[1.6,1.8]}};
+const FR=2.2, KPER=0.13 /* 每 N 拉力的弯曲（rad/N）：k=10·r/1.3 */, COMP=1/20 /* 电机伺服柔度 mm/N */, TMAX=30, SPOOL=3;
+const THUMB_BASE={pos:[12,-13,-6.8],euler:[0,.4,.4]};
+const CYL={x:20,z:-8.5,R:5,y:-2.5,half:12};
+const MOTORS=[
+ {id:'thumb',name:'拇指',fingers:['thumb'],place:'前臂',css:'--m-thumb'},
+ {id:'index',name:'食指',fingers:['index'],place:'前臂',css:'--m-index'},
+ {id:'middle',name:'中指',fingers:['middle'],place:'上臂，线穿过肘',css:'--m-middle'},
+ {id:'ringlittle',name:'无名指＋小指',fingers:['ring','little'],place:'上臂，线穿过肘',css:'--m-ring'}];
+const GESTURES=[
+ ['张开',{thumb:0,index:0,middle:0,ringlittle:0},false],
+ ['握拳',{thumb:4.5,index:9,middle:9,ringlittle:8.4},false],
+ ['比 V',{thumb:4.5,index:0,middle:0,ringlittle:8.4},false],
+ ['指',{thumb:4.5,index:0,middle:9,ringlittle:8.4},false],
+ ['OK',{thumb:0,index:4.5,middle:0,ringlittle:0},false],
+ ['握圆柱',{thumb:0,index:4,middle:4,ringlittle:3.4},true]];
+const S={pull:{thumb:0,index:0,middle:0,ringlittle:0},target:{thumb:0,index:0,middle:0,ringlittle:0},cyl:false,xray:true,gesture:'张开',res:{}};
+
+/* ---------- 静力学：拉线 → 拉力 → 关节角 ---------- */
+function segHit(px,pz,qx,qz,rad){ // 线段与圆柱（手指平面内的圆）是否相交
+  const dx=qx-px,dz=qz-pz,l2=dx*dx+dz*dz;let t=((CYL.x-px)*dx+(CYL.z-pz)*dz)/l2;t=Math.max(0,Math.min(1,t));
+  const cx=px+t*dx-CYL.x,cz=pz+t*dz-CYL.z;return Math.hypot(cx,cz)<CYL.R+rad;}
+function anglesAt(name,t){ // 给定单根线的拉力 t，算各关节角（考虑关节极限和圆柱阻挡）
+  const f=F[name],n=f.len.length,th=[],capped=[];
+  const useCyl=S.cyl&&name!=='thumb'&&Math.abs(f.y-CYL.y)<=CYL.half;
+  let px=20,pz=0,phi=0;
+  for(let i=0;i<n;i++){
+    let a=Math.min(KPER*t*(f.r[i]/f.r[i])*1, f.max[i]);let hit=false;
+    if(useCyl){const rad=f.rad||FR;
+      const end=x=>[px+f.len[i]*Math.cos(phi+x),pz-f.len[i]*Math.sin(phi+x)];
+      let e=end(a);if(segHit(px,pz,e[0],e[1],rad)){hit=true;let lo=0,hi=a;
+        if(segHit(px,pz,...end(0),rad)){a=0;}else{for(let k=0;k<14;k++){const m=(lo+hi)/2;segHit(px,pz,...end(m),rad)?hi=m:lo=m;}a=lo;}}}
+    th.push(a);capped.push(hit);phi+=a;px+=f.len[i]*Math.cos(phi);pz-=f.len[i]*Math.sin(phi);}
+  return {th,capped};}
+function excursion(name,t){const f=F[name],a=anglesAt(name,t);return a.th.reduce((s,x,i)=>s+f.r[i]*x,0)+t*COMP;}
+function solveMotor(m,x){ // 电机拉线 x（mm）→ 每根线的拉力 t（平衡杆：多根手指拉力相等）
+  const ex=t=>m.fingers.reduce((s,n)=>s+excursion(n,t),0)/m.fingers.length;
+  const tcap=TMAX/m.fingers.length;
+  if(x<=0)return {t:0,stall:false};
+  if(ex(tcap)<x)return {t:tcap,stall:true};
+  let lo=0,hi=tcap;for(let k=0;k<30;k++){const mid=(lo+hi)/2;ex(mid)<x?lo=mid:hi=mid;}
+  return {t:(lo+hi)/2,stall:false};}
+
+/* ---------- 界面 ---------- */
+$('#gest').innerHTML=GESTURES.map(([n])=>`<button data-g="${n}" aria-pressed="${n==='张开'}">${n}</button>`).join('');
+$('#motors').insertAdjacentHTML('beforeend',MOTORS.map(m=>`<div class="motor" style="--c:var(${m.css})">
+  <span class="nm">${m.name}</span><span class="pl">${m.place}</span>
+  <input type="range" id="sl-${m.id}" min="0" max="11" step="0.1" value="0" aria-label="${m.name}电机拉线长度">
+  <div class="bar"><div id="bar-${m.id}"></div></div>
+  <div class="rd"><span>拉线 <b id="x-${m.id}">0.0</b> mm</span><span>线拉力 <b id="t-${m.id}">0.0</b> N</span><span>绳轮扭矩 <b id="q-${m.id}">0</b> mN·m</span></div></div>`).join(''));
+$('#legend').innerHTML=MOTORS.map(m=>`<span style="--c:var(${m.css})"><i></i>${m.name}的线</span>`).join('')+'<span style="--c:var(--ink-2)"><i></i>手背弹性带</span>';
+function pressGesture(name){[...$('#gest').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.g===name));}
+$('#gest').addEventListener('click',e=>{const b=e.target.closest('[data-g]');if(!b)return;const g=GESTURES.find(x=>x[0]===b.dataset.g);
+  S.gesture=g[0];Object.assign(S.target,g[1]);S.cyl=g[2];$('#cyl').checked=g[2];pressGesture(g[0]);});
+MOTORS.forEach(m=>$('#sl-'+m.id).addEventListener('input',e=>{S.target[m.id]=+e.target.value;S.pull[m.id]=+e.target.value;S.gesture='';pressGesture('');}));
+$('#cyl').addEventListener('change',e=>{S.cyl=e.target.checked;});
+$('#xray').addEventListener('change',e=>{S.xray=e.target.checked;});
+
+/* ---------- 三维 ---------- */
+const viewer=$('#viewer');
+function noGL(msg){viewer.insertAdjacentHTML('beforeend',`<div id="nogl">${msg}</div>`);}
+if(!window.THREE){noGL('三维库没有加载成功，请检查网络后刷新。右侧的控制和读数仍然可用。');}
+const T=window.THREE;let renderer=null;
+try{if(T)renderer=new T.WebGLRenderer({antialias:true});}catch(e){noGL('这个浏览器不支持 WebGL，无法显示三维模型。');}
+let scene,camera,hand,parts={},tubes={},bands={},cylMesh,skinMat,tipMarks=[];
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+if(renderer){
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));viewer.prepend(renderer.domElement);
+  scene=new T.Scene();camera=new T.PerspectiveCamera(30,1,1,2000);
+  scene.add(new T.HemisphereLight(0xffffff,0x8a90a0,.95));const dl=new T.DirectionalLight(0xffffff,.7);dl.position.set(60,120,80);scene.add(dl);
+  const dl2=new T.DirectionalLight(0xc8d0ff,.35);dl2.position.set(-60,-80,-40);scene.add(dl2);
+  hand=new T.Group();hand.rotation.x=-Math.PI/2;scene.add(hand); // 手的坐标与 MuJoCo 一致：+x 指尖方向，+z 手背
+  skinMat=new T.MeshStandardMaterial({color:0xf2d8c8,roughness:.6,transparent:true,opacity:.42,depthWrite:false});
+  const boneMat=new T.MeshStandardMaterial({color:0xe8e4dc,roughness:.7});
+  const pulleyMat=new T.MeshStandardMaterial({color:0xd2961c,roughness:.45,metalness:.2});
+  const motorMat=new T.MeshStandardMaterial({color:0x7d8796,roughness:.4,metalness:.5});
+  const cap=(len,rad,mat)=>{const g=new T.Group();const c=new T.Mesh(new T.CylinderGeometry(rad,rad,len,20),mat);c.rotation.z=-Math.PI/2;c.position.x=len/2;g.add(c);
+    const s1=new T.Mesh(new T.SphereGeometry(rad,16,12),mat);g.add(s1);const s2=s1.clone();s2.position.x=len;g.add(s2);return g;};
+  // 手掌与前臂
+  const palm=new T.Mesh(new T.BoxGeometry(23,22,8),skinMat);palm.position.set(5.5,0,0);hand.add(palm);
+  const palmBone=new T.Mesh(new T.BoxGeometry(20,18,3),boneMat);palmBone.position.set(5.5,0,.5);hand.add(palmBone);
+  const fore=new T.Mesh(new T.CylinderGeometry(8,9.5,60,28),skinMat);fore.rotation.z=Math.PI/2;fore.position.set(-42,0,-.5);hand.add(fore);
+  [['thumb',-30,-3.5],['index',-52,2.5]].forEach(([id,x,y])=>{const mo=new T.Mesh(new T.CylinderGeometry(5,5,22,20),motorMat);mo.rotation.z=Math.PI/2;mo.position.set(x,y,-1);hand.add(mo);
+    const sp=new T.Mesh(new T.CylinderGeometry(3,3,3,20),pulleyMat);sp.rotation.z=Math.PI/2;sp.position.set(x+12.5,y,-1);hand.add(sp);parts['spool_'+id]=sp;});
+  // 手指
+  Object.entries(F).forEach(([name,f])=>{
+    const base=new T.Group();
+    if(name==='thumb'){base.position.set(...THUMB_BASE.pos);base.rotation.set(...THUMB_BASE.euler,'XYZ');}else base.position.set(20,f.y,0);
+    hand.add(base);let par=base;const segs=[];
+    f.len.forEach((L,i)=>{const g=new T.Group();if(i>0)g.position.x=f.len[i-1];par.add(g);
+      g.add(cap(L,f.rad||FR,skinMat));const bone=cap(L,.9,boneMat);g.add(bone);
+      const ring=new T.Mesh(new T.TorusGeometry((f.rad||FR)+.1,.2,8,24),pulleyMat);ring.rotation.y=Math.PI/2;ring.position.x=.8;g.add(ring);
+      segs.push(g);par=g;});
+    const tip=new T.Object3D();tip.position.x=f.len[f.len.length-1];par.add(tip);
+    parts[name]={base,segs,tip};});
+  // 圆柱
+  cylMesh=new T.Mesh(new T.CylinderGeometry(CYL.R,CYL.R,CYL.half*2,32),new T.MeshStandardMaterial({color:0x7fa6d6,transparent:true,opacity:.55,roughness:.3}));
+  cylMesh.position.set(CYL.x,CYL.y,CYL.z);hand.add(cylMesh);
+}
+const MCOL={};function readCols(){MOTORS.forEach(m=>MCOL[m.id]=new T.Color(css(m.css)||'#888'));}
+const tmpV=()=>new T.Vector3();
+function local(obj,x,y,z){const v=new T.Vector3(x,y,z);obj.localToWorld(v);hand.worldToLocal(v);return v;}
+function tendonPoints(name){const f=F[name],p=parts[name],pts=[];
+  const motor=MOTORS.find(m=>m.fingers.includes(name));
+  if(name==='thumb')pts.push(new T.Vector3(-17.5,-3.5,-1));
+  else if(name==='index')pts.push(new T.Vector3(-39.5,2.5,-1));
+  else pts.push(new T.Vector3(-72,name==='middle'?-1:(name==='ring'?3:5),-1.5));
+  pts.push(new T.Vector3(-12,f.y*.6,-3.5));
+  if(name!=='thumb')pts.push(new T.Vector3(17,f.y,-3.5));else pts.push(local(p.base,-2,0,-f.r[0]-.4));
+  p.segs.forEach((g,i)=>{pts.push(local(g,.6,0,-f.r[i]));pts.push(local(g,f.len[i]-.6,0,-f.r[i]));});
+  return pts;}
+function bandPoints(name){const f=F[name],p=parts[name],pts=[];
+  if(name!=='thumb')pts.push(new T.Vector3(14,f.y,4));else pts.push(local(p.base,-2,0,f.r[0]+.3));
+  p.segs.forEach((g,i)=>{pts.push(local(g,.5,0,(f.rad||FR)-.2));pts.push(local(g,f.len[i]-.5,0,(f.rad||FR)-.2));});return pts;}
+function setTube(store,key,pts,rad,color,op){if(store[key]){store[key].geometry.dispose();hand.remove(store[key]);}
+  const geo=new T.TubeGeometry(new T.CatmullRomCurve3(pts,false,'centripetal'),Math.max(24,pts.length*8),rad,6,false);
+  const m=new T.Mesh(geo,new T.MeshBasicMaterial({color,transparent:op<1,opacity:op}));hand.add(m);store[key]=m;}
+
+/* ---------- 相机 ---------- */
+const cam={az:.7,el:-.45,dist:105,gaz:.7,gel:-.45,gdist:105};const tgt=T?new T.Vector3(8,-3,0):null;
+function updCam(dt){const k=Math.min(1,dt*6);cam.az+=(cam.gaz-cam.az)*k;cam.el+=(cam.gel-cam.el)*k;cam.dist+=(cam.gdist-cam.dist)*k;
+  camera.position.set(tgt.x+cam.dist*Math.cos(cam.el)*Math.sin(cam.az),tgt.y+cam.dist*Math.sin(cam.el),tgt.z+cam.dist*Math.cos(cam.el)*Math.cos(cam.az));camera.lookAt(tgt);}
+if(renderer){const el=renderer.domElement,pt=new Map();let mv=0,p0=0;
+  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);mv=0;if(pt.size===2){const [a,b]=[...pt.values()];p0=Math.hypot(a[0]-b[0],a[1]-b[1]);}});
+  el.addEventListener('pointermove',e=>{if(!pt.has(e.pointerId))return;const p=pt.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pt.set(e.pointerId,[e.clientX,e.clientY]);mv+=Math.abs(dx)+Math.abs(dy);
+    if(pt.size===2){const [a,b]=[...pt.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(p0)cam.gdist=Math.min(260,Math.max(40,cam.gdist*p0/d));p0=d;}
+    else if(mv>3){viewer.classList.add('drag');cam.gaz-=dx*.008;cam.gel=Math.max(-1.45,Math.min(1.45,cam.gel+dy*.006));}});
+  const up=e=>{pt.delete(e.pointerId);if(pt.size<2)p0=0;viewer.classList.remove('drag');};
+  el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',e=>{e.preventDefault();cam.gdist=Math.min(260,Math.max(40,cam.gdist*(1+e.deltaY*.0012)));},{passive:false});
+  new ResizeObserver(()=>{const w=viewer.clientWidth,h=viewer.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}).observe(viewer);
+  const theme=()=>{renderer.setClearColor(new T.Color(css('--stage')||'#dfe3e8'));readCols();};
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);
+  new MutationObserver(theme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});theme();}
+
+/* ---------- 主循环 ---------- */
+const NAMES={index:'食指',middle:'中指',ring:'无名指',little:'小指'};
+let last=performance.now(),acc=0;
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  MOTORS.forEach(m=>{S.pull[m.id]+=(S.target[m.id]-S.pull[m.id])*Math.min(1,dt*5);});
+  const touch=[];
+  MOTORS.forEach(m=>{const x=S.pull[m.id],sol=solveMotor(m,x);S.res[m.id]=sol;
+    m.fingers.forEach(n=>{const a=anglesAt(n,sol.t);a.capped.forEach(c=>{if(c&&!touch.includes(NAMES[n]))touch.push(NAMES[n]);});
+      if(renderer)parts[n].segs.forEach((g,i)=>g.rotation.y=a.th[i]);});});
+  if(renderer){
+    skinMat.opacity=S.xray?.42:1;skinMat.depthWrite=!S.xray;skinMat.needsUpdate=true;cylMesh.visible=S.cyl;
+    hand.updateMatrixWorld(true);
+    MOTORS.forEach(m=>{const load=Math.min(1,(S.res[m.id].t*m.fingers.length)/TMAX);
+      m.fingers.forEach(n=>setTube(tubes,n,tendonPoints(n),.32+.25*load,MCOL[m.id],1));
+      if(parts['spool_'+m.id])parts['spool_'+m.id].rotation.x=-S.pull[m.id]/SPOOL;});
+    Object.keys(F).forEach(n=>setTube(bands,n,bandPoints(n),.22,new T.Color(css('--ink-2')||'#888'),.55));
+    updCam(dt);renderer.render(scene,camera);}
+  acc+=dt;if(acc>.1){acc=0;
+    MOTORS.forEach(m=>{const sol=S.res[m.id],tt=sol.t*m.fingers.length;
+      $('#x-'+m.id).textContent=S.pull[m.id].toFixed(1);$('#t-'+m.id).textContent=(m.fingers.length>1?`${tt.toFixed(1)}（每指 ${sol.t.toFixed(1)}）`:tt.toFixed(1));
+      $('#q-'+m.id).textContent=(tt*SPOOL).toFixed(0);const b=$('#bar-'+m.id);b.style.width=Math.min(100,tt/TMAX*100)+'%';b.classList.toggle('max',sol.stall);
+      if(document.activeElement!==$('#sl-'+m.id))$('#sl-'+m.id).value=S.pull[m.id].toFixed(1);});
+    let st=S.gesture||'手动控制';
+    if(renderer){const a=parts.thumb.tip.getWorldPosition(new T.Vector3()),b=parts.index.tip.getWorldPosition(new T.Vector3());
+      const d=a.distanceTo(b);if(S.gesture==='OK'||d<9)st+=` · 拇指与食指指尖中心相距 ${d.toFixed(1)} mm${d<=2*FR+.3?'（相碰）':''}`;}
+    if(S.cyl)st+=touch.length?` · 贴住圆柱：${touch.join('、')}`:' · 还没碰到圆柱';
+    if(MOTORS.some(m=>S.res[m.id].stall))st+=' · 有电机达到最大拉力 30 N';
+    $('#status').textContent=st;}
+  requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+})();
+</script>

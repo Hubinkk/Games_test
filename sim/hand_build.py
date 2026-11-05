@@ -104,8 +104,8 @@ def build():
     <body name="palm" pos="0 0 0.1">
       <geom type="box" pos="0.0055 0 0" size="0.0115 0.011 0.004"/>
 {palm_sites}{bodies}    </body>
-    <body name="target" pos="0.0255 -0.0025 0.0905">
-      <geom name="target" type="cylinder" size="0.0055 0.012" euler="1.5708 0 0" rgba="0.5 0.7 0.9 0.4" contype="2" conaffinity="2"/>
+    <body name="target" pos="0.020 -0.0025 0.0915">
+      <geom name="target" type="cylinder" size="0.005 0.012" euler="1.5708 0 0" rgba="0.5 0.7 0.9 0.4" contype="2" conaffinity="2"/>
     </body>
   </worldbody>
   <tendon>
