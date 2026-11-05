@@ -126,7 +126,7 @@ def run_phase(sim, seconds, pose_fn, push=None):
         sim.step()
         tq = sim.torques()
         for n, v in tq.items():
-            peak[n] = max(peak[n], abs(v))
+            peak[n] = max(peak.get(n, 0.0), abs(v))
         knee_series.append((t, abs(tq["l_knee"]), abs(tq["r_knee"])))
         if fell_at is None and sim.fallen():
             fell_at = t
