@@ -1,0 +1,214 @@
+<title>人偶灵巧手 v2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 版式：左边是 MuJoCo 回放画面和时间轴（主角），右边是测量结果和 14 个电机的线拉力 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --bad:#cf3b3d; --bar:#4a5fa8;
+  --f-display:"Noto Serif SC","Songti SC",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --bad:#ff6a6a; --bar:#93a6ec; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --bad:#ff6a6a; --bar:#93a6ec; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+header h1{font-family:var(--f-display);font-size:28px;margin:0;letter-spacing:.04em;line-height:1.25}
+header p{margin:4px 0 0;color:var(--ink-2);max-width:74ch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button,.ctl button{font:inherit;font-size:13px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.left{display:flex;flex-direction:column;gap:10px;min-width:0}
+.viewer{position:relative;background:var(--stage);border:1px solid var(--rule);border-radius:14px;overflow:hidden;height:min(64vh,620px);min-height:380px;touch-action:none;cursor:grab}
+.viewer.drag{cursor:grabbing}
+.viewer canvas{display:block;width:100%;height:100%}
+#label{position:absolute;left:12px;top:10px;font-size:14px;font-weight:500;background:color-mix(in srgb,var(--panel) 85%,transparent);border:1px solid var(--rule);border-radius:8px;padding:3px 10px}
+#nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink-2)}
+.ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ctl input[type=range]{flex:1 1 200px;accent-color:var(--calm);min-width:0}
+.ctl .t{font-family:var(--f-data);font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;min-width:7.5em}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--ink-2)}
+.big{display:flex;gap:18px;flex-wrap:wrap}
+.big div{display:flex;flex-direction:column}
+.big b{font-family:var(--f-data);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.big span{font-size:12px;color:var(--ink-2)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:4px 6px;border-top:1px solid var(--rule)}
+th{font-weight:500;color:var(--ink-2);font-size:12px;border-top:0}
+td.n{font-family:var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+.okc{color:var(--ok);font-weight:500}.badc{color:var(--bad);font-weight:500}
+.tw{overflow-x:auto}
+.acts{display:flex;flex-direction:column;gap:8px}
+.grp{display:flex;flex-direction:column;gap:3px}
+.grp h4{margin:0;font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.grp h4 span{font-weight:400;color:var(--ink-2);font-size:12px}
+.row{display:grid;grid-template-columns:7.5em minmax(0,1fr) 4.2em;gap:8px;align-items:center;font-size:12.5px}
+.row .b{height:6px;border-radius:3px;background:var(--rule);overflow:hidden}
+.row .b div{height:100%;background:var(--bar);width:0}
+.row .v{font-family:var(--f-data);font-size:12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.note{margin:0;color:var(--ink-2);font-size:13px;max-width:64ch}
+footer{font-size:12px;color:var(--ink-2);max-width:92ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>人偶灵巧手 v2</h1>
+    <p>55 cm 人偶尺寸的手（手掌约 2.2 cm 宽），14 个微型电机经绳驱带动 25 个关节。画面是 MuJoCo 物理仿真逐帧回放，所有指节、手掌、手机屏幕之间都有完整的碰撞计算。拖动画面可以旋转，滚轮或双指缩放。</p>
+  </header>
+  <div class="tabs" id="tabs">
+    <button data-s="typing" aria-pressed="true">打字 hello</button>
+    <button data-s="gestures" aria-pressed="false">手势</button>
+    <button data-s="pen" aria-pressed="false">握笔</button>
+  </div>
+  <main class="grid">
+    <div class="left">
+      <section class="viewer" id="viewer" aria-label="手部仿真回放"><div id="label">—</div></section>
+      <div class="ctl">
+        <button id="play">暂停</button>
+        <input type="range" id="scrub" min="0" max="0" step="1" value="0" aria-label="时间轴">
+        <span class="t" id="time">0.00 / 0.00 s</span>
+        <button id="speed">0.5×</button>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card" id="result"></div>
+      <div class="card"><div class="eyebrow">14 个电机 · 此刻的线拉力</div><div class="acts" id="acts"></div></div>
+      <div class="card">
+        <div class="eyebrow">怎么做到的</div>
+        <p class="note">打字时，手臂（肩和肘）只负责粗定位，每两个键挪一档；最后几毫米由手腕左右转动、食指张开和弯曲一起完成，位置由逆运动学实时计算。其余手指收起，拇指贴在手侧，避免先碰到屏幕。</p>
+        <p class="note">手机触摸屏是电容式的，只要碰到就算，所以按键力很小也能输入。控制器带重力补偿，否则手的自重会让指尖下沉约 2 mm，按不准。</p>
+      </div>
+    </aside>
+  </main>
+  <footer>数据来自仓库里的 sim/hand2_build.py 和 sim/hand2_demo.py。指节半径 2 mm，关节力臂 1.5–4 mm，每个手指电机最大线拉力 15 N，手腕 30 N。仿真里的接触是"软接触"，三个场景的最深穿透为 0.07–0.40 mm。</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="hand2_frames.js"></script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const D=window.HAND2;
+if(!D){document.querySelector('#viewer').insertAdjacentHTML('beforeend','<div id="nogl">仿真数据没有加载成功，请刷新页面。</div>');return;}
+const GROUPS=[
+ ['食指',['index_mcp','index_pip','index_abd'],['根部弯曲','中节＋末节','左右张开']],
+ ['中指',['middle_mcp','middle_pip','middle_abd'],['根部弯曲','中节＋末节','左右张开']],
+ ['无名指＋小指',['ring_flex','little_flex','spread'],['无名指弯曲','小指弯曲','张开']],
+ ['拇指',['thumb_opp','thumb_cmc','thumb_flex'],['对掌旋转','根部弯曲','中节＋末节']],
+ ['手腕',['wrist_pitch','wrist_yaw'],['上下','左右']]];
+const PLACE={'食指':'前臂','中指':'前臂','无名指＋小指':'上臂','拇指':'前臂','手腕':'上臂'};
+$('#acts').innerHTML=GROUPS.map(([g,ids,names])=>`<div class="grp"><h4>${g}<span>电机在${PLACE[g]}</span></h4>${ids.map((id,i)=>`<div class="row"><span>${names[i]}</span><div class="b"><div id="b-${id}"></div></div><span class="v" id="v-${id}">0.0 N</span></div>`).join('')}</div>`).join('');
+
+/* ---------- 测量结果卡片 ---------- */
+function renderResult(scene){const r=$('#result');const sc=D.scenes[scene];
+  if(scene==='typing'){const s=sc.summary;const hits=s.filter(x=>x.hit===x.key).length;const errs=s.map(x=>x.error_mm).filter(x=>x!=null);
+    const avg=errs.reduce((a,b)=>a+b,0)/errs.length,mx=Math.max(...errs);
+    r.innerHTML=`<div class="eyebrow">打字测试 · 手机屏幕键盘（键宽 5.5 mm）</div>
+     <div class="big"><div><b>${hits}/${s.length}</b><span>按对的键</span></div><div><b>${avg.toFixed(2)} mm</b><span>平均误差</span></div><div><b>${mx.toFixed(2)} mm</b><span>最大误差</span></div></div>
+     <div class="tw"><table><tr><th>键</th><th>按到</th><th>误差</th><th>按键力</th><th>食指张开</th><th>手腕转</th></tr>
+     ${s.map(x=>`<tr><td>${x.key.toUpperCase()}</td><td class="${x.hit===x.key?'okc':'badc'}">${x.hit?x.hit.toUpperCase():'没按到'}</td><td class="n">${x.error_mm==null?'—':x.error_mm.toFixed(2)+' mm'}</td><td class="n">${x.force_N.toFixed(2)} N</td><td class="n">${x.abd_deg.toFixed(0)}°</td><td class="n">${x.yaw_deg.toFixed(0)}°</td></tr>`).join('')}</table></div>`;}
+  else if(scene==='gestures'){const ok=sc.events.find(e=>e.type==='ok');
+    r.innerHTML=`<div class="eyebrow">手势</div><p class="note" style="color:var(--ink)">张开 → 握拳 → 比 V → 指 → 张开五指 → OK → 张开。</p>
+     <div class="big"><div><b>${ok?ok.dist_mm.toFixed(1):'—'} mm</b><span>OK 时两指尖中心距离（小于 4.2 mm 即表面相碰）</span></div></div>
+     <p class="note">比 V 和张开五指用到了手指的左右张开；OK 时拇指的位置由逆运动学搜索得到。</p>`;}
+  else{r.innerHTML=`<div class="eyebrow">握笔 · 直径 6 mm</div><p class="note" style="color:var(--ink)">四指和拇指同时弯曲去包住笔。</p>
+     <p class="note">目前只有食指、中指、无名指的指尖碰到笔，拇指没有碰到，还不是稳定的抓握。这是 v2 尚未解决的问题：拇指的对掌位置还需要专门为握笔调整。</p>`;}}
+
+/* ---------- 三维 ---------- */
+const viewer=$('#viewer');const T=window.THREE;let renderer=null;
+try{if(T)renderer=new T.WebGLRenderer({antialias:true});}catch(e){}
+if(!renderer)viewer.insertAdjacentHTML('beforeend','<div id="nogl">这个浏览器无法显示三维画面，右侧的测量结果仍然可以查看。</div>');
+let scene,camera,root,meshes=[],keyMeshes={},penIdx=-1;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function keyTex(ch){const c=document.createElement('canvas');c.width=88;c.height=64;const x=c.getContext('2d');
+  x.fillStyle='#d6dde8';x.fillRect(0,0,88,64);x.fillStyle='#1c2430';x.font='bold 40px sans-serif';x.textAlign='center';x.textBaseline='middle';
+  x.save();x.translate(44,32);x.rotate(Math.PI/2);x.fillText(ch.toUpperCase(),0,2);x.restore();return new T.CanvasTexture(c);}
+if(renderer){
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));viewer.prepend(renderer.domElement);
+  scene=new T.Scene();camera=new T.PerspectiveCamera(30,1,1,3000);
+  scene.add(new T.HemisphereLight(0xffffff,0x8a90a0,.95));const dl=new T.DirectionalLight(0xffffff,.7);dl.position.set(40,120,90);scene.add(dl);
+  const dl2=new T.DirectionalLight(0xc8d0ff,.3);dl2.position.set(-60,40,-80);scene.add(dl2);
+  root=new T.Group();root.rotation.x=-Math.PI/2;scene.add(root); // MuJoCo z 朝上 → three y 朝上
+  D.geoms.forEach((g,i)=>{let geo;const s=g.size;
+    if(g.type===2)geo=new T.SphereGeometry(s[0],20,14);
+    else if(g.type===3){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],18);geo.rotateX(Math.PI/2);
+      const a=new T.SphereGeometry(s[0],16,12);a.translate(0,0,s[1]);const b=new T.SphereGeometry(s[0],16,12);b.translate(0,0,-s[1]);
+      geo=mergeGeos([geo,a,b]);}
+    else if(g.type===5){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],24);geo.rotateX(Math.PI/2);}
+    else if(g.type===6)geo=new T.BoxGeometry(2*s[0],2*s[1],2*s[2]);
+    else{meshes.push(null);return;}
+    let mat;
+    if(g.name.startsWith('key_')){mat=[0,1,2,3].map(()=>new T.MeshStandardMaterial({color:0xd6dde8,roughness:.6}));
+      const top=new T.MeshStandardMaterial({map:keyTex(g.name.slice(4)),roughness:.6});mat.splice(4,0,top);keyMeshes[g.name.slice(4)]=mat;}
+    else mat=new T.MeshStandardMaterial({color:new T.Color(g.rgba[0],g.rgba[1],g.rgba[2]),roughness:.55,transparent:g.name==='forearm',opacity:g.name==='forearm'?.6:1});
+    if(g.name==='pen'){mat.transparent=false;mat.opacity=1;penIdx=i;}
+    const m=new T.Mesh(geo,mat);root.add(m);meshes.push(m);});
+}
+function mergeGeos(gs){ // 简单合并 BufferGeometry（位置与法线）
+  const pos=[],nor=[],idx=[];let off=0;
+  gs.forEach(g=>{const ng=g.index?g:g;const p=ng.attributes.position,n=ng.attributes.normal;
+    for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));nor.push(n.getX(i),n.getY(i),n.getZ(i));}
+    if(ng.index)for(let i=0;i<ng.index.count;i++)idx.push(ng.index.getX(i)+off);else for(let i=0;i<p.count;i++)idx.push(i+off);
+    off+=p.count;});
+  const out=new T.BufferGeometry();out.setAttribute('position',new T.Float32BufferAttribute(pos,3));out.setAttribute('normal',new T.Float32BufferAttribute(nor,3));out.setIndex(idx);return out;}
+
+/* ---------- 回放 ---------- */
+const P={scene:'typing',i:0,playing:true,speed:.5,acc:0};
+function frames(){return D.scenes[P.scene].frames;}
+function show(i){const f=frames()[i];if(!f)return;
+  if(renderer){f.g.forEach((g,k)=>{const m=meshes[k];if(!m)return;m.position.set(g[0],g[1],g[2]);m.quaternion.set(g[4],g[5],g[6],g[3]);});
+    if(penIdx>=0)meshes[penIdx].visible=P.scene==='pen';
+    Object.values(keyMeshes).forEach(ms=>ms.forEach((mm,j)=>{if(j!==4)mm.color.setHex(0xd6dde8);}));
+    const ev=D.scenes[P.scene].events.filter(e=>e.type==='key'&&Math.abs(e.t-f.t)<0.25);
+    ev.forEach(e=>{const ms=keyMeshes[e.key];if(ms)ms.forEach((mm,j)=>{if(j!==4)mm.color.set(e.hit===e.key?css('--ok'):css('--bad'));});});}
+  $('#label').textContent=f.label||'—';
+  D.actuators.forEach(a=>{const lim=a.startsWith('wrist')?D.t_max.wrist:D.t_max.finger;const v=f.ten[a]||0;
+    const b=$('#b-'+a);if(b)b.style.width=Math.min(100,v/lim*100)+'%';const t=$('#v-'+a);if(t)t.textContent=v.toFixed(1)+' N';});
+  $('#scrub').value=i;const tot=frames().length/30;$('#time').textContent=`${(i/30).toFixed(2)} / ${tot.toFixed(2)} s`;}
+function setScene(s){P.scene=s;P.i=0;$('#scrub').max=frames().length-1;[...$('#tabs').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===s));renderResult(s);show(0);}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b){setScene(b.dataset.s);P.playing=true;$('#play').textContent='暂停';}});
+$('#play').addEventListener('click',()=>{P.playing=!P.playing;$('#play').textContent=P.playing?'暂停':'播放';if(P.playing&&P.i>=frames().length-1)P.i=0;});
+$('#scrub').addEventListener('input',e=>{P.i=+e.target.value;P.playing=false;$('#play').textContent='播放';show(P.i);});
+const SPEEDS=[.25,.5,1];$('#speed').addEventListener('click',()=>{P.speed=SPEEDS[(SPEEDS.indexOf(P.speed)+1)%3];$('#speed').textContent=P.speed+'×';});
+
+/* ---------- 相机 ---------- */
+const cam={az:.45,el:.32,dist:150,gaz:.45,gel:.32,gdist:150};const tgt=T?new T.Vector3(30,6,0):null;
+function updCam(dt){const k=Math.min(1,dt*6);cam.az+=(cam.gaz-cam.az)*k;cam.el+=(cam.gel-cam.el)*k;cam.dist+=(cam.gdist-cam.dist)*k;
+  camera.position.set(tgt.x+cam.dist*Math.cos(cam.el)*Math.sin(cam.az),tgt.y+cam.dist*Math.sin(cam.el),tgt.z+cam.dist*Math.cos(cam.el)*Math.cos(cam.az));camera.lookAt(tgt);}
+if(renderer){const el=renderer.domElement,pt=new Map();let mv=0,p0=0;
+  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);mv=0;if(pt.size===2){const [a,b]=[...pt.values()];p0=Math.hypot(a[0]-b[0],a[1]-b[1]);}});
+  el.addEventListener('pointermove',e=>{if(!pt.has(e.pointerId))return;const p=pt.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pt.set(e.pointerId,[e.clientX,e.clientY]);mv+=Math.abs(dx)+Math.abs(dy);
+    if(pt.size===2){const [a,b]=[...pt.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(p0)cam.gdist=Math.min(320,Math.max(35,cam.gdist*p0/d));p0=d;}
+    else if(mv>3){viewer.classList.add('drag');cam.gaz-=dx*.008;cam.gel=Math.max(-1.45,Math.min(1.45,cam.gel+dy*.006));}});
+  const up=e=>{pt.delete(e.pointerId);if(pt.size<2)p0=0;viewer.classList.remove('drag');};
+  el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',e=>{e.preventDefault();cam.gdist=Math.min(320,Math.max(35,cam.gdist*(1+e.deltaY*.0012)));},{passive:false});
+  new ResizeObserver(()=>{const w=viewer.clientWidth,h=viewer.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}).observe(viewer);
+  const theme=()=>renderer.setClearColor(new T.Color(css('--stage')||'#dfe3e8'));
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);
+  new MutationObserver(theme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});theme();}
+
+let last=performance.now();
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;
+  if(P.playing){P.acc+=dt*30*P.speed;while(P.acc>=1){P.acc-=1;P.i++;}
+    if(P.i>=frames().length){P.i=0;}show(P.i);}
+  if(renderer){updCam(dt);renderer.render(scene,camera);}
+  requestAnimationFrame(frame);}
+setScene('typing');requestAnimationFrame(frame);
+})();
+</script>

@@ -1,0 +1,217 @@
+<mujoco model="hand2">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.0005" integrator="implicitfast" cone="elliptic" noslip_iterations="3"/>
+  <default>
+    <joint damping="0.0004" armature="2e-7"/>
+    <geom contype="1" conaffinity="1" density="1100" friction="1.0 0.01 0.001" solref="0.004 1" solimp="0.95 0.99 0.0005"/>
+    <site size="0.0005" rgba="0.2 0.5 0.9 1"/>
+  </default>
+  <worldbody>
+    <light pos="0.05 0 0.3" dir="0 0 -1"/>
+    <!-- 手机：屏幕表面 z = 0 -->
+    <body name="phone" pos="0 0 0">
+      <geom name="phone" type="box" pos="0.040 0 -0.002" size="0.022 0.036 0.002" rgba="0.15 0.17 0.22 1"/>
+      <geom name="key_q" type="box" pos="0.049 -0.029249999999999998 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_q" pos="0.049 -0.029249999999999998 0.0005" size="0.0006"/>
+      <geom name="key_w" type="box" pos="0.049 -0.02275 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_w" pos="0.049 -0.02275 0.0005" size="0.0006"/>
+      <geom name="key_e" type="box" pos="0.049 -0.01625 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_e" pos="0.049 -0.01625 0.0005" size="0.0006"/>
+      <geom name="key_r" type="box" pos="0.049 -0.009749999999999998 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_r" pos="0.049 -0.009749999999999998 0.0005" size="0.0006"/>
+      <geom name="key_t" type="box" pos="0.049 -0.0032499999999999994 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_t" pos="0.049 -0.0032499999999999994 0.0005" size="0.0006"/>
+      <geom name="key_y" type="box" pos="0.049 0.003250000000000003 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_y" pos="0.049 0.003250000000000003 0.0005" size="0.0006"/>
+      <geom name="key_u" type="box" pos="0.049 0.009750000000000002 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_u" pos="0.049 0.009750000000000002 0.0005" size="0.0006"/>
+      <geom name="key_i" type="box" pos="0.049 0.01625 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_i" pos="0.049 0.01625 0.0005" size="0.0006"/>
+      <geom name="key_o" type="box" pos="0.049 0.02275 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_o" pos="0.049 0.02275 0.0005" size="0.0006"/>
+      <geom name="key_p" type="box" pos="0.049 0.029249999999999998 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_p" pos="0.049 0.029249999999999998 0.0005" size="0.0006"/>
+      <geom name="key_a" type="box" pos="0.04 -0.026 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_a" pos="0.04 -0.026 0.0005" size="0.0006"/>
+      <geom name="key_s" type="box" pos="0.04 -0.0195 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_s" pos="0.04 -0.0195 0.0005" size="0.0006"/>
+      <geom name="key_d" type="box" pos="0.04 -0.013 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_d" pos="0.04 -0.013 0.0005" size="0.0006"/>
+      <geom name="key_f" type="box" pos="0.04 -0.006499999999999999 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_f" pos="0.04 -0.006499999999999999 0.0005" size="0.0006"/>
+      <geom name="key_g" type="box" pos="0.04 0.0 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_g" pos="0.04 0.0 0.0005" size="0.0006"/>
+      <geom name="key_h" type="box" pos="0.04 0.006500000000000002 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_h" pos="0.04 0.006500000000000002 0.0005" size="0.0006"/>
+      <geom name="key_j" type="box" pos="0.04 0.013000000000000001 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_j" pos="0.04 0.013000000000000001 0.0005" size="0.0006"/>
+      <geom name="key_k" type="box" pos="0.04 0.0195 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_k" pos="0.04 0.0195 0.0005" size="0.0006"/>
+      <geom name="key_l" type="box" pos="0.04 0.026 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_l" pos="0.04 0.026 0.0005" size="0.0006"/>
+      <geom name="key_z" type="box" pos="0.031 -0.019499999999999997 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_z" pos="0.031 -0.019499999999999997 0.0005" size="0.0006"/>
+      <geom name="key_x" type="box" pos="0.031 -0.012999999999999998 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_x" pos="0.031 -0.012999999999999998 0.0005" size="0.0006"/>
+      <geom name="key_c" type="box" pos="0.031 -0.006499999999999997 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_c" pos="0.031 -0.006499999999999997 0.0005" size="0.0006"/>
+      <geom name="key_v" type="box" pos="0.031 3.469446951953614e-18 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_v" pos="0.031 3.469446951953614e-18 0.0005" size="0.0006"/>
+      <geom name="key_b" type="box" pos="0.031 0.006500000000000002 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_b" pos="0.031 0.006500000000000002 0.0005" size="0.0006"/>
+      <geom name="key_n" type="box" pos="0.031 0.013000000000000005 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_n" pos="0.031 0.013000000000000005 0.0005" size="0.0006"/>
+      <geom name="key_m" type="box" pos="0.031 0.019500000000000003 0.00025" size="0.00375 0.00275 0.00025" rgba="0.82 0.86 0.92 1"/>
+      <site name="key_m" pos="0.031 0.019500000000000003 0.0005" size="0.0006"/>
+    </body>
+    <!-- 手臂（代表肩和肘）：三个滑动关节把手送到目标附近 -->
+    <body name="arm" pos="0.0 0.0 0.02">
+      <joint name="arm_x" type="slide" axis="1 0 0" range="-0.03 0.06"/>
+      <joint name="arm_y" type="slide" axis="0 1 0" range="-0.05 0.05"/>
+      <joint name="arm_z" type="slide" axis="0 0 1" range="-0.015 0.03"/>
+      <geom name="forearm" type="capsule" fromto="-0.075 0 0 -0.014 0 0" size="0.0075" rgba="0.92 0.9 0.95 1" contype="0" conaffinity="0" mass="0.06"/>
+      <body name="palm">
+        <joint name="wrist_pitch" axis="0 1 0" range="-0.9 0.9"/>
+        <joint name="wrist_yaw" axis="0 0 1" range="-0.5 0.5"/>
+        <geom name="palm" type="box" pos="0.0055 0 0" size="0.0115 0.011 0.0035" rgba="0.95 0.85 0.79 1"/>
+        <geom name="wrist" type="sphere" pos="-0.012 0 0" size="0.0065" rgba="0.95 0.85 0.79 1" contype="0" conaffinity="0"/>
+
+        <body name="index1" pos="0.019 -0.0075 0">
+          <joint name="index_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="index_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="index_g1" type="capsule" fromto="0 0 0 0.007 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+          <body name="index2" pos="0.007 0 0">
+            <joint name="index_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="index_g2" type="capsule" fromto="0 0 0 0.005 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+            <body name="index3" pos="0.005 0 0">
+              <joint name="index_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="index_g3" type="capsule" fromto="0 0 0 0.004 0 0" size="0.0019" rgba="0.95 0.85 0.79 1"/>
+              <site name="index_tip" pos="0.004 0 0"/>
+              <site name="index_pad" pos="0.0024 0 -0.0019"/>
+              <site name="index_tap" pos="0.0057 0 -0.0006"/>
+            </body>
+          </body>
+        </body>
+        <body name="middle1" pos="0.019 -0.0025 0">
+          <joint name="middle_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="middle_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="middle_g1" type="capsule" fromto="0 0 0 0.0075 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+          <body name="middle2" pos="0.0075 0 0">
+            <joint name="middle_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="middle_g2" type="capsule" fromto="0 0 0 0.0055 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+            <body name="middle3" pos="0.0055 0 0">
+              <joint name="middle_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="middle_g3" type="capsule" fromto="0 0 0 0.0042 0 0" size="0.0019" rgba="0.95 0.85 0.79 1"/>
+              <site name="middle_tip" pos="0.0042 0 0"/>
+              <site name="middle_pad" pos="0.0025199999999999997 0 -0.0019"/>
+              <site name="middle_tap" pos="0.0059 0 -0.0006"/>
+            </body>
+          </body>
+        </body>
+        <body name="ring1" pos="0.019 0.0025 0">
+          <joint name="ring_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="ring_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="ring_g1" type="capsule" fromto="0 0 0 0.007 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+          <body name="ring2" pos="0.007 0 0">
+            <joint name="ring_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="ring_g2" type="capsule" fromto="0 0 0 0.005 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+            <body name="ring3" pos="0.005 0 0">
+              <joint name="ring_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="ring_g3" type="capsule" fromto="0 0 0 0.004 0 0" size="0.0019" rgba="0.95 0.85 0.79 1"/>
+              <site name="ring_tip" pos="0.004 0 0"/>
+              <site name="ring_pad" pos="0.0024 0 -0.0019"/>
+              <site name="ring_tap" pos="0.0057 0 -0.0006"/>
+            </body>
+          </body>
+        </body>
+        <body name="little1" pos="0.019 0.0075 0">
+          <joint name="little_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="little_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="little_g1" type="capsule" fromto="0 0 0 0.0056 0 0" size="0.0018" rgba="0.95 0.85 0.79 1"/>
+          <body name="little2" pos="0.0056 0 0">
+            <joint name="little_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="little_g2" type="capsule" fromto="0 0 0 0.0042 0 0" size="0.0018" rgba="0.95 0.85 0.79 1"/>
+            <body name="little3" pos="0.0042 0 0">
+              <joint name="little_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="little_g3" type="capsule" fromto="0 0 0 0.0035 0 0" size="0.00171" rgba="0.95 0.85 0.79 1"/>
+              <site name="little_tip" pos="0.0035 0 0"/>
+              <site name="little_pad" pos="0.0021 0 -0.00171"/>
+              <site name="little_tap" pos="0.00503 0 -0.00054"/>
+            </body>
+          </body>
+        </body>
+        <body name="thumb1" pos="0.001 -0.0105 -0.0025" euler="0 0 -0.6">
+          <joint name="thumb_opp" axis="1 0 0" range="-0.2 1.6" stiffness="0.002"/>
+          <joint name="thumb_cmc" axis="0 1 0" range="-0.4 1.0" stiffness="0.002"/>
+          <geom name="thumb_g1" type="capsule" fromto="0 0 0 0.009 0 0" size="0.0021" rgba="0.95 0.85 0.79 1"/>
+          <body name="thumb2" pos="0.009 0 0">
+            <joint name="thumb_mcp" axis="0 1 0" range="0 1.2" stiffness="0.0015"/>
+            <geom name="thumb_g2" type="capsule" fromto="0 0 0 0.0065 0 0" size="0.0021" rgba="0.95 0.85 0.79 1"/>
+            <body name="thumb3" pos="0.0065 0 0">
+              <joint name="thumb_ip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="thumb_g3" type="capsule" fromto="0 0 0 0.005 0 0" size="0.001995" rgba="0.95 0.85 0.79 1"/>
+              <site name="thumb_tip" pos="0.005 0 0"/>
+              <site name="thumb_pad" pos="0.003 0 -0.001995"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="pen" pos="0.026 -0.0025 0.008">
+      <geom name="pen" type="cylinder" size="0.003 0.012" euler="1.5708 0 0" rgba="0.55 0.7 0.92 1" contype="2" conaffinity="2"/>
+    </body>
+  </worldbody>
+
+  <contact>
+    <exclude body1="palm" body2="index1"/><exclude body1="palm" body2="middle1"/>
+    <exclude body1="palm" body2="ring1"/><exclude body1="palm" body2="little1"/>
+    <exclude body1="palm" body2="thumb1"/>
+  </contact>
+
+  <equality>
+    <!-- 指尖节与中间节联动（和真人一样，DIP ≈ 0.75 × PIP） -->
+    <joint joint1="index_dip" joint2="index_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="middle_dip" joint2="middle_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="ring_dip" joint2="ring_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="little_dip" joint2="little_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="thumb_ip" joint2="thumb_mcp" polycoef="0 1.0 0 0 0"/>
+    <joint joint1="ring_abd" joint2="little_abd" polycoef="0 0.4 0 0 0"/>
+  </equality>
+
+  <tendon>
+    <fixed name="index_mcp"><joint joint="index_mcp" coef="0.0022"/></fixed>
+    <fixed name="index_pip"><joint joint="index_pip" coef="0.0018"/></fixed>
+    <fixed name="index_abd"><joint joint="index_abd" coef="0.0015"/></fixed>
+    <fixed name="middle_mcp"><joint joint="middle_mcp" coef="0.0022"/></fixed>
+    <fixed name="middle_pip"><joint joint="middle_pip" coef="0.0018"/></fixed>
+    <fixed name="middle_abd"><joint joint="middle_abd" coef="0.0015"/></fixed>
+    <fixed name="ring_flex"><joint joint="ring_mcp" coef="0.0022"/><joint joint="ring_pip" coef="0.0018"/></fixed>
+    <fixed name="little_flex"><joint joint="little_mcp" coef="0.0022"/><joint joint="little_pip" coef="0.0018"/></fixed>
+    <fixed name="spread"><joint joint="little_abd" coef="0.0015"/></fixed>
+    <fixed name="thumb_opp"><joint joint="thumb_opp" coef="0.002"/></fixed>
+    <fixed name="thumb_cmc"><joint joint="thumb_cmc" coef="0.002"/></fixed>
+    <fixed name="thumb_flex"><joint joint="thumb_mcp" coef="0.002"/></fixed>
+    <fixed name="wrist_pitch"><joint joint="wrist_pitch" coef="0.004"/></fixed>
+    <fixed name="wrist_yaw"><joint joint="wrist_yaw" coef="0.004"/></fixed>
+  </tendon>
+
+  <actuator>
+    <position name="index_mcp" tendon="index_mcp" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="index_pip" tendon="index_pip" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="index_abd" tendon="index_abd" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="middle_mcp" tendon="middle_mcp" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="middle_pip" tendon="middle_pip" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="middle_abd" tendon="middle_abd" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="ring_flex" tendon="ring_flex" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="little_flex" tendon="little_flex" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="spread" tendon="spread" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="thumb_opp" tendon="thumb_opp" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="thumb_cmc" tendon="thumb_cmc" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="thumb_flex" tendon="thumb_flex" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="wrist_pitch" tendon="wrist_pitch" kp="6000" kv="12" forcerange="-30.0 30.0"/>
+    <position name="wrist_yaw" tendon="wrist_yaw" kp="6000" kv="12" forcerange="-30.0 30.0"/>
+    <position name="arm_x" joint="arm_x" kp="400" kv="25" forcerange="-20 20"/>
+    <position name="arm_y" joint="arm_y" kp="400" kv="25" forcerange="-20 20"/>
+    <position name="arm_z" joint="arm_z" kp="400" kv="25" forcerange="-20 20"/>
+  </actuator>
+</mujoco>
