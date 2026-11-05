@@ -1,0 +1,168 @@
+<mujoco model="hand55">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.0005" integrator="implicitfast"/>
+  <default>
+    <joint damping="0.0004" armature="2e-7"/>
+    <geom contype="1" conaffinity="1" density="1100" rgba="0.95 0.85 0.79 1"/>
+    <site size="0.0006" rgba="0.2 0.5 0.9 1"/>
+  </default>
+  <worldbody>
+    <light pos="0 0 0.3" dir="0 0 -1"/>
+    <body name="palm" pos="0 0 0.1">
+      <geom type="box" pos="0.0055 0 0" size="0.0115 0.011 0.004"/>
+      <site name="wrist_index" pos="-0.012 -0.0045 -0.0035"/>
+      <site name="palm_index" pos="0.017 -0.0075 -0.0035"/>
+      <site name="wrist_middle" pos="-0.012 -0.0015 -0.0035"/>
+      <site name="palm_middle" pos="0.017 -0.0025 -0.0035"/>
+      <site name="wrist_ring" pos="-0.012 0.0015 -0.0035"/>
+      <site name="palm_ring" pos="0.017 0.0025 -0.0035"/>
+      <site name="wrist_little" pos="-0.012 0.0045 -0.0035"/>
+      <site name="palm_little" pos="0.017 0.0075 -0.0035"/>
+      <site name="wrist_thumb" pos="-0.012 -0.0048 -0.0035"/>
+<body name="index_base" pos="0.020 -0.0075 0">
+  <geom name="index_pulley0" type="cylinder" size="0.0022 0.0015" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="index_side0" pos="0 0 -0.0066"/>
+<body name="index0">
+  <joint name="index_j0" axis="0 1 0" range="0 1.6" stiffness="0.016923" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.007 0 0" size="0.0022"/>
+  <site name="index_s0a" pos="0.00175 0 -0.0022"/>
+  <site name="index_s0b" pos="0.00525 0 -0.0022"/>
+  <geom name="index_pulley1" type="cylinder" size="0.0018 0.0015" pos="0.007 0 0" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="index_side1" pos="0.007 0 -0.0054"/>
+<body name="index1" pos="0.007 0 0">
+  <joint name="index_j1" axis="0 1 0" range="0 1.8" stiffness="0.013846" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.005 0 0" size="0.0022"/>
+  <site name="index_s1a" pos="0.00125 0 -0.0018"/>
+  <site name="index_s1b" pos="0.00375 0 -0.0018"/>
+  <geom name="index_pulley2" type="cylinder" size="0.0014 0.0015" pos="0.005 0 0" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="index_side2" pos="0.005 0 -0.0042"/>
+<body name="index2" pos="0.005 0 0">
+  <joint name="index_j2" axis="0 1 0" range="0 1.4" stiffness="0.010769" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.004 0 0" size="0.0022"/>
+  <site name="index_s2a" pos="0.001 0 -0.0014"/>
+  <site name="index_s2b" pos="0.003 0 -0.0014"/>
+  <site name="index_tip" pos="0.004 0 0"/>
+</body>
+</body>
+</body>
+</body>
+<body name="middle_base" pos="0.020 -0.0025 0">
+  <geom name="middle_pulley0" type="cylinder" size="0.0022 0.0015" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="middle_side0" pos="0 0 -0.0066"/>
+<body name="middle0">
+  <joint name="middle_j0" axis="0 1 0" range="0 1.6" stiffness="0.016923" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.0075 0 0" size="0.0022"/>
+  <site name="middle_s0a" pos="0.001875 0 -0.0022"/>
+  <site name="middle_s0b" pos="0.005625 0 -0.0022"/>
+  <geom name="middle_pulley1" type="cylinder" size="0.0018 0.0015" pos="0.0075 0 0" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="middle_side1" pos="0.0075 0 -0.0054"/>
+<body name="middle1" pos="0.0075 0 0">
+  <joint name="middle_j1" axis="0 1 0" range="0 1.8" stiffness="0.013846" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.0055 0 0" size="0.0022"/>
+  <site name="middle_s1a" pos="0.001375 0 -0.0018"/>
+  <site name="middle_s1b" pos="0.004125 0 -0.0018"/>
+  <geom name="middle_pulley2" type="cylinder" size="0.0014 0.0015" pos="0.0055 0 0" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="middle_side2" pos="0.0055 0 -0.0042"/>
+<body name="middle2" pos="0.0055 0 0">
+  <joint name="middle_j2" axis="0 1 0" range="0 1.4" stiffness="0.010769" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.0042 0 0" size="0.0022"/>
+  <site name="middle_s2a" pos="0.00105 0 -0.0014"/>
+  <site name="middle_s2b" pos="0.00315 0 -0.0014"/>
+  <site name="middle_tip" pos="0.0042 0 0"/>
+</body>
+</body>
+</body>
+</body>
+<body name="ring_base" pos="0.020 0.0025 0">
+  <geom name="ring_pulley0" type="cylinder" size="0.0022 0.0015" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="ring_side0" pos="0 0 -0.0066"/>
+<body name="ring0">
+  <joint name="ring_j0" axis="0 1 0" range="0 1.6" stiffness="0.016923" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.007 0 0" size="0.0022"/>
+  <site name="ring_s0a" pos="0.00175 0 -0.0022"/>
+  <site name="ring_s0b" pos="0.00525 0 -0.0022"/>
+  <geom name="ring_pulley1" type="cylinder" size="0.0018 0.0015" pos="0.007 0 0" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="ring_side1" pos="0.007 0 -0.0054"/>
+<body name="ring1" pos="0.007 0 0">
+  <joint name="ring_j1" axis="0 1 0" range="0 1.8" stiffness="0.013846" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.005 0 0" size="0.0022"/>
+  <site name="ring_s1a" pos="0.00125 0 -0.0018"/>
+  <site name="ring_s1b" pos="0.00375 0 -0.0018"/>
+  <geom name="ring_pulley2" type="cylinder" size="0.0014 0.0015" pos="0.005 0 0" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="ring_side2" pos="0.005 0 -0.0042"/>
+<body name="ring2" pos="0.005 0 0">
+  <joint name="ring_j2" axis="0 1 0" range="0 1.4" stiffness="0.010769" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.004 0 0" size="0.0022"/>
+  <site name="ring_s2a" pos="0.001 0 -0.0014"/>
+  <site name="ring_s2b" pos="0.003 0 -0.0014"/>
+  <site name="ring_tip" pos="0.004 0 0"/>
+</body>
+</body>
+</body>
+</body>
+<body name="little_base" pos="0.020 0.0075 0">
+  <geom name="little_pulley0" type="cylinder" size="0.002 0.0015" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="little_side0" pos="0 0 -0.006"/>
+<body name="little0">
+  <joint name="little_j0" axis="0 1 0" range="0 1.6" stiffness="0.015385" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.0056 0 0" size="0.00198"/>
+  <site name="little_s0a" pos="0.0014 0 -0.002"/>
+  <site name="little_s0b" pos="0.0042 0 -0.002"/>
+  <geom name="little_pulley1" type="cylinder" size="0.0016 0.0015" pos="0.0056 0 0" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="little_side1" pos="0.0056 0 -0.0048000000000000004"/>
+<body name="little1" pos="0.0056 0 0">
+  <joint name="little_j1" axis="0 1 0" range="0 1.8" stiffness="0.012308" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.0042 0 0" size="0.00198"/>
+  <site name="little_s1a" pos="0.00105 0 -0.0016"/>
+  <site name="little_s1b" pos="0.00315 0 -0.0016"/>
+  <geom name="little_pulley2" type="cylinder" size="0.0012 0.0015" pos="0.0042 0 0" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="little_side2" pos="0.0042 0 -0.0036"/>
+<body name="little2" pos="0.0042 0 0">
+  <joint name="little_j2" axis="0 1 0" range="0 1.4" stiffness="0.0092308" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.0035 0 0" size="0.00198"/>
+  <site name="little_s2a" pos="0.000875 0 -0.0012"/>
+  <site name="little_s2b" pos="0.002625 0 -0.0012"/>
+  <site name="little_tip" pos="0.0035 0 0"/>
+</body>
+</body>
+</body>
+</body>
+<body name="thumb_base" pos="0.012 -0.013 -0.0068" euler="0.0 0.4 0.4">
+  <geom name="thumb_pulley0" type="cylinder" size="0.002 0.0015" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="thumb_side0" pos="0 0 -0.006"/>
+<body name="thumb0">
+  <joint name="thumb_j0" axis="0 1 0" range="0 1.6" stiffness="0.015385" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.008 0 0" size="0.0022"/>
+  <site name="thumb_s0a" pos="0.002 0 -0.002"/>
+  <site name="thumb_s0b" pos="0.006 0 -0.002"/>
+  <geom name="thumb_pulley1" type="cylinder" size="0.0016 0.0015" pos="0.008 0 0" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+  <site name="thumb_side1" pos="0.008 0 -0.0048000000000000004"/>
+<body name="thumb1" pos="0.008 0 0">
+  <joint name="thumb_j1" axis="0 1 0" range="0 1.8" stiffness="0.012308" springref="0"/>
+  <geom type="capsule" fromto="0 0 0 0.006 0 0" size="0.0022"/>
+  <site name="thumb_s1a" pos="0.0015 0 -0.0016"/>
+  <site name="thumb_s1b" pos="0.0045000000000000005 0 -0.0016"/>
+  <site name="thumb_tip" pos="0.006 0 0"/>
+</body>
+</body>
+</body>
+    </body>
+    <body name="target" pos="0.0255 -0.0025 0.0905">
+      <geom name="target" type="cylinder" size="0.0055 0.012" euler="1.5708 0 0" rgba="0.5 0.7 0.9 0.4" contype="2" conaffinity="2"/>
+    </body>
+  </worldbody>
+  <tendon>
+    <fixed name="index"><joint joint="index_j0" coef="-0.0022"/><joint joint="index_j1" coef="-0.0018"/><joint joint="index_j2" coef="-0.0014"/></fixed>
+    <fixed name="middle"><joint joint="middle_j0" coef="-0.0022"/><joint joint="middle_j1" coef="-0.0018"/><joint joint="middle_j2" coef="-0.0014"/></fixed>
+    <fixed name="ring"><joint joint="ring_j0" coef="-0.0022"/><joint joint="ring_j1" coef="-0.0018"/><joint joint="ring_j2" coef="-0.0014"/></fixed>
+    <fixed name="little"><joint joint="little_j0" coef="-0.002"/><joint joint="little_j1" coef="-0.0016"/><joint joint="little_j2" coef="-0.0012"/></fixed>
+    <fixed name="thumb"><joint joint="thumb_j0" coef="-0.002"/><joint joint="thumb_j1" coef="-0.0016"/></fixed>
+  </tendon>
+  <actuator>
+    <position name="thumb_motor" tendon="thumb" kp="20000" kv="20" forcerange="-30.0 0" ctrlrange="-0.03 0"/>
+    <position name="index_motor" tendon="index" kp="20000" kv="20" forcerange="-30.0 0" ctrlrange="-0.03 0"/>
+    <position name="middle_motor" tendon="middle" kp="20000" kv="20" forcerange="-30.0 0" ctrlrange="-0.03 0"/>
+    <position name="ring_motor" tendon="ring" kp="20000" kv="20" forcerange="-30.0 0" ctrlrange="-0.03 0"/>
+    <position name="little_motor" tendon="little" kp="20000" kv="20" forcerange="-30.0 0" ctrlrange="-0.03 0"/>
+  </actuator>
+</mujoco>

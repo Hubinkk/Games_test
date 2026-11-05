@@ -1,0 +1,80 @@
+{
+ "张开": {
+  "pulls": {
+   "thumb": 0,
+   "index": 0,
+   "middle": 0,
+   "ringlittle": 0
+  },
+  "tension": {
+   "thumb": -0.0,
+   "index": -0.0,
+   "middle": -0.0,
+   "ring": -0.0,
+   "little": -0.0
+  }
+ },
+ "握拳": {
+  "pulls": {
+   "thumb": 4.5,
+   "index": 9.0,
+   "middle": 9.0,
+   "ringlittle": 9.0
+  },
+  "tension": {
+   "thumb": 8.689028948423072,
+   "index": 13.039192493120595,
+   "middle": 12.932267814562493,
+   "ring": 13.039192493120595,
+   "little": 15.859094458652464
+  }
+ },
+ "比 V": {
+  "pulls": {
+   "thumb": 4.5,
+   "index": 0,
+   "middle": 0,
+   "ringlittle": 9.0
+  },
+  "tension": {
+   "thumb": 8.689028948423072,
+   "index": -0.0,
+   "middle": -0.0,
+   "ring": 13.039192493120595,
+   "little": 15.859094458652436
+  }
+ },
+ "指": {
+  "pulls": {
+   "thumb": 4.5,
+   "index": 0,
+   "middle": 9.0,
+   "ringlittle": 9.0
+  },
+  "tension": {
+   "thumb": 8.689028948423072,
+   "index": -0.0,
+   "middle": 12.932267814562636,
+   "ring": 13.039192493120908,
+   "little": 15.859094458652464
+  }
+ },
+ "OK": {
+  "pulls": {
+   "thumb": 0.0,
+   "index": 4.5,
+   "middle": 0,
+   "ringlittle": 0
+  },
+  "tip_mm": 1.0638934205492647
+ },
+ "grasp": {
+  "tension": {
+   "thumb": -0.0,
+   "index": 12.092529758879294,
+   "middle": 11.952178762791561,
+   "ring": 12.092521985770674,
+   "little": 15.498454768655677
+  }
+ }
+}
