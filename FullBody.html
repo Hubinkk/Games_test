@@ -1,0 +1,195 @@
+<title>人偶整体</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 版式：左边是 MuJoCo 回放画面和时间轴（主角），右边是测量结果和 14 个电机的线拉力 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --bad:#cf3b3d; --bar:#4a5fa8;
+  --f-display:"Noto Serif SC","Songti SC",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --bad:#ff6a6a; --bar:#93a6ec; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --bad:#ff6a6a; --bar:#93a6ec; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+header h1{font-family:var(--f-display);font-size:28px;margin:0;letter-spacing:.04em;line-height:1.25}
+header p{margin:4px 0 0;color:var(--ink-2);max-width:74ch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button,.ctl button{font:inherit;font-size:13px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.left{display:flex;flex-direction:column;gap:10px;min-width:0}
+.viewer{position:relative;background:var(--stage);border:1px solid var(--rule);border-radius:14px;overflow:hidden;height:min(64vh,620px);min-height:380px;touch-action:none;cursor:grab}
+.viewer.drag{cursor:grabbing}
+.viewer canvas{display:block;width:100%;height:100%}
+#label{position:absolute;left:12px;top:10px;font-size:14px;font-weight:500;background:color-mix(in srgb,var(--panel) 85%,transparent);border:1px solid var(--rule);border-radius:8px;padding:3px 10px}
+#nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink-2)}
+.ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ctl input[type=range]{flex:1 1 200px;accent-color:var(--calm);min-width:0}
+.ctl .t{font-family:var(--f-data);font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;min-width:7.5em}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--ink-2)}
+.big{display:flex;gap:18px;flex-wrap:wrap}
+.big div{display:flex;flex-direction:column}
+.big b{font-family:var(--f-data);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.big span{font-size:12px;color:var(--ink-2)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:4px 6px;border-top:1px solid var(--rule)}
+th{font-weight:500;color:var(--ink-2);font-size:12px;border-top:0}
+td.n{font-family:var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+.okc{color:var(--ok);font-weight:500}.badc{color:var(--bad);font-weight:500}
+.tw{overflow-x:auto}
+.acts{display:flex;flex-direction:column;gap:8px}
+.grp{display:flex;flex-direction:column;gap:3px}
+.grp h4{margin:0;font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.grp h4 span{font-weight:400;color:var(--ink-2);font-size:12px}
+.row{display:grid;grid-template-columns:7.5em minmax(0,1fr) 4.2em;gap:8px;align-items:center;font-size:12.5px}
+.row .b{height:6px;border-radius:3px;background:var(--rule);overflow:hidden}
+.row .b div{height:100%;background:var(--bar);width:0}
+.row .v{font-family:var(--f-data);font-size:12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.note{margin:0;color:var(--ink-2);font-size:13px;max-width:64ch}
+footer{font-size:12px;color:var(--ink-2);max-width:92ch}
+.parts{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;font-size:13px}
+.parts span:nth-child(even){font-family:var(--f-data);color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>人偶整体</h1>
+    <p>55 cm、3.17 kg 的二次元人偶机器人，把目前所有部件合在一起：24 个身体关节、绳驱膝（股四头肌 / 腘绳肌两根线）、两只 6 电机手、4.4 cm 宽的脚，计算单元在头里，30 Wh 电池在背包里。画面是 MuJoCo 物理仿真逐帧回放。拖动画面可以旋转，滚轮或双指缩放。</p>
+  </header>
+  <div class="tabs" id="tabs">
+    <button data-s="walk" aria-pressed="true">走路</button>
+    <button data-s="gesture" aria-pressed="false">挥手与手势</button>
+    <button data-s="squat" aria-pressed="false">站立与深蹲</button>
+    <button data-s="single" aria-pressed="false">单腿站立</button>
+  </div>
+  <main class="grid">
+    <div class="left">
+      <section class="viewer" id="viewer" aria-label="整体仿真回放"><div id="label">—</div></section>
+      <div class="ctl">
+        <button id="play">暂停</button>
+        <input type="range" id="scrub" min="0" max="0" step="1" value="0" aria-label="时间轴">
+        <span class="t" id="time">0.00 / 0.00 s</span>
+        <button id="speed">1×</button>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card" id="result"></div>
+      <div class="card"><div class="eyebrow">此刻的受力</div><div class="acts" id="acts"></div></div>
+      <div class="card">
+        <div class="eyebrow">零件放在哪里（体积预算的推荐方案）</div>
+        <div class="parts">
+          <span>头：屏幕眼睛、摄像头、计算单元</span><span>0.30 kg</span>
+          <span>胸腔：肩电机、两只手的 12 个电机和锁、控制器</span><span>0.62 kg</span>
+          <span>背包：30 Wh 电池</span><span>0.20 kg</span>
+          <span>腹部：腰部电机</span><span>0.21 kg</span>
+          <span>骨盆：6 个髋关节电机</span><span>0.50 kg</span>
+          <span>大腿：膝绳轮电机 + 踝的两个电机</span><span>每条 0.26 kg</span>
+          <span>小腿、脚：拉杆、肌腱线、足底传感</span><span>每条 0.18 kg</span>
+          <span>手：只有指节和线，电机在胸腔</span><span>每只约 0.01 kg</span>
+        </div>
+        <p class="note">整合时发现：身体变重、重心变高以后，站立相当于一个倒立摆，踝关节的控制刚度要从 10 提高到 25 N·m/rad，否则站着就会慢慢往后倒。</p>
+      </div>
+    </aside>
+  </main>
+  <footer>数据来自仓库里的 sim/full_build.py 和 sim/full_demo.py。身体控制沿用之前的代码（重心反馈平衡、静步行），手部用 6 电机手的控制方式。</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="full_frames.js"></script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const D=window.FULL;
+if(!D){$('#viewer').insertAdjacentHTML('beforeend','<div id="nogl">仿真数据没有加载成功，请刷新页面。</div>');return;}
+const BARS=[['quad_l','左膝前线（股四头肌）拉力','N',250],['quad_r','右膝前线（股四头肌）拉力','N',250],['hip_l','左髋俯仰','N·m',2.8],['hip_r','右髋俯仰','N·m',2.8],
+ ['ankle_l','左踝俯仰','N·m',1.5],['ankle_r','右踝俯仰','N·m',1.5],['hand_l','左手电机最大线拉力','N',15],['hand_r','右手电机最大线拉力','N',15],['tilt','躯干倾斜','°',30]];
+$('#acts').innerHTML=BARS.map(([k,n])=>`<div class="row" style="grid-template-columns:11em minmax(0,1fr) 5em"><span>${n}</span><div class="b"><div id="b-${k}"></div></div><span class="v" id="v-${k}">0</span></div>`).join('');
+const R=D.results;
+const TXT={
+ squat:()=>`<div class="eyebrow">站立与深蹲</div><div class="big"><div><b>${R.squat.fell?'摔倒':'完成'}</b><span>结果</span></div><div><b>${R.squat.quad_peak_N.toFixed(0)} N</b><span>膝前线最大拉力</span></div><div><b>${R.squat.knee_peak_Nm.toFixed(2)}</b><span>膝关节 N·m</span></div></div><p class="note">绳驱膝：大腿里的电机带动绳轮，前线相当于股四头肌。深蹲到 1.6 rad 再站起。</p>`,
+ single:()=>`<div class="eyebrow">单腿站立</div><div class="big"><div><b>${R.single.fell?'摔倒':'站住'}</b><span>结果</span></div><div><b>${R.single.hip_roll_peak_Nm.toFixed(2)}</b><span>髋侧摆 N·m</span></div><div><b>${R.single.ankle_roll_peak_Nm.toFixed(2)}</b><span>踝侧摆 N·m</span></div></div><p class="note">重心先移到左脚，再大幅抬起右腿。靠 4.4 cm 宽的脚和重心反馈平衡站住。</p>`,
+ walk:()=>`<div class="eyebrow">走路 · 静步行 6 步</div><div class="big"><div><b>${R.walk.fell?'摔倒':'走完'}</b><span>结果</span></div><div><b>${R.walk.dx_cm.toFixed(1)} cm</b><span>前进</span></div><div><b>${R.walk.quad_peak_N.toFixed(0)} N</b><span>膝前线最大拉力</span></div><div><b>${R.walk.hip_peak_Nm.toFixed(2)}</b><span>髋俯仰 N·m</span></div></div><p class="note">每一步都先把重心移到支撑脚上方再迈腿，所以很慢；自然的动步行要在台式机上用强化学习训练。</p>`,
+ gesture:()=>`<div class="eyebrow">挥手与手势</div><div class="big"><div><b>${R.gesture.fell?'摔倒':'站稳'}</b><span>全程</span></div><div><b>${R.gesture.ok_ik_err_mm.toFixed(1)} mm</b><span>OK 指尖误差</span></div></div><p class="note">右臂举起挥手，右手 张开 → 比 V → OK，左手握拳。手臂举起后重心偏移，由平衡控制器补偿。</p>`};
+
+const viewer=$('#viewer');const T=window.THREE;let renderer=null;
+try{if(T)renderer=new T.WebGLRenderer({antialias:true});}catch(e){}
+if(!renderer)viewer.insertAdjacentHTML('beforeend','<div id="nogl">这个浏览器无法显示三维画面，右侧的结果仍然可以查看。</div>');
+let scene,camera,root,meshes=[];
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function mergeGeos(gs){const pos=[],nor=[],idx=[];let off=0;
+  gs.forEach(g=>{const p=g.attributes.position,n=g.attributes.normal;for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));nor.push(n.getX(i),n.getY(i),n.getZ(i));}
+    if(g.index)for(let i=0;i<g.index.count;i++)idx.push(g.index.getX(i)+off);else for(let i=0;i<p.count;i++)idx.push(i+off);off+=p.count;});
+  const out=new T.BufferGeometry();out.setAttribute('position',new T.Float32BufferAttribute(pos,3));out.setAttribute('normal',new T.Float32BufferAttribute(nor,3));out.setIndex(idx);return out;}
+if(renderer){
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));viewer.prepend(renderer.domElement);
+  scene=new T.Scene();camera=new T.PerspectiveCamera(30,1,5,10000);
+  scene.add(new T.HemisphereLight(0xffffff,0x8a90a0,.95));const dl=new T.DirectionalLight(0xffffff,.7);dl.position.set(300,800,500);scene.add(dl);
+  root=new T.Group();root.rotation.x=-Math.PI/2;scene.add(root);
+  D.geoms.forEach(g=>{let geo;const s=g.size;
+    if(g.type===0){geo=new T.PlaneGeometry(1200,1200);}
+    else if(g.type===2)geo=new T.SphereGeometry(s[0],22,16);
+    else if(g.type===3){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],18);geo.rotateX(Math.PI/2);
+      const a=new T.SphereGeometry(s[0],16,12);a.translate(0,0,s[1]);const b=new T.SphereGeometry(s[0],16,12);b.translate(0,0,-s[1]);geo=mergeGeos([geo,a,b]);}
+    else if(g.type===5){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],24);geo.rotateX(Math.PI/2);}
+    else if(g.type===6)geo=new T.BoxGeometry(2*s[0],2*s[1],2*s[2]);
+    else if(g.type===4){geo=new T.SphereGeometry(1,22,16);geo.scale(s[0],s[1],s[2]);}
+    else{meshes.push(null);return;}
+    const col=g.type===0?new T.Color(css('--rule')||'#cdd3da'):new T.Color(g.rgba[0],g.rgba[1],g.rgba[2]);
+    const mat=new T.MeshStandardMaterial({color:col,roughness:.6,transparent:g.rgba[3]<1,opacity:g.rgba[3]<1?Math.max(.15,g.rgba[3]):1});
+    if(g.name.endsWith('pulley')){mat.color.setHex(0xd2961c);}
+    const m=new T.Mesh(geo,mat);root.add(m);meshes.push(m);});
+}
+const P={scene:'walk',i:0,playing:true,speed:1,acc:0};
+const F=()=>D.scenes[P.scene].frames;
+function show(i){const f=F()[i];if(!f)return;
+  if(renderer)f.g.forEach((g,k)=>{const m=meshes[k];if(!m)return;m.position.set(g[0],g[1],g[2]);m.quaternion.set(g[4],g[5],g[6],g[3]);});
+  $('#label').textContent=f.label||'—';
+  BARS.forEach(([k,,u,lim])=>{const v=f.v[k]||0;const b=$('#b-'+k);if(b)b.style.width=Math.min(100,v/lim*100)+'%';const t=$('#v-'+k);if(t)t.textContent=(u==='N'?v.toFixed(0):v.toFixed(2))+' '+u;});
+  $('#scrub').value=i;$('#time').textContent=`${(i/30).toFixed(2)} / ${(F().length/30).toFixed(2)} s`;}
+function setScene(s){P.scene=s;P.i=0;$('#scrub').max=F().length-1;[...$('#tabs').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===s));$('#result').innerHTML=TXT[s]();
+  if(s==='gesture'){cam.gaz=.35;cam.gel=.2;cam.gdist=1250;}else{cam.gaz=.9;cam.gel=.25;cam.gdist=1500;}show(0);}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b){setScene(b.dataset.s);P.playing=true;$('#play').textContent='暂停';}});
+$('#play').addEventListener('click',()=>{P.playing=!P.playing;$('#play').textContent=P.playing?'暂停':'播放';if(P.playing&&P.i>=F().length-1)P.i=0;});
+$('#scrub').addEventListener('input',e=>{P.i=+e.target.value;P.playing=false;$('#play').textContent='播放';show(P.i);});
+const SPEEDS=[.25,.5,1,2];$('#speed').addEventListener('click',()=>{P.speed=SPEEDS[(SPEEDS.indexOf(P.speed)+1)%4];$('#speed').textContent=P.speed+'×';});
+const cam={az:.9,el:.25,dist:1500,gaz:.9,gel:.25,gdist:1500};
+function updCam(dt){const k=Math.min(1,dt*5);cam.az+=(cam.gaz-cam.az)*k;cam.el+=(cam.gel-cam.el)*k;cam.dist+=(cam.gdist-cam.dist)*k;
+  const f=F()[P.i];let cx=0,cz=0;if(f){const pv=f.g[1];cx=pv[0];cz=-pv[1];}
+  const tgt=new T.Vector3(cx,260,cz);
+  camera.position.set(tgt.x+cam.dist*Math.cos(cam.el)*Math.sin(cam.az),tgt.y+cam.dist*Math.sin(cam.el),tgt.z+cam.dist*Math.cos(cam.el)*Math.cos(cam.az));camera.lookAt(tgt);}
+if(renderer){const el=renderer.domElement,pt=new Map();let mv=0,p0=0;
+  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);mv=0;if(pt.size===2){const [a,b]=[...pt.values()];p0=Math.hypot(a[0]-b[0],a[1]-b[1]);}});
+  el.addEventListener('pointermove',e=>{if(!pt.has(e.pointerId))return;const p=pt.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pt.set(e.pointerId,[e.clientX,e.clientY]);mv+=Math.abs(dx)+Math.abs(dy);
+    if(pt.size===2){const [a,b]=[...pt.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(p0)cam.gdist=Math.min(4000,Math.max(200,cam.gdist*p0/d));p0=d;}
+    else if(mv>3){viewer.classList.add('drag');cam.gaz-=dx*.008;cam.gel=Math.max(-1.2,Math.min(1.45,cam.gel+dy*.006));}});
+  const up=e=>{pt.delete(e.pointerId);if(pt.size<2)p0=0;viewer.classList.remove('drag');};
+  el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',e=>{e.preventDefault();cam.gdist=Math.min(4000,Math.max(200,cam.gdist*(1+e.deltaY*.0012)));},{passive:false});
+  new ResizeObserver(()=>{const w=viewer.clientWidth,h=viewer.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}).observe(viewer);
+  const theme=()=>renderer.setClearColor(new T.Color(css('--stage')||'#dfe3e8'));
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);
+  new MutationObserver(theme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});theme();}
+let last=performance.now();
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;
+  if(P.playing){P.acc+=dt*30*P.speed;while(P.acc>=1){P.acc-=1;P.i++;}if(P.i>=F().length)P.i=0;show(P.i);}
+  if(renderer){updCam(dt);renderer.render(scene,camera);}
+  requestAnimationFrame(frame);}
+setScene('walk');requestAnimationFrame(frame);
+})();
+</script>
