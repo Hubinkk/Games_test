@@ -153,16 +153,19 @@ const PARTS=[
 {id:'neck',st:3,layer:'joint',f:'ok',name:'颈部（三支链并联）',why:'歪头、点头、转头是角色最重要的表情之一。',how:'三条小连杆从下方托住头部，驱动器放在胸腔顶部。',can:'动作快而稳，头部不承担电机的重量。',limit:'转头角度受连杆限制，大约左右各 60°。'},
 {id:'wrist',st:3,layer:'tendon',f:'hard',name:'腕关节（肌腱驱动）',why:'手腕细是二次元比例的特征，装不下电机。',how:'驱动器在前臂根部，用纤维肌腱拉动手腕。',can:'手腕细，动作灵活。',limit:'肌腱会伸长、有摩擦，需要定期张紧。'},
 {id:'hand',st:3,layer:'tendon',f:'hard',name:'欠驱动手',why:'要能握、捏、比手势。',how:'每只手用 2–3 个驱动器带动 5 根手指，手指会自动贴合物体形状。',can:'抓起小物件、比 V、挥手。',limit:'手指不能各自独立地动；握力很小。'},
+{id:'swaphand',st:3,layer:'tendon',f:'ok',name:'换手（手办式）',why:'握拳、比 V、张开这些手势，手办都是靠换手来表现的。',how:'准备几只不同手型的手，手腕处用磁吸或卡扣快速更换；另配一只能简单开合的手负责抓东西。',can:'大部分场景都不需要人手级的灵巧手指。',limit:'需要有人或者机器人自己完成更换。'},
 {id:'dexhand',st:3,layer:'tendon',f:'no',name:'人手级灵巧手指',why:'人手约有 20 个自由度，可以弹琴、写字。',how:'每根手指独立驱动，并带有指尖触觉。',can:'这个尺寸下做不到。',limit:'驱动器的体积、力量和自由度无法同时满足。即使是真人尺寸的灵巧手，现在也仍然昂贵、容易坏。'},
 {id:'qdd',st:4,layer:'joint',f:'hard',name:'关节即电机（准直驱）',why:'方形舵机让关节鼓出来；减速比太高，被推时不会顺从，摔倒时齿轮容易崩。',how:'扁圆形中空无刷电机直接嵌进关节，配 6–10 比 1 的低减速比。',can:'能被推动，知道自己用了多大力，摔倒时能吸收冲击。',limit:'电机缩小后力量下降得很快，在 55 cm 尺寸上扭矩余量很小，需要定制。'},
 {id:'tendon',st:4,layer:'tendon',f:'hard',name:'躯干肌肉＋肌腱传力',why:'让四肢末端像二次元角色一样细。',how:'驱动器集中在躯干、大腿和上臂，用超高分子量聚乙烯绳传力。',can:'手腕、脚踝、手指几乎没有电机的体积。',limit:'绳子会伸长，转弯处有摩擦损失，长期使用要张紧和更换。'},
 {id:'sea',st:4,layer:'joint',f:'ok',name:'串联弹性（跟腱弹簧）',why:'人走路时，跟腱会储存和释放能量。',how:'在膝和踝的传动里加入弹簧元件。',can:'更省电，走路有弹性，落地更柔和。',limit:'弹簧会降低位置精度，需要软件补偿。'},
-{id:'artmuscle',st:4,layer:'joint',f:'no',name:'人造肌肉替代电机',why:'形状和工作方式都最像真正的肌肉。',how:'介电弹性体、液压静电肌肉、扭曲尼龙纤维肌肉等。',can:'目前只适合表情、头发这类不需要力气的小动作。',limit:'力量不足、速度慢、效率低、寿命短，还撑不起一个会走路的身体。'},
+{id:'artmuscle',st:4,layer:'joint',f:'no',name:'人造肌肉驱动腿和腰',why:'形状和工作方式都最像真正的肌肉。',how:'介电弹性体、液压静电肌肉、扭曲尼龙纤维肌肉等。',can:'承重的腿和腰目前做不到，仍然用电机。',limit:'力量、速度和效率都不够；腿一年要动几百万次，寿命也撑不住。'},
+{id:'smallmuscle',st:4,layer:'tendon',f:'ok',name:'人造肌肉驱动手指、头发、表情',why:'这些动作不需要力气，动得也不频繁。',how:'形状记忆合金丝或尼龙纤维肌肉，做成两端卡扣固定的可更换模块。',can:'按一年寿命设计；身体地图记录动作次数，快到寿命时提醒更换。',limit:'动作慢、效率低，只适合小动作。'},
 {id:'encoder',st:5,layer:'sense',f:'ok',name:'双编码器（本体感觉）',why:'要知道每个关节此刻的确切角度。',how:'电机端和输出端各装一个磁编码器。',can:'比人更精确地知道自己的姿态。',limit:'没有明显障碍。'},
 {id:'imu',st:5,layer:'sense',f:'ok',name:'IMU（平衡感）',why:'相当于内耳，感知倾斜和加速度。',how:'骨盆和头部各放一个。',can:'站立和行走时保持平衡，摔倒之前就能察觉。',limit:'长时间会漂移，需要和脚底信息融合。'},
 {id:'footforce',st:5,layer:'sense',f:'hard',name:'脚底三轴力阵列',why:'要知道踩在哪里、有没有打滑。',how:'脚底分区测量竖直和水平方向的力。',can:'提前感到打滑，分辨踩在台阶边缘还是中间。',limit:'这么小的三轴力传感器很少见。只测竖直压力的传感器则很容易做到。'},
-{id:'skin',st:5,layer:'sense',f:'ok',name:'电容触觉外壳',why:'要知道被摸了哪里。',how:'在外壳内侧贴电容感应电极。',can:'分辨摸头、握手、轻拍。',limit:'只能感知有没有接触，测不出力度。'},
-{id:'fullskin',st:5,layer:'sense',f:'no',name:'人类级全身皮肤',why:'人的皮肤能同时感到压力、温度、振动和疼痛，而且密度极高。',how:'高密度、多模态的柔性传感皮肤铺满全身。',can:'这个尺寸下做不到。',limit:'高密度布线、柔软和耐用目前无法同时满足，更难在全身铺开。'},
+{id:'skin',st:5,layer:'sense',f:'ok',name:'局部触觉（头、手、肩）',why:'要知道被摸了哪里。角色真正会被碰到的只有头、手和肩膀。',how:'在这几处外壳内侧贴电容感应电极。',can:'分辨摸头、握手、轻拍。',limit:'只能感知有没有接触，测不出力度。'},
+{id:'heartbeat',st:5,layer:'sense',f:'ok',name:'胸口心跳（线性振动马达）',why:'拥抱时能感到它，被碰到时也能回应。',how:'在胸口放一个和手机同类的线性振动马达。',can:'轻微的心跳、被摸时轻轻一颤；心跳快慢可以和发热、呼吸联动。',limit:'只能表达振动，不能用来出力。'},
+{id:'fullskin',st:5,layer:'sense',f:'no',name:'人类级全身皮肤',why:'人的皮肤能同时感到压力、温度、振动和疼痛，而且密度极高。',how:'高密度、多模态的柔性传感皮肤铺满全身。',can:'这个尺寸下做不到；按二次元的标准也不需要，局部触觉就够了。',limit:'高密度布线、柔软和耐用目前无法同时满足，更难在全身铺开。'},
 {id:'camera',st:5,layer:'sense',f:'ok',name:'发夹摄像头',why:'眼睛是显示屏，看东西的工作交给发夹。',how:'把微型摄像头藏进角色的发夹饰品里。',can:'识别人脸、跟随视线、观察环境。',limit:'视角在头顶偏上，看脚下需要低头。'},
 {id:'mic',st:5,layer:'sense',f:'ok',name:'耳饰麦克风阵列',why:'要听见声音，并知道声音从哪里来。',how:'左右耳饰各放麦克风，组成阵列。',can:'找到说话的人，并转头看过去。',limit:'走路时电机的噪声会混进来，需要降噪。'},
 {id:'ganglia',st:6,layer:'nerve',f:'ok',name:'关节神经节',why:'反射必须快，不能等大脑来决定。',how:'每个关节里一颗小芯片，自己完成力矩控制和自我保护。',can:'检测到跌倒时让关节立刻变软；出问题时自动进入受损模式。',limit:'没有明显障碍。'},
@@ -311,6 +314,8 @@ SIDES.forEach(([k,s])=>{
   [-.5,0,.5].forEach(x=>cylB('tendon',G['wr'+k],[x*.8,-.4,.33],[x*1.1,-3.3,.33],.05));
   const hp=[];for(let i=0;i<=60;i++){const a=i/60*Math.PI*2*5;hp.push([Math.cos(a)*.42,-1.2-i/60*2.4,-.95+Math.sin(a)*.42]);}tube('sea',G['kn'+k],hp,.07);
   sph('artmuscle',G['hip'+k],1,[0,-5.5,1.05],[1.15,4,.75]);
+  cylB('smallmuscle',G['el'+k],[-.35,-1.2,.5],[-.3,-6.8,.45],.07);
+  box('swaphand',G.pelvis,[1.3,1.7,.55],[s*2.3,-.6,-2.7]);
   // 5 感觉
   box('encoder',G['hip'+k],[.6,.6,.6],[-s*1.35,0,0]);box('encoder',G['kn'+k],[.55,.55,.55],[-s*1.05,0,0]);
   box('encoder',G['sh'+k],[.5,.5,.5],[-s*.4,.9,.6]);box('encoder',G['el'+k],[.45,.45,.45],[-s*.95,0,0]);
@@ -326,7 +331,7 @@ SIDES.forEach(([k,s])=>{
   add('shell',new T.Mesh(limbGeo(1.5,1.0,11.5),SUIT),G['kn'+k]);
   add('shell',new T.Mesh(limbGeo(1.2,.92,8.5),SUIT),G['sh'+k]);
   add('shell',new T.Mesh(limbGeo(.92,.68,7.5),SKIN),G['el'+k]);
-  const boot=new T.Mesh(new T.SphereGeometry(1,20,14),BOOT);boot.scale.set(1.35,1.05,2.75);boot.position.set(0,-2.95,.95);add('shell',boot,G['an'+k]);
+  const boot=new T.Mesh(new T.SphereGeometry(1,20,14),BOOT);boot.scale.set(2.2,1.05,2.75);boot.position.set(0,-2.95,.95);add('shell',boot,G['an'+k]);
   const bootT=new T.Mesh(limbGeo(1.12,1.05,4),BOOT);bootT.position.set(0,1,0);add('shell',bootT,G['an'+k]);
   tor('softskin',G['kn'+k],1.55,.32,[0,0,0],[Math.PI/2,0,0]);tor('softskin',G['el'+k],1.0,.26,[0,0,0],[Math.PI/2,0,0]);
 });
@@ -340,6 +345,8 @@ tor('damage',G.pelvis,4.3,.1,[0,.4,0],[Math.PI/2,0,0],[1,.72,1]);
 box('spinalcord',G.pelvis,[2.2,1.1,.8],[0,.8,-1]);
 box('battery',G.pelvis,[4.2,1.6,1.8],[0,-1.4,.35]);
 const fan=disc('breathfan',G.chest,1.3,.45,[0,2.4,-2.1],'z');
+const hb=sph('heartbeat',G.chest,.5,[.9,3.0,1.7]);
+cylB('smallmuscle',G.head,[.3,8.5,.3],[.3,9.3,.6],.09);
 box('brain',G.chest,[3.2,2.2,1.5],[0,3.3,.25]);
 tube('antenna',G.head,[[0,6,-4.2],[0,3,-4.9],[0,.5,-4.6],[0,-1.3,-4.0]],.1);
 // 躯干外壳
@@ -454,6 +461,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
   updatePose(dt,t);
   const br=reduce.matches?0:Math.sin(t*1.6);breathMeshes.forEach(m=>{m.scale.x=(m.geometry.type==='TorusGeometry'?1:1)*(1+br*.018);m.scale.y=(m.geometry.type==='TorusGeometry'?.72:1)*(1+br*.012);});
   fan.rotation.y+=dt*6;
+  hb.scale.setScalar(reduce.matches?1:1+.35*Math.pow(Math.max(0,Math.sin(t*7.5)),8));
   blinkT-=dt;const bl=blinkT<0&&blinkT>-.14;if(blinkT<-.14)blinkT=2.5+Math.random()*3;eyes.forEach(m=>m.scale.y=bl?.12:1);
   updateCam(dt);renderer.render(scene,camera);requestAnimationFrame(frame);}
 refresh();

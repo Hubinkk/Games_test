@@ -120,7 +120,7 @@
                 <geom type="sphere" size="0.007" mass="0.01"/>
                 <body name="l_foot">
                   <joint name="l_ankle_roll" axis="1 0 0" range="-0.4 0.4" class="big"/>
-                  <geom name="l_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.014 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
+                  <geom name="l_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
                 </body>
               </body>
             </body>
@@ -148,7 +148,7 @@
                 <geom type="sphere" size="0.007" mass="0.01"/>
                 <body name="r_foot">
                   <joint name="r_ankle_roll" axis="1 0 0" range="-0.4 0.4" class="big"/>
-                  <geom name="r_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.014 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
+                  <geom name="r_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
                 </body>
               </body>
             </body>

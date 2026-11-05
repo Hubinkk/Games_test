@@ -91,8 +91,7 @@ def main():
               f"支撑腿 髋侧摆 {pk['l_hip_roll']:.2f} / 踝侧摆 {pk['l_ankle_roll']:.2f} / 膝 {pk['l_knee']:.2f} N·m")
 
     print("\n说明：平衡控制器是手写的重心反馈（balance.py），不是学出来的策略。")
-    print("      大幅抬腿会摔，说明二次元的小脚（宽 2.8 cm）给重心留的余地很小；")
-    print("      对照实验中脚宽加到 4.4 cm 后，大幅抬腿也能站住（见 README）。")
+    print("      脚宽已按对照实验改为 4.4 cm；2.8 cm 的小脚在大幅抬腿时会摔倒（见 README）。")
 
 
 if __name__ == "__main__":
