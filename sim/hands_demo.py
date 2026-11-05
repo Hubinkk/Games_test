@@ -49,6 +49,10 @@ W_ARM, W_YAW = 0.015, 0.5   # 逆运动学权重：让手臂、手腕、手指�
 
 
 class Hands:
+    TEN_GROUPS = (("index", ["index_mcp", "index_pip", "index_abd"]), ("middle", ["middle_mcp", "middle_pip", "middle_abd"]),
+                  ("ring", ["ring_flex"]), ("little", ["little_flex", "spread"]),
+                  ("thumb", ["thumb_opp", "thumb_cmc", "thumb_flex"]), ("wrist", ["wrist_pitch", "wrist_yaw"]))
+
     def __init__(self):
         hsb.build()
         self.m = mujoco.MjModel.from_xml_path(hsb.OUT)
@@ -120,6 +124,13 @@ class Hands:
         d = self.kin({hand: q})
         return q, float(np.linalg.norm(target - d.site_xpos[sid]))
 
+    # ---------- 可替换的接口（A+B 等方案会覆盖） ----------
+    def extra_move(self, stroke, t_move):
+        return 0.0
+
+    def hover_joints(self, finger):
+        return JOINTS_OF[finger]
+
     # ---------- 规划 ----------
     def plan(self, text):
         base = {h: self.typing_posture(h) for h in hsb.SIDES}
@@ -177,14 +188,16 @@ class Hands:
                 hover[j] = qp[j]
             if finger not in ("ring", "little"):  # 悬停时指尖正好在目标键上方，垂直落下，不擦邻键
                 lift = 0.005 if finger == "thumb" else LIFT  # 拇指从更高处落下，避免路过最下一行时擦到键
+                hj = self.hover_joints(finger)
                 qh, _ = self.ik(hand, finger, [kx, ky, TOP + lift], {**hover, **{j: qp[j] for j in qp if j.startswith(finger)}},
-                                JOINTS_OF[finger], [1.0] * len(JOINTS_OF[finger]))
+                                hj, [1.0] * len(hj))
                 for j, v in qh.items():
                     if j.startswith(finger):
                         hover[j] = v
             lift_q = hover
             if finger == "thumb":  # 拇指按完先抬到键面以上 8 mm，再收回掌下，收回途中不会擦到最下一行
-                ql, _ = self.ik(hand, finger, [kx, ky, TOP + 0.008], hover, JOINTS_OF[finger], [1.0] * 3)
+                hj = self.hover_joints(finger)
+                ql, _ = self.ik(hand, finger, [kx, ky, TOP + 0.008], hover, hj, [1.0] * len(hj))
                 lift_q = dict(hover); lift_q.update({j: v for j, v in ql.items() if j.startswith(finger)})
             strokes.append({"ch": ch, "key": hsb.hb.key_name(ch), "hand": hand, "finger": finger,
                             "press": qp, "hover": hover, "lift": lift_q, "ik_err": err})
@@ -238,8 +251,9 @@ class Hands:
         t_lift = max(0.06, 0.4 * t_move)
         events, ready, last_press = [], {h: T0 for h in hsb.SIDES}, -1.0
         for i, s in enumerate(strokes):
-            pr = max(ready[s["hand"]] + t_move, last_press + t_gap)
-            mv = pr - t_move  # 到该按的时候才移过去，等待时手指不悬在键上
+            extra = self.extra_move(s, t_move)  # 分时驱动等方案需要的额外移动时间（默认 0）
+            pr = max(ready[s["hand"]] + t_move + extra, last_press + t_gap)
+            mv = pr - t_move - extra  # 到该按的时候才移过去，等待时手指不悬在键上
             s["t_move"], s["t_press"] = mv, pr
             ready[s["hand"]] = pr + t_press + (t_lift if s["finger"] == "thumb" else 0.0)
             last_press = pr
@@ -361,9 +375,7 @@ class Hands:
             g.append([round(float(x) * 1000, 2) for x in d.geom_xpos[i]] + [round(float(x), 3) for x in q])
         ten = {}
         for h in hsb.SIDES:
-            for grp, names in (("index", ["index_mcp", "index_pip", "index_abd"]), ("middle", ["middle_mcp", "middle_pip", "middle_abd"]),
-                               ("ring", ["ring_flex"]), ("little", ["little_flex", "spread"]),
-                               ("thumb", ["thumb_opp", "thumb_cmc", "thumb_flex"]), ("wrist", ["wrist_pitch", "wrist_yaw"])):
+            for grp, names in self.TEN_GROUPS:
                 ten[f"{h}_{grp}"] = round(max(abs(float(d.actuator_force[self.act[f"{h}_{n}"]])) for n in names), 2)
         typed = "".join(" " if t["key"] == "space" else t["key"] for t in self.touches)
         self.frames.append({"t": round(d.time, 3), "g": g, "ten": ten, "typed": typed})
@@ -373,8 +385,8 @@ SPEEDS = [  # (移动, 按下, 两次按下的最小间隔) 秒
     (0.30, 0.12, 0.10), (0.22, 0.10, 0.08), (0.16, 0.08, 0.06), (0.12, 0.07, 0.05), (0.09, 0.06, 0.04), (0.07, 0.05, 0.03)]
 
 
-def main():
-    h = Hands()
+def main(hands_cls=None, out_name="hands_frames.js", baseline="单指为 3.3 字符/秒"):
+    h = (hands_cls or Hands)()
     h.recording = False
     strokes = h.plan(TEXT)
     print(f'文字："{TEXT}"；逆运动学最大残差 {max(s["ik_err"] for s in strokes)*1000:.2f} mm')
@@ -394,7 +406,7 @@ def main():
         print("\n没有完全不出错的速度档。")
         return
     (tm, tp, tg), r = best
-    print(f"\n不出错的最高速度：{r['cps']:.1f} 字符/秒，约 {r['wpm']:.0f} 词/分（单指为 3.3 字符/秒）")
+    print(f"\n不出错的最高速度：{r['cps']:.1f} 字符/秒，约 {r['wpm']:.0f} 词/分（{baseline}）")
     h.recording = True
     strokes, r = h.type_text(TEXT, tm, tp, tg)
     print(f"重新录制：打出 {r['typed']!r}，最深穿透 {-h.min_dist*1000:.2f} mm")
@@ -406,7 +418,7 @@ def main():
                        "mistouch": rr["mistouch"], "err_mean": rr["err_mean"], "err_max": rr["err_max"]} for p, rr in rows],
            "strokes": [{"ch": s["ch"], "hand": s["hand"], "finger": s["finger"], "t": round(s["t_press"], 3)} for s in strokes],
            "penetration_mm": round(-h.min_dist * 1000, 2), "t_max": {"finger": hsb.hb.T_FINGER, "wrist": hsb.hb.T_WRIST}}
-    path = os.path.join(HERE, "..", "hands_frames.js")
+    path = os.path.join(HERE, "..", out_name)
     with open(path, "w", encoding="utf-8") as f:
         f.write("window.HANDS = " + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
     print(f"已导出 {os.path.relpath(path, HERE)}（{os.path.getsize(path)/1e6:.1f} MB，{len(h.frames)} 帧）")

@@ -1,0 +1,201 @@
+<title>人偶十指打字（6 电机手）</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 版式：左边是 MuJoCo 回放画面和时间轴（主角），右边是测量结果和 14 个电机的线拉力 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --bad:#cf3b3d; --bar:#4a5fa8;
+  --f-display:"Noto Serif SC","Songti SC",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --bad:#ff6a6a; --bar:#93a6ec; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --bad:#ff6a6a; --bar:#93a6ec; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+header h1{font-family:var(--f-display);font-size:28px;margin:0;letter-spacing:.04em;line-height:1.25}
+header p{margin:4px 0 0;color:var(--ink-2);max-width:74ch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button,.ctl button{font:inherit;font-size:13px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.left{display:flex;flex-direction:column;gap:10px;min-width:0}
+.viewer{position:relative;background:var(--stage);border:1px solid var(--rule);border-radius:14px;overflow:hidden;height:min(64vh,620px);min-height:380px;touch-action:none;cursor:grab}
+.viewer.drag{cursor:grabbing}
+.viewer canvas{display:block;width:100%;height:100%}
+#label{position:absolute;left:12px;top:10px;font-size:14px;font-weight:500;background:color-mix(in srgb,var(--panel) 85%,transparent);border:1px solid var(--rule);border-radius:8px;padding:3px 10px}
+#nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink-2)}
+.ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ctl input[type=range]{flex:1 1 200px;accent-color:var(--calm);min-width:0}
+.ctl .t{font-family:var(--f-data);font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;min-width:7.5em}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--ink-2)}
+.big{display:flex;gap:18px;flex-wrap:wrap}
+.big div{display:flex;flex-direction:column}
+.big b{font-family:var(--f-data);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.big span{font-size:12px;color:var(--ink-2)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:4px 6px;border-top:1px solid var(--rule)}
+th{font-weight:500;color:var(--ink-2);font-size:12px;border-top:0}
+td.n{font-family:var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+.okc{color:var(--ok);font-weight:500}.badc{color:var(--bad);font-weight:500}
+.tw{overflow-x:auto}
+.acts{display:flex;flex-direction:column;gap:8px}
+.grp{display:flex;flex-direction:column;gap:3px}
+.grp h4{margin:0;font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.grp h4 span{font-weight:400;color:var(--ink-2);font-size:12px}
+.row{display:grid;grid-template-columns:7.5em minmax(0,1fr) 4.2em;gap:8px;align-items:center;font-size:12.5px}
+.row .b{height:6px;border-radius:3px;background:var(--rule);overflow:hidden}
+.row .b div{height:100%;background:var(--bar);width:0}
+.row .v{font-family:var(--f-data);font-size:12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.note{margin:0;color:var(--ink-2);font-size:13px;max-width:64ch}
+footer{font-size:12px;color:var(--ink-2);max-width:92ch}
+.chat{font-family:var(--f-data);font-size:20px;min-height:1.8em;padding:8px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);white-space:pre-wrap;word-break:break-all}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--calm);vertical-align:-0.15em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.caret{animation:none}}
+.who{font-size:13px;color:var(--ink-2)}
+.acts2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px}
+.acts2 h4{margin:0 0 2px;font-size:12.5px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>人偶十指打字（6 电机手）</h1>
+    <p>A+B 混合方案：每只手从 14 个电机减到 6 个电机 + 6 个锁。食指、中指用差动双线（同时拉 = 弯曲，单拉一侧 = 偏向那一侧）；无名指、小指、张开、拇指共用一个电机，经离合器分时驱动，没被选中的由锁保持。画面是 MuJoCo 物理仿真逐帧回放，默认 0.25 倍速。</p>
+  </header>
+  <main class="grid">
+    <div class="left">
+      <section class="viewer" id="viewer" aria-label="手部仿真回放"><div id="label">—</div></section>
+      <div class="ctl">
+        <button id="play">暂停</button>
+        <input type="range" id="scrub" min="0" max="0" step="1" value="0" aria-label="时间轴">
+        <span class="t" id="time">0.00 / 0.00 s</span>
+        <button id="speed">1×</button>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card"><div class="eyebrow">聊天框 · 按指尖接触键面的先后顺序输入</div><div class="chat"><span id="typed"></span><span class="caret"></span></div><div class="who" id="who">—</div></div>
+      <div class="card" id="result"></div>
+      <div class="card"><div class="eyebrow">两只手 · 此刻每根手指电机的最大线拉力</div><div class="acts2" id="acts"></div></div>
+      <div class="card">
+        <div class="eyebrow">怎么做到的</div>
+        <p class="note">共享电机同一时刻只能驱动一个输出，换输出要先切换离合器（20 ms），所以用到无名指、小指、拇指的键会慢一些。</p>
+        <p class="note">分时驱动特有的规则：①压在键上的手指要先抬起，抬起之前手臂不许移动，否则会拖过别的键；②拇指伸出时先在掌下调好弯曲再转出来，收回时先转回掌下再调弯曲，顺序反了会提前按到空格；③锁必须是刚性的，被碰一下就松动会让整只手下沉；④右手拇指按空格的右半边，避免和左手拇指相撞。</p>
+      </div>
+    </aside>
+  </main>
+  <footer>数据来自仓库里的 sim/hands_ab_build.py 和 sim/hands_ab_demo.py。每只手 14 个电机，指节半径 2 mm，每个手指电机最大线拉力 15 N。键盘为手机尺寸（键宽 5.5 mm）。仿真里的接触是"软接触"，录制过程中最深穿透约 0.2 mm。</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="hands_ab_frames.js"></script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const D=window.HANDS;
+if(!D){$('#viewer').insertAdjacentHTML('beforeend','<div id="nogl">仿真数据没有加载成功，请刷新页面。</div>');return;}
+const FN={index:'食指',middle:'中指',ring:'无名指',little:'小指',thumb:'拇指'};
+const FCOL={L:{little:0x7a5cc4,ring:0x2f78bd,middle:0x23897c,index:0xc9772a,thumb:0xb0476b},R:{index:0xc9772a,middle:0x23897c,ring:0x2f78bd,little:0x7a5cc4,thumb:0xb0476b}};
+const ROWS=[['thumb','拇指'],['index','食指'],['middle','中指'],['ring','无名指'],['little','小指＋张开'],['wrist','手腕']];
+$('#acts').innerHTML=['L','R'].map(h=>`<div><h4>${h==='L'?'左手':'右手'}</h4>${ROWS.map(([k,n])=>`<div class="row"><span>${n}</span><div class="b"><div id="b-${h}_${k}"></div></div><span class="v" id="v-${h}_${k}">0.0 N</span></div>`).join('')}</div>`).join('');
+
+/* ---------- 结果卡片 ---------- */
+(function(){const s=D.summary,sp=D.speeds;
+  $('#result').innerHTML=`<div class="eyebrow">速度测试 · "${D.text}"</div>
+   <div class="big"><div><b>${s.cps.toFixed(1)}</b><span>字符/秒</span></div><div><b>${Math.round(s.wpm)}</b><span>词/分</span></div><div><b>${s.hits}/${s.n}</b><span>按对</span></div><div><b>${s.mistouch}</b><span>误触</span></div></div>
+   <div class="tw"><table><tr><th>速度</th><th>打出的字</th><th>误触</th><th>平均误差</th></tr>
+   ${sp.map(x=>{const ok=x.typed===D.text;return `<tr><td class="n">${x.cps.toFixed(1)} 字/秒（${Math.round(x.wpm)} 词/分）</td><td class="n ${ok?'okc':'badc'}">${x.typed.replace(/ /g,'␣')}</td><td class="n">${x.mistouch}</td><td class="n">${x.err_mean.toFixed(2)} mm</td></tr>`;}).join('')}</table></div>
+   <p class="note">同一句话的对比：14 电机手十指打字不出错可达 8.3 字符/秒，单根食指 3.3 字符/秒；6 电机手为 ${s.cps.toFixed(1)} 字符/秒。表中绿色表示文字完全正确；有些档文字正确但个别键按晚了，严格统计时算作误触。误差不计空格键。</p>`;})();
+
+/* ---------- 三维 ---------- */
+const viewer=$('#viewer');const T=window.THREE;let renderer=null;
+try{if(T)renderer=new T.WebGLRenderer({antialias:true});}catch(e){}
+if(!renderer)viewer.insertAdjacentHTML('beforeend','<div id="nogl">这个浏览器无法显示三维画面，右侧的聊天框和测量结果仍然可以查看。</div>');
+let scene,camera,root,meshes=[],keyMats={},fingerMats={};
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function keyTex(ch){const label=ch==='space'?'空格':ch.toUpperCase();const c=document.createElement('canvas');c.width=88;c.height=64;const x=c.getContext('2d');
+  x.fillStyle='#d6dde8';x.fillRect(0,0,88,64);x.fillStyle='#1c2430';x.font=label.length>1?'bold 26px sans-serif':'bold 40px sans-serif';x.textAlign='center';x.textBaseline='middle';
+  x.save();x.translate(44,32);x.rotate(Math.PI/2);x.fillText(label,0,2);x.restore();return new T.CanvasTexture(c);}
+function mergeGeos(gs){const pos=[],nor=[],idx=[];let off=0;
+  gs.forEach(g=>{const p=g.attributes.position,n=g.attributes.normal;for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));nor.push(n.getX(i),n.getY(i),n.getZ(i));}
+    if(g.index)for(let i=0;i<g.index.count;i++)idx.push(g.index.getX(i)+off);else for(let i=0;i<p.count;i++)idx.push(i+off);off+=p.count;});
+  const out=new T.BufferGeometry();out.setAttribute('position',new T.Float32BufferAttribute(pos,3));out.setAttribute('normal',new T.Float32BufferAttribute(nor,3));out.setIndex(idx);return out;}
+if(renderer){
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));viewer.prepend(renderer.domElement);
+  scene=new T.Scene();camera=new T.PerspectiveCamera(30,1,1,3000);
+  scene.add(new T.HemisphereLight(0xffffff,0x8a90a0,.95));const dl=new T.DirectionalLight(0xffffff,.7);dl.position.set(-60,140,60);scene.add(dl);
+  root=new T.Group();root.rotation.x=-Math.PI/2;scene.add(root);
+  D.geoms.forEach((g)=>{let geo;const s=g.size;
+    if(g.type===2)geo=new T.SphereGeometry(s[0],20,14);
+    else if(g.type===3){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],18);geo.rotateX(Math.PI/2);
+      const a=new T.SphereGeometry(s[0],16,12);a.translate(0,0,s[1]);const b=new T.SphereGeometry(s[0],16,12);b.translate(0,0,-s[1]);geo=mergeGeos([geo,a,b]);}
+    else if(g.type===6)geo=new T.BoxGeometry(2*s[0],2*s[1],2*s[2]);
+    else{meshes.push(null);return;}
+    let mat;
+    if(g.name.startsWith('key_')){const k=g.name.slice(4);mat=[0,1,2,3].map(()=>new T.MeshStandardMaterial({color:0xd6dde8,roughness:.6}));
+      mat.splice(4,0,new T.MeshStandardMaterial({map:keyTex(k),roughness:.6}));keyMats[k]=mat;}
+    else{mat=new T.MeshStandardMaterial({color:new T.Color(g.rgba[0],g.rgba[1],g.rgba[2]),roughness:.55,transparent:g.name.endsWith('forearm'),opacity:g.name.endsWith('forearm')?.6:1});
+      const m=g.name.match(/^([LR])_(index|middle|ring|little|thumb)_g/);if(m){const k=m[1]+'_'+m[2];(fingerMats[k]=fingerMats[k]||[]).push(mat);}}
+    const mesh=new T.Mesh(geo,mat);root.add(mesh);meshes.push(mesh);});
+}
+const SKIN=0xf2d9c9;
+
+/* ---------- 回放 ---------- */
+const F=D.frames;const P={i:0,playing:true,speed:.25,acc:0};
+$('#scrub').max=F.length-1;
+function show(i){const f=F[i];if(!f)return;
+  if(renderer){f.g.forEach((g,k)=>{const m=meshes[k];if(!m)return;m.position.set(g[0],g[1],g[2]);m.quaternion.set(g[4],g[5],g[6],g[3]);});
+    Object.values(fingerMats).forEach(ms=>ms.forEach(mm=>mm.color.setHex(SKIN)));
+    Object.values(keyMats).forEach(ms=>ms.forEach((mm,j)=>{if(j!==4)mm.color.setHex(0xd6dde8);}));
+    const act=D.strokes.filter(s=>f.t>=s.t-0.03&&f.t<=s.t+0.09);
+    act.forEach(s=>{const col=FCOL[s.hand][s.finger];(fingerMats[s.hand+'_'+s.finger]||[]).forEach(mm=>mm.color.setHex(col));
+      const k=s.ch===' '?'space':s.ch;(keyMats[k]||[]).forEach((mm,j)=>{if(j!==4)mm.color.setHex(col);});});
+    $('#who').textContent=act.length?act.map(s=>`${s.hand==='L'?'左手':'右手'}${FN[s.finger]}按 ${s.ch===' '?'空格':s.ch.toUpperCase()}`).join('，'):'—';}
+  $('#typed').textContent=f.typed;$('#label').textContent=`第 ${(f.t).toFixed(2)} 秒`;
+  Object.entries(f.ten).forEach(([k,v])=>{const lim=k.endsWith('wrist')?D.t_max.wrist:D.t_max.finger;const b=$('#b-'+k);if(b)b.style.width=Math.min(100,v/lim*100)+'%';const t=$('#v-'+k);if(t)t.textContent=v.toFixed(1)+' N';});
+  $('#scrub').value=i;$('#time').textContent=`${(i/30).toFixed(2)} / ${(F.length/30).toFixed(2)} s`;}
+$('#play').addEventListener('click',()=>{P.playing=!P.playing;$('#play').textContent=P.playing?'暂停':'播放';if(P.playing&&P.i>=F.length-1)P.i=0;});
+$('#scrub').addEventListener('input',e=>{P.i=+e.target.value;P.playing=false;$('#play').textContent='播放';show(P.i);});
+const SPEEDS=[.1,.25,.5,1];$('#speed').textContent='0.25×';
+$('#speed').addEventListener('click',()=>{P.speed=SPEEDS[(SPEEDS.indexOf(P.speed)+1)%SPEEDS.length];$('#speed').textContent=P.speed+'×';});
+
+/* ---------- 相机 ---------- */
+const cam={az:-1.25,el:.6,dist:190,gaz:-1.25,gel:.6,gdist:190};const tgt=T?new T.Vector3(32,4,0):null;
+function updCam(dt){const k=Math.min(1,dt*6);cam.az+=(cam.gaz-cam.az)*k;cam.el+=(cam.gel-cam.el)*k;cam.dist+=(cam.gdist-cam.dist)*k;
+  camera.position.set(tgt.x+cam.dist*Math.cos(cam.el)*Math.sin(cam.az),tgt.y+cam.dist*Math.sin(cam.el),tgt.z+cam.dist*Math.cos(cam.el)*Math.cos(cam.az));camera.lookAt(tgt);}
+if(renderer){const el=renderer.domElement,pt=new Map();let mv=0,p0=0;
+  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);mv=0;if(pt.size===2){const [a,b]=[...pt.values()];p0=Math.hypot(a[0]-b[0],a[1]-b[1]);}});
+  el.addEventListener('pointermove',e=>{if(!pt.has(e.pointerId))return;const p=pt.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pt.set(e.pointerId,[e.clientX,e.clientY]);mv+=Math.abs(dx)+Math.abs(dy);
+    if(pt.size===2){const [a,b]=[...pt.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(p0)cam.gdist=Math.min(400,Math.max(40,cam.gdist*p0/d));p0=d;}
+    else if(mv>3){viewer.classList.add('drag');cam.gaz-=dx*.008;cam.gel=Math.max(-1.45,Math.min(1.45,cam.gel+dy*.006));}});
+  const up=e=>{pt.delete(e.pointerId);if(pt.size<2)p0=0;viewer.classList.remove('drag');};
+  el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',e=>{e.preventDefault();cam.gdist=Math.min(400,Math.max(40,cam.gdist*(1+e.deltaY*.0012)));},{passive:false});
+  new ResizeObserver(()=>{const w=viewer.clientWidth,h=viewer.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}).observe(viewer);
+  const theme=()=>renderer.setClearColor(new T.Color(css('--stage')||'#dfe3e8'));
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);
+  new MutationObserver(theme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});theme();}
+
+let last=performance.now();
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;
+  if(P.playing){P.acc+=dt*30*P.speed;while(P.acc>=1){P.acc-=1;P.i++;}
+    if(P.i>=F.length){P.i=0;}show(P.i);}
+  if(renderer){updCam(dt);renderer.render(scene,camera);}
+  requestAnimationFrame(frame);}
+show(0);requestAnimationFrame(frame);
+})();
+</script>
