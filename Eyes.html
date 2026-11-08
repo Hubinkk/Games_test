@@ -88,6 +88,23 @@ section > p{max-width:74ch;color:var(--ink-2);font-size:14.5px}
     </div>
   </section>
 
+  <section aria-labelledby="h-vr">
+    <h2 id="h-vr">VR 模式：主人通过它的眼睛看</h2>
+    <p>开始以后，你就是戴着头显的主人。在左边的画面上移动鼠标（或手指），就是在转头。机器人的眼球和脖子会跟着你转，但电机比你的头慢，脖子也只能转 ±57°。对比两种显示方式，看哪种会让人晕。</p>
+    <div class="seg">
+      <button class="btn primary" id="vrBtn">开始 VR</button>
+      <span class="seg" id="reproj"></span>
+    </div>
+    <div class="stage">
+      <div class="view cam"><canvas id="hmd" width="760" height="560" aria-label="头显里看到的画面"></canvas><span class="cap">头显里看到的（你的头决定看哪里）</span></div>
+      <div class="status">
+        <div class="view"><canvas id="top" width="760" height="560" aria-label="从上往下看：你的头、脖子、眼球、摄像头的方向"></canvas><span class="cap">从上往下看</span></div>
+        <div class="flag" id="flagVR"></div>
+      </div>
+    </div>
+    <p class="foot">摄像头按 140° × 100° 的广角镜头计算，头显视野 100° × 80°。人偶两眼相距约 3.7 cm，人约 6.3 cm，所以用它的眼睛看，东西会显得更大，你会觉得自己只有 55 cm 高。</p>
+  </section>
+
   <section class="controls" aria-label="控制">
     <div class="group">
       <span class="lbl">方案</span>
@@ -188,11 +205,11 @@ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const MODES={
   screen:{name:"纯屏幕眼睛",note:"摄像头在额头，跟着头转。眼睛是画出来的，可以朝任何方向看。"},
   A:{name:"A：瞳孔摄像头 + 眼睑",note:"眼睛不能单独转，看东西全靠转头，所以视线慢半拍。"},
-  B:{name:"B：再加眼球云台",note:"眼睛先快速转过去（±20°），头再慢慢跟上，眼睛回到正中。"},
+  B:{name:"B：再加眼球云台",note:"眼睛先快速转过去（±12°），头再慢慢跟上，眼睛回到正中。"},
 };
 const TARGETS={you:{name:"你"},cup:{name:"桌上的杯子",yaw:-28,pitch:-24},win:{name:"窗外",yaw:40,pitch:12}};
 const FACES={normal:"普通",happy:"开心",surprise:"惊讶",sleepy:"困了",hot:"有点热"};
-const S={mode:"B",target:"you",face:"normal",you:{yaw:0,pitch:4},neck:{yaw:0,pitch:0},eye:{yaw:0,pitch:0},
+const S={vr:false,owner:{yaw:0,pitch:4},reproj:true,sick:0,mode:"B",target:"you",face:"normal",you:{yaw:0,pitch:4},neck:{yaw:0,pitch:0},eye:{yaw:0,pitch:0},
   lid:0,lidT:0,drawnBlink:0,nextBlink:5,blinkPhys:false,sleeping:false,notLooking:false,lostFrames:0,frames:0,eyeSpeed:0};
 
 function seg(id,obj,key,cb){
@@ -217,17 +234,17 @@ function setYou(e){const r=face.getBoundingClientRect();const x=(e.clientX-r.lef
   S.you.yaw=clamp(x*90,-55,55);S.you.pitch=clamp(-y*55+4,-30,30)}
 face.addEventListener("pointermove",setYou);face.addEventListener("pointerdown",setYou);
 
-function targetAngles(){return S.target==="you"?S.you:TARGETS[S.target]}
+function targetAngles(){return S.vr?S.owner:S.target==="you"?S.you:TARGETS[S.target]}
 function step(dt){
   const T=targetAngles(), m=S.mode;
   const mv=(cur,goal,vmax)=>cur+clamp(goal-cur,-vmax*dt,vmax*dt);
   // 头（脖子）：最快 120°/s，范围 ±60° / ±35°
-  const ny=clamp(T.yaw,-60,60), np=clamp(T.pitch,-35,35);
+  const ny=clamp(T.yaw,-57,57), np=clamp(T.pitch,-28,34);   // 脖子的范围：左右 ±57°（模型 ±1.0 rad）
   if(m==="B"){
     // 眼睛先到：眼球云台 400°/s，±20°；头以较慢的速度跟上，眼睛随之回中
     const e0={...S.eye};
     S.neck.yaw=mv(S.neck.yaw,ny,70);S.neck.pitch=mv(S.neck.pitch,np,50);
-    S.eye.yaw=mv(S.eye.yaw,clamp(T.yaw-S.neck.yaw,-20,20),400);S.eye.pitch=mv(S.eye.pitch,clamp(T.pitch-S.neck.pitch,-20,20),400);
+    S.eye.yaw=mv(S.eye.yaw,clamp(T.yaw-S.neck.yaw,-12,12),400);S.eye.pitch=mv(S.eye.pitch,clamp(T.pitch-S.neck.pitch,-12,12),400);   // 眼球式云台 ±12°
     S.eyeSpeed=Math.hypot(S.eye.yaw-e0.yaw,S.eye.pitch-e0.pitch)/dt;
   }else{
     S.neck.yaw=mv(S.neck.yaw,ny,120);S.neck.pitch=mv(S.neck.pitch,np,90);
@@ -251,42 +268,49 @@ function camDir(){
 }
 const FOVX=64,FOVY=43;
 let lastCam=null;
-function drawCam(){
-  const W=cam.width,H=cam.height,c=camDir(),g=cg;
-  const blur=S.eyeSpeed>200;
-  if(blur&&lastCam){g.globalAlpha=0.45}else g.globalAlpha=1;
-  const P=(y,p)=>[W/2+(y-c.yaw)/FOVX*W,H/2-(p-c.pitch)/FOVY*H];
-  // 房间
+// 房间里的东西（以机器人为中心的方向角，度）：人、杯子、窗、门、植物
+const ROOMP={yaw:0,pitch:4};
+function drawScene(g,W,H,c,fx,fy,person,plabel){
+  const P=(y,p)=>[W/2+(y-c.yaw)/fx*W,H/2-(p-c.pitch)/fy*H], k=W/fx;
   const [,hz]=P(0,-12);
   let grd=g.createLinearGradient(0,0,0,H);grd.addColorStop(0,"#d9d3c7");grd.addColorStop(1,"#c9c0b0");g.fillStyle=grd;g.fillRect(0,0,W,H);
   g.fillStyle="#8a6a4f";g.fillRect(0,hz,W,H-hz);g.fillStyle="#9b7a5c";g.fillRect(0,hz,W,8);
-  // 墙上的竖线（看得出转动）
   g.strokeStyle="rgba(0,0,0,.08)";g.lineWidth=2;for(let a=-180;a<=180;a+=15){const [x]=P(a,0);if(x>-10&&x<W+10){g.beginPath();g.moveTo(x,0);g.lineTo(x,hz);g.stroke()}}
-  // 窗户
+  // 门
+  let [dx,dy]=P(-80-10,-12+34),[dx2,dy2]=P(-80+10,-12);g.fillStyle="#a07e5e";g.fillRect(dx,dy,dx2-dx,dy2-dy);g.fillStyle="#d8c060";g.beginPath();g.arc(dx2-k*3,(dy+dy2)/2,k*0.9,0,7);g.fill();
+  // 窗
   let [wx,wy]=P(40-15,12+11),[wx2,wy2]=P(40+15,12-11);
-  g.fillStyle="#9cc6e8";g.fillRect(wx,wy,wx2-wx,wy2-wy);g.strokeStyle="#f3efe7";g.lineWidth=8;g.strokeRect(wx,wy,wx2-wx,wy2-wy);
+  g.fillStyle="#9cc6e8";g.fillRect(wx,wy,wx2-wx,wy2-wy);g.strokeStyle="#f3efe7";g.lineWidth=k*1.0;g.strokeRect(wx,wy,wx2-wx,wy2-wy);
   g.beginPath();g.moveTo((wx+wx2)/2,wy);g.lineTo((wx+wx2)/2,wy2);g.stroke();
-  g.fillStyle="#6fa36a";g.beginPath();g.ellipse((wx+wx2)/2+30,wy2-20,60,30,0,Math.PI,0);g.fill();
+  g.fillStyle="#6fa36a";g.beginPath();g.ellipse((wx+wx2)/2+k*4,wy2-k*2.5,k*7.5,k*4,0,Math.PI,0);g.fill();
+  // 植物
+  let [px,py]=P(85,-12);g.fillStyle="#7d5a42";g.fillRect(px-k*3,py-k*6,k*6,k*6);g.fillStyle="#4f8f4a";
+  for(const [ox,oy,r] of [[0,-12,6],[-4,-9,4.5],[4,-9,4.5],[0,-17,4]]){g.beginPath();g.arc(px+ox*k,py+oy*k,r*k,0,7);g.fill()}
   // 杯子
-  let [cx,cy]=P(-28,-24);const cs=W/FOVX*6;
+  let [cx,cy]=P(-28,-24);const cs=k*6;
   g.fillStyle="#e9eef2";g.fillRect(cx-cs/2,cy-cs*0.6,cs,cs*1.2);g.strokeStyle="#e9eef2";g.lineWidth=cs*0.14;g.beginPath();g.arc(cx+cs*0.6,cy,cs*0.3,-1.2,1.2);g.stroke();
   g.fillStyle="#7a4a2a";g.fillRect(cx-cs/2+3,cy-cs*0.6+3,cs-6,cs*0.18);
-  // 你
-  const [yx,yy]=P(S.you.yaw,S.you.pitch);const ys=W/FOVX*9;
+  // 人
+  const [yx,yy]=P(person.yaw,person.pitch);const ys=k*9;
   g.fillStyle="#3c3a4a";g.beginPath();g.ellipse(yx,yy+ys*2.2,ys*1.6,ys*1.3,0,Math.PI,0);g.fill();
   g.fillStyle="#efd2bf";g.beginPath();g.ellipse(yx,yy,ys*0.75,ys*0.9,0,0,Math.PI*2);g.fill();
   g.fillStyle="#3c3a4a";g.beginPath();g.ellipse(yx,yy-ys*0.45,ys*0.8,ys*0.5,0,Math.PI,0);g.fill();
   g.fillStyle="#222";g.beginPath();g.arc(yx-ys*0.28,yy+ys*0.05,ys*0.08,0,7);g.arc(yx+ys*0.28,yy+ys*0.05,ys*0.08,0,7);g.fill();
   g.globalAlpha=1;
-  g.font='600 22px "Noto Sans SC",sans-serif';g.textAlign="center";
-  g.fillStyle="rgba(0,0,0,.55)";g.fillRect(yx-62,yy-ys*1.55-26,124,32);g.fillStyle="#fff";g.fillText("你（鼠标）",yx,yy-ys*1.55-3);
+  g.font='600 22px "Noto Sans SC",sans-serif';g.textAlign="center";const tw=g.measureText(plabel).width+20;
+  g.fillStyle="rgba(0,0,0,.55)";g.fillRect(yx-tw/2,yy-ys*1.55-26,tw,32);g.fillStyle="#fff";g.fillText(plabel,yx,yy-ys*1.55-3);
   g.textAlign="start";
+}
+function drawCam(){
+  const W=cam.width,H=cam.height,c=camDir(),g=cg;
+  const blur=S.eyeSpeed>200;
+  g.globalAlpha=blur&&lastCam?0.45:1;
+  drawScene(g,W,H,c,FOVX,FOVY,S.vr?ROOMP:S.you,S.vr?"房间里的人":"你（鼠标）");
   // 注意点
   g.strokeStyle="rgba(120,255,200,.9)";g.lineWidth=2;g.beginPath();g.arc(W/2,H/2,16,0,7);g.moveTo(W/2-28,H/2);g.lineTo(W/2-18,H/2);g.moveTo(W/2+18,H/2);g.lineTo(W/2+28,H/2);g.stroke();
   g.fillStyle="rgba(120,255,200,.95)";g.font='18px "Noto Sans SC",sans-serif';g.fillText("它正在看的地方",W/2+24,H/2+34);
   g.fillStyle="rgba(255,255,255,.9)";g.font='20px "Noto Sans SC",sans-serif';
-  g.fillText(S.target==="you"?"它一直在看你，所以你总在画面中间":`它在看${TARGETS[S.target].name}，你不在中间`,18,H-18);
-  // 物理眼睑：从上往下挡住
+  g.fillText(S.vr?"VR 中：它跟着主人的头转":S.target==="you"?"它一直在看你，所以你总在画面中间":`它在看${TARGETS[S.target].name}，你不在中间`,18,H-18);
   if(S.lid>0.01){const h=H*S.lid*1.05;g.fillStyle="#120c0a";g.fillRect(0,0,W,h);const gr=g.createLinearGradient(0,h-30,0,h);gr.addColorStop(0,"rgba(18,12,10,1)");gr.addColorStop(1,"rgba(18,12,10,0)");g.fillStyle=gr;g.fillRect(0,h-30,W,30)}
   if(blur){g.fillStyle="rgba(255,255,255,.85)";g.font='600 22px "Noto Sans SC",sans-serif';g.fillText("转得太快，画面糊了",18,H-52)}
   $("camCap").textContent=S.mode==="screen"?"额头摄像头看到的":"瞳孔里的摄像头看到的";
@@ -353,6 +377,7 @@ function drawEye(g,x,y,sx,iy,ip,side){
     g.fillStyle="#141a2c";g.beginPath();g.ellipse(ix,iyy+4,irw*0.42,irh*0.42,0,0,Math.PI*2);g.fill();
     // 镜头：在瞳孔正中（A/B 方案镜头和虹膜一起动；纯屏幕方案没有镜头）
     if(m!=="screen"){g.fillStyle="#05070b";g.beginPath();g.arc(ix,iyy+4,7,0,7);g.fill();g.fillStyle="rgba(140,190,255,.7)";g.beginPath();g.arc(ix-2,iyy+2,2.4,0,7);g.fill()}
+    if(S.vr){g.strokeStyle="rgba(255,176,60,.95)";g.lineWidth=5;g.beginPath();g.ellipse(ix,iyy,irw+5,irh+5,0,0,Math.PI*2);g.stroke()}
     g.fillStyle="#fff";g.beginPath();g.ellipse(ix-irw*0.35,iyy-irh*0.4,irw*0.28,irh*0.2,-0.4,0,7);g.fill();
     g.beginPath();g.arc(ix+irw*0.3,iyy+irh*0.35,irw*0.12,0,7);g.fill();
   }else{
@@ -439,7 +464,85 @@ function flags(){
   else if(S.blinkPhys&&m!=="screen"){const lost=S.frames?S.lostFrames/S.frames*100:0;fL.className="flag";fL.innerHTML=`<b>用物理眼睑眨眼</b><span>每次眨眼画面会黑一下，大约丢失 ${lost.toFixed(1)}% 的画面。平时用屏幕画眨眼就不会丢。</span>`}
   else{fL.className="flag";fL.innerHTML=`<b>眼睛睁着</b><span>${m==="screen"?"平时的眨眼是屏幕画的。":"平时的眨眼是屏幕画的，镜头不受影响；睡觉或\"我不看\"时才用物理眼睑。"}</span>`}
 }
+
+// ---------- VR 模式 ----------
+const hmd=$("hmd"),hg=hmd.getContext("2d"),top_=$("top"),tg=top_.getContext("2d");
+const WIDE={x:140,y:100}, HMD={x:100,y:80};
+(function(){const box=$("reproj");const o={on:"先裁画面（重投影）",off:"直接显示摄像头画面"};
+  box.innerHTML=Object.entries(o).map(([k,v])=>`<button data-k="${k}" aria-pressed="${k==="on"}">${v}</button>`).join("");
+  box.onclick=e=>{const b=e.target.closest("button");if(!b)return;S.reproj=b.dataset.k==="on";S.sick=0;for(const x of box.children)x.setAttribute("aria-pressed",x===b)}})();
+$("vrBtn").onclick=()=>{S.vr=!S.vr;S.sick=0;$("vrBtn").textContent=S.vr?"结束 VR":"开始 VR";if(S.vr&&S.mode==="screen"){S.mode="B";for(const x of $("modes").children)x.setAttribute("aria-pressed",x.dataset.k==="B")}};
+function setOwner(e){if(!S.vr)return;const r=hmd.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+  S.owner.yaw=clamp(x*200,-100,100);S.owner.pitch=clamp(-y*70+4,-30,34)}
+hmd.addEventListener("pointermove",setOwner);hmd.addEventListener("pointerdown",setOwner);
+function drawVR(dt){
+  const W=hmd.width,H=hmd.height,g=hg,o=S.owner,c=camDir();
+  const view=S.reproj?o:c;
+  drawScene(g,W,H,view,HMD.x,HMD.y,ROOMP,"房间里的人");
+  let lag=0,edge=0;
+  if(S.reproj){
+    // 广角画面只覆盖摄像头方向 ±70° / ±50°，超出的部分暂时没有画面
+    const L=W*(0.5+(c.yaw-WIDE.x/2-view.yaw)/HMD.x), R=W*(0.5+(c.yaw+WIDE.x/2-view.yaw)/HMD.x);
+    const T=H*(0.5-(c.pitch+WIDE.y/2-view.pitch)/HMD.y), B=H*(0.5-(c.pitch-WIDE.y/2-view.pitch)/HMD.y);
+    g.fillStyle="#07080a";
+    if(L>0){g.fillRect(0,0,Math.min(L,W),H);edge=Math.max(edge,L/W)}
+    if(R<W){g.fillRect(Math.max(R,0),0,W-Math.max(R,0),H);edge=Math.max(edge,(W-R)/W)}
+    if(T>0)g.fillRect(0,0,W,Math.min(T,H));
+    if(B<H)g.fillRect(0,Math.max(B,0),W,H-Math.max(B,0));
+  }else{
+    lag=Math.hypot(o.yaw-c.yaw,o.pitch-c.pitch);
+  }
+  if(S.lid>0.01){g.fillStyle="#07080a";g.fillRect(0,0,W,H*S.lid*1.05)}
+  // 头显镜片的暗角
+  const vg=g.createRadialGradient(W/2,H/2,H*0.35,W/2,H/2,W*0.62);vg.addColorStop(0,"rgba(0,0,0,0)");vg.addColorStop(1,"rgba(0,0,0,.7)");g.fillStyle=vg;g.fillRect(0,0,W,H);
+  // 晕的程度：画面和头的方向不一致就会累积
+  if(S.vr){S.sick=clamp(S.sick+(lag>4?lag*dt*0.03:-dt*0.2),0,1)}else S.sick=0;
+  g.fillStyle="rgba(255,255,255,.92)";g.font='18px "JetBrains Mono",monospace';
+  g.fillText(`你的头 ${o.yaw.toFixed(0)}°   摄像头 ${c.yaw.toFixed(0)}°`,16,H-18);
+  if(S.vr){
+    g.fillStyle="rgba(0,0,0,.5)";g.fillRect(W-226,14,210,26);g.fillStyle=S.sick>0.5?"#ff6a6a":S.sick>0.15?"#e7ae46":"#4cc2b2";g.fillRect(W-222,18,202*S.sick,18);
+    g.fillStyle="#fff";g.font='15px "Noto Sans SC",sans-serif';g.fillText("晕的程度",W-300,32);
+  }else{
+    g.fillStyle="rgba(0,0,0,.55)";g.fillRect(0,0,W,H);g.fillStyle="#fff";g.font='600 26px "Noto Sans SC",sans-serif';g.textAlign="center";g.fillText("点上面的“开始 VR”",W/2,H/2);g.textAlign="start";
+  }
+  drawTop(c,o);
+  // 说明
+  const f=$("flagVR");if(!S.vr){f.className="flag";f.innerHTML="<b>还没开始</b><span>开始后，机器人的眼睛会多一圈琥珀色光环，告诉房间里的人“现在有人在里面看”。</span>";return}
+  const beyond=Math.abs(o.yaw)>57+12+WIDE.x/2-HMD.x/2;
+  if(S.reproj){
+    f.className="flag"+(beyond?" bad":"");
+    f.innerHTML=`<b>${beyond?"超出它能看的范围":edge>0.02?"边缘暂时是黑的":"画面跟得上"}</b><span>${beyond?"它的脖子只能转 ±57°，眼球 ±12°，你转得再远，这一侧它就是看不见。":edge>0.02?"你的头转得比它快，头显先从广角画面里裁出新的方向；超出广角的部分暂时是黑的，等它转过来就补上。":"你转头时，头显立刻从广角画面里裁出新的方向（几毫秒），机器人随后才转过来。画面始终和你的头一致，不会晕。"}</span>`;
+  }else{
+    f.className="flag"+(lag>4?" bad":"");
+    f.innerHTML=`<b>${lag>4?"画面落后你的头 "+lag.toFixed(0)+"°":"画面和头一致"}</b><span>头显直接显示摄像头的画面，要等机器人转过来画面才会动。你的眼睛和内耳感觉到的转动对不上，这就是 VR 晕的原因。</span>`;
+  }
+}
+function drawTop(c,o){
+  const g=tg,W=top_.width,H=top_.height,cx=W/2,cy=H*0.62,R=Math.min(W,H)*0.42;
+  g.clearRect(0,0,W,H);
+  const dir=(a,r)=>[cx+Math.sin(a*Math.PI/180)*r,cy-Math.cos(a*Math.PI/180)*r];
+  const wedge=(a,half,r,fill,stroke,dash)=>{g.beginPath();g.moveTo(cx,cy);g.arc(cx,cy,r,(a-half-90)*Math.PI/180,(a+half-90)*Math.PI/180);g.closePath();
+    if(fill){g.fillStyle=fill;g.fill()}if(stroke){g.strokeStyle=stroke;g.lineWidth=3;g.setLineDash(dash||[]);g.stroke();g.setLineDash([])}};
+  // 脖子能转到的范围
+  g.strokeStyle=css("--rule");g.lineWidth=10;g.beginPath();g.arc(cx,cy,R*0.38,(-57-90)*Math.PI/180,(57-90)*Math.PI/180);g.stroke();
+  wedge(c.yaw,WIDE.x/2,R,"rgba(76,194,178,.18)",css("--ok"));
+  if(S.vr)wedge(o.yaw,HMD.x/2,R*0.92,null,"rgba(231,174,70,.95)",[8,6]);
+  // 房间里的东西
+  const things=[[0,"人"],[-28,"杯子"],[40,"窗"],[-80,"门"],[85,"植物"]];
+  g.font='16px "Noto Sans SC",sans-serif';g.textAlign="center";
+  for(const [a,n] of things){const [x,y]=dir(a,R*1.08);g.fillStyle=css("--ink");g.beginPath();g.arc(x,y,6,0,7);g.fill();g.fillText(n,x,y-12)}
+  // 箭头
+  const arrow=(a,r,col,w)=>{const [x,y]=dir(a,r);g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(cx,cy);g.lineTo(x,y);g.stroke();g.fillStyle=col;g.beginPath();g.arc(x,y,w+2,0,7);g.fill()};
+  arrow(S.neck.yaw,R*0.45,css("--ink-2"),6);
+  arrow(c.yaw,R*0.7,css("--ok"),4);
+  if(S.vr)arrow(o.yaw,R*0.85,css("--hard"),3);
+  // 机器人的头
+  g.fillStyle=css("--panel");g.strokeStyle=css("--ink");g.lineWidth=2;g.beginPath();g.arc(cx,cy,26,0,7);g.fill();g.stroke();
+  g.textAlign="start";g.font='15px "Noto Sans SC",sans-serif';
+  const leg=[[css("--ink-2"),"脖子（±57°，灰色弧线）"],[css("--ok"),"摄像头 = 脖子 + 眼球（绿色扇形是广角画面）"],[css("--hard"),"主人的头（虚线扇形是头显视野）"]];
+  leg.forEach(([col,t],i)=>{g.fillStyle=col;g.fillRect(14,H-78+i*24,18,6);g.fillStyle=css("--ink");g.fillText(t,40,H-70+i*24)});
+}
 let last=performance.now();
-function loop(t){const dt=Math.min(0.05,(t-last)/1000);last=t;step(dt);drawFace();drawCam();flags();requestAnimationFrame(loop)}
+function loop(t){const dt=Math.min(0.05,(t-last)/1000);last=t;step(dt);drawFace();drawCam();flags();drawVR(dt);requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 </script>
