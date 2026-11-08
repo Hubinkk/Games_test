@@ -1,0 +1,354 @@
+<title>触手舌头</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* 布局：先给结论（四格评分），再给证据（试听 → 形状 → 力学 → s 闭环），最后列出还没验证的部分 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --hard:#b9800f; --no:#cf3b3d; --tongue:#d98a8a; --human:#4a5fa8;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --tongue:#e08f8f; --human:#93a6ec; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --tongue:#e08f8f; --human:#93a6ec; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.6}
+.wrap{max-width:1120px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:44px}
+header{display:grid;gap:10px;max-width:74ch}
+.eyebrow{font-family:var(--f-data);font-size:12px;letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase}
+h1{font-family:var(--f-display);font-size:clamp(30px,4.4vw,44px);line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:23px;margin:0;text-wrap:balance}
+h3{margin:0;font-size:15.5px}
+p{margin:0}
+.lede{color:var(--ink-2);font-size:15.5px}
+.lede b{color:var(--ink)}
+section{display:grid;gap:14px}
+section > p{max-width:74ch;color:var(--ink-2);font-size:14.5px}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+/* 评分 */
+.score{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.score{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.score{grid-template-columns:minmax(0,1fr)}}
+.tile{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:6px;align-content:start;border-top:4px solid var(--rule)}
+.tile.ok{border-top-color:var(--ok)} .tile.hard{border-top-color:var(--hard)} .tile.no{border-top-color:var(--no)}
+.tile .k{font-size:12.5px;color:var(--ink-2);letter-spacing:.04em}
+.tile .v{font-family:var(--f-display);font-size:26px;line-height:1.2}
+.tile .d{font-size:13px;color:var(--ink-2)}
+.ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:var(--panel)}
+@media (max-width:760px){.ladder{grid-template-columns:minmax(0,1fr)}}
+.rung{padding:12px 14px;display:grid;gap:4px;border-right:1px solid var(--rule)}
+.rung:last-child{border-right:0}
+@media (max-width:760px){.rung{border-right:0;border-bottom:1px solid var(--rule)}.rung:last-child{border-bottom:0}}
+.rung .st{font-size:12px;font-weight:700}
+.rung.ok .st{color:var(--ok)} .rung.hard .st{color:var(--hard)} .rung.no .st{color:var(--no)}
+.rung p{font-size:13px;color:var(--ink-2)}
+/* 试听表 */
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+th,td{border-bottom:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:middle}
+th{color:var(--ink-2);font-weight:500;font-size:12.5px}
+th small{display:block;font-weight:400}
+td.vw{font-family:var(--f-display);font-size:20px;width:3em}
+.cell{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.play{font:inherit;font-size:13px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:99px;padding:3px 12px 3px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.play::before{content:"";border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.play:hover{border-color:var(--calm);color:var(--calm)}
+.play.on{background:var(--calm);border-color:var(--calm);color:var(--paper)}
+button:focus-visible,.seg button:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.heard{font-size:12.5px}
+.heard.ok{color:var(--ok)} .heard.no{color:var(--no)}
+.meta{font-family:var(--f-data);font-size:11.5px;color:var(--ink-2)}
+/* 形状 */
+.shapes{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.shapes{grid-template-columns:minmax(0,1fr)}}
+.stage{background:var(--stage);border-radius:10px;padding:10px;display:grid;gap:8px}
+.stage canvas{width:100%;height:auto;display:block;max-width:100%}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:13.5px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:7px;padding:5px 11px;cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--calm);color:var(--calm);box-shadow:inset 0 0 0 1px var(--calm);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink-2)}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.side{display:grid;gap:12px}
+.note{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;display:grid;gap:6px;font-size:13.5px;color:var(--ink-2)}
+.note b{color:var(--ink)}
+/* 力学 */
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.fact{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;display:grid;gap:4px;align-content:start}
+.fact .t{font-size:12.5px;color:var(--ink-2)}
+.fact .n{font-family:var(--f-data);font-size:18px;font-variant-numeric:tabular-nums}
+.fact .s{font-size:12.5px}
+.fact .s.ok{color:var(--ok)} .fact .s.hard{color:var(--hard)}
+/* s 闭环 */
+.loops{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.loop{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px;display:grid;gap:6px;align-content:start}
+.loop canvas{width:100%;height:auto;display:block}
+.loop .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.loop .pct{font-family:var(--f-data);font-size:20px;font-variant-numeric:tabular-nums}
+.loop p{font-size:12.5px;color:var(--ink-2)}
+.todo{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.todo div{background:var(--panel);border:1px dashed var(--rule);border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--ink-2)}
+.todo b{color:var(--ink);display:block;margin-bottom:2px}
+.foot{font-size:12.5px;color:var(--ink-2);max-width:80ch}
+code{font-family:var(--f-data);font-size:.92em}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">55 cm 人偶 · 发声 · 绳驱连续体舌头</div>
+    <h1>触手舌头</h1>
+    <p class="lede">把舌头做成章鱼触手那样：一根镍钛丝脊柱分两段，用线拉弯；外面包硅胶软体，里面有两个气腔；舌根装在两轴滑台上。这一页回答一个问题：<b>它能像人到什么程度。</b>声音是用同一个声道模型合成的，三种舌头只有舌头的形状不同。</p>
+  </header>
+
+  <section aria-labelledby="h-sum">
+    <h2 id="h-sum">结论</h2>
+    <div class="score" id="score"></div>
+    <div class="ladder" id="ladder"></div>
+  </section>
+
+  <section aria-labelledby="h-listen">
+    <h2 id="h-listen">听：三种舌头说同一个元音</h2>
+    <p>"人"是已经和真人数据校验过的发音器官模型。触手舌头搜索了两次：一次只要求声音对，一次同时要求舌头最窄的位置和人接近。"听成"按共振峰离哪个日语元音最近来判断。三列用同一个声带、同一个声道长度（成年女性 14.5 cm），音高一样。</p>
+    <div class="tblwrap"><table id="listen"></table></div>
+  </section>
+
+  <section aria-labelledby="h-shape">
+    <h2 id="h-shape">看：舌头的形状和动作</h2>
+    <p>侧面剖面，成人尺寸（人偶上整体缩小到 8/17）。蓝色竖线是人发这个音时声道最窄的位置，红色圆点是触手舌头最窄的位置。两者相差 1.5 cm 以内算"形状像"。</p>
+    <div class="shapes">
+      <div class="stage">
+        <div class="seg" id="setBtns" role="group" aria-label="选择舌头"></div>
+        <canvas id="cv" width="720" height="640" aria-label="舌头侧面剖面"></canvas>
+        <div class="seg" id="vowBtns" role="group" aria-label="选择元音"></div>
+        <div class="legend"><span><i style="background:var(--tongue)"></i>触手舌头（软体）</span><span><i style="background:var(--ink-2);height:2px"></i>脊柱（镍钛丝）</span><span><i style="background:var(--human);width:4px"></i>人的收紧点</span><span><i style="background:var(--no);border-radius:50%;width:10px"></i>触手的收紧点</span></div>
+      </div>
+      <div class="side">
+        <div class="note" id="shapeNote"></div>
+        <div class="note"><b>四个驱动在做什么</b>
+          <span>舌根滑台：前后、上下各一个电机，相当于人的舌骨和颏舌肌，负责把整个舌体推到位置上。</span>
+          <span>舌体、舌尖：各一对线，一个电机拉，弯曲舌头。</span>
+          <span>两个气腔：舌体前部充气变厚；舌根放气变薄，让咽腔变宽。没有它们，i 和 e 只能用"不像人"的形状发出来。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-mech">
+    <h2 id="h-mech">做得出来吗：力学估算（人偶尺寸）</h2>
+    <p>静态估算：镍钛丝 Ø0.5 mm 做脊柱，Ecoflex 00-30 级硅胶做软体，Ø0.2 mm 超高分子量聚乙烯线，电机在头里。</p>
+    <div class="facts" id="facts"></div>
+  </section>
+
+  <section aria-labelledby="h-loop">
+    <h2 id="h-loop">s：只有边说边感觉才稳</h2>
+    <p>s 的缝在人偶上只有约 0.47 mm，要保持在 ±0.14 mm 以内，相当于线的位移稳定在 ±14 µm。线会随拉力伸长，套管有摩擦，硅胶会蠕变，温度会漂移。下面是同一段对话里说 300 次 s，每个点是一次发音的缝宽，绿色带是合格范围。</p>
+    <div class="loops" id="loops"></div>
+  </section>
+
+  <section aria-labelledby="h-todo">
+    <h2 id="h-todo">还没验证的</h2>
+    <div class="todo">
+      <div><b>i 和 e 还"暗"一点</b>形状像人时，i、e 的第二共振峰比目标低约 15–20%，能听对，但不够亮。需要更细的舌面形状控制（第三个气腔或更多段）。</div>
+      <div><b>只有侧面二维</b>没有模拟舌头左右的形状：s 的中央凹槽、两侧贴住上齿。</div>
+      <div><b>力学是静态估算</b>没有模拟硅胶的大变形、接触和疲劳，也没有做实物。舌尖段的镍钛应变 5.3% 接近上限，要用更细的丝或减小弯角。</div>
+      <div><b>声音本身的"像"</b>这里的"像"只看共振峰和舌形。音色、气息、辅音的过渡是否自然，还需要真人来听。</div>
+    </div>
+    <p class="foot">模型：<code>sim/tongue.py</code>（几何与搜索）、<code>sim/tongue_like.py</code>（像不像）、<code>sim/tongue_mech.py</code>（力学与 s 闭环）、<code>sim/voice.py</code>（声道波导与声源）。人的收紧点取经典元音发音测量的大致位置（成年男性，±1 cm 量级）。声音片段由时域波导合成，每段 0.55 秒。</p>
+  </section>
+</div>
+
+<script id="data" type="application/json">/*DATA_START*/{}/*DATA_END*/</script>
+<script>
+"use strict";
+const D = JSON.parse(document.getElementById("data").textContent.replace(/\/\*DATA_(START|END)\*\//g,""));
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const VOW = ["a","i","u","e","o"];
+const SETS = {human:"人", sound:"触手 · 只求声音", both:"触手 · 声音和形状都求"};
+const pct = x => Math.round(x*100)+"%";
+
+// ---------- 结论 ----------
+(function summary(){
+  const b=D.sets.both, s=D.sets.sound;
+  const heard=VOW.filter(v=>b[v].heard===v).length, shape=VOW.filter(v=>Math.abs(b[v].dloc)<=D.tol).length;
+  const shapeSound=VOW.filter(v=>Math.abs(s[v].dloc)<=D.tol).length;
+  const maxErr=Math.max(...VOW.map(v=>b[v].err));
+  const best=D.loop.touch, hear=D.loop.both_loops;
+  const tiles=[
+    {c:heard===5?"ok":"hard",k:"听起来像",v:`${heard} / 5 元音听对`,d:`形状也像人时，共振峰最大误差 ${pct(maxErr)}；真人数据本身相差约 ±15%。`},
+    {c:shape===5?"ok":"hard",k:"形状像人",v:`${shape} / 5 位置对`,d:`舌头最窄处离人的位置都在 ${D.tol} cm 以内。只求声音时只有 ${shapeSound} / 5。`},
+    {c:"ok",k:"辅音",v:"t n k s 都能做",d:"t、n 靠软皮肤轻压封住（差 0.2 mm）；k 要加大舌根升降行程。"},
+    {c:"hard",k:"能不能稳定做到",v:`s 成功 ${pct(best.success)}`,d:`前提是舌尖装触觉传感器。只靠"听"是 ${pct(hear.success)}，不修正只有 ${pct(D.loop.open.success)}。`},
+  ];
+  $("score").innerHTML=tiles.map(t=>`<div class="tile ${t.c}"><span class="k">${t.k}</span><span class="v">${t.v}</span><span class="d">${t.d}</span></div>`).join("");
+  const rungs=[
+    {c:"ok",st:"做到了",t:"声音像",d:"5 个元音能被听对，共振峰在真人差异的范围附近。"},
+    {c:"ok",st:"做到了",t:"形状像",d:"加了舌根滑台和两个气腔后，舌头最窄的位置和人一致。"},
+    {c:"hard",st:"部分做到",t:"能稳定地像",d:"s 这样的精细动作需要舌尖触觉闭环；元音和 t、n、k 不需要。"},
+    {c:"no",st:"还没验证",t:"动作和音色像",d:"说话时的过渡速度、口型同步、音色是否自然，要做实物、请人听。"},
+  ];
+  $("ladder").innerHTML=rungs.map(r=>`<div class="rung ${r.c}"><span class="st">${r.st}</span><h3>${r.t}</h3><p>${r.d}</p></div>`).join("");
+})();
+
+// ---------- 声音 ----------
+let actx=null, playing=null, onAudioTick=null;
+const bufs={};
+async function getBuf(key){
+  if(bufs[key])return bufs[key];
+  const bin=atob(D.audio[key]),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+  bufs[key]=await actx.decodeAudioData(u8.buffer);return bufs[key];
+}
+async function play(key,btn,onStart){
+  try{
+    if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==="suspended")await actx.resume();
+    if(playing){try{playing.src.stop()}catch(e){}playing.btn&&playing.btn.classList.remove("on")}
+    const b=await getBuf(key),src=actx.createBufferSource();src.buffer=b;src.connect(actx.destination);
+    src.start();btn&&btn.classList.add("on");playing={src,btn};const t0=actx.currentTime;
+    onStart&&onStart(()=>actx.currentTime-t0,b.duration);
+    src.onended=()=>{btn&&btn.classList.remove("on");if(playing&&playing.src===src)playing=null};
+  }catch(e){btn&&(btn.textContent="无法播放")}
+}
+(function listen(){
+  const t=$("listen");
+  let h=`<thead><tr><th></th>${Object.entries(SETS).map(([k,n])=>`<th>${n}${k==="human"?"<small>发音器官模型（已校验）</small>":k==="sound"?"<small>只优化共振峰</small>":"<small>共振峰 + 收紧点位置</small>"}</th>`).join("")}</tr></thead><tbody>`;
+  for(const v of [...VOW,"aiueo"]){
+    h+=`<tr><td class="vw">${v}</td>`;
+    for(const k of Object.keys(SETS)){
+      if(v==="aiueo"){h+=`<td><div class="cell"><button class="play" data-k="${k}_aiueo">あいうえお</button></div></td>`;continue}
+      const r=D.sets[k][v], ok=r.heard===v, sh=Math.abs(r.dloc)<=D.tol;
+      h+=`<td><div class="cell"><button class="play" data-k="${k}_${v}">${v}</button>
+        <span class="heard ${ok?"ok":"no"}">听成 ${r.heard}${ok?"":" ✕"}</span></div>
+        <div class="meta">F1/F2 ${Math.round(r.f[0])}/${Math.round(r.f[1])} · 误差 ${pct(r.err)} · 最窄处 ${r.loc.toFixed(1)} cm <span style="color:var(--${sh?"ok":"no"})">${sh?"像人":"差 "+Math.abs(r.dloc).toFixed(1)+" cm"}</span></div></td>`;
+    }
+    h+="</tr>";
+  }
+  t.innerHTML=h+"</tbody>";
+  t.addEventListener("click",e=>{const b=e.target.closest(".play");if(b)play(b.dataset.k,b)});
+})();
+
+// ---------- 舌头几何（与 sim/tongue.py 相同） ----------
+const G=D.geo, clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+function rot(p,c,a){const s=Math.sin(a),co=Math.cos(a),dx=p[0]-c[0],dy=p[1]-c[1];return[c[0]+co*dx-s*dy,c[1]+s*dx+co*dy]}
+function thick(u,bulge,back){
+  let body=0.25+(G.thick-0.25)*Math.pow(Math.sin(Math.PI*clamp(u/0.82,0,1)),0.7); if(u>0.82)body=0.25;
+  const front=back?(u>0.35&&u<0.8):(u<0.8), root=(u<=0.35?1:0)*clamp((0.45-u)/0.2,0,1);
+  return Math.max(body*(1+bulge*(front?1:0)-back*root),0.2);
+}
+function tongue(p){
+  const ja=-0.22*p.jaw; let pos=rot([2.6+p.slide,G.baseY+(p.lift||0)],G.tmj,ja), th=95*Math.PI/180+ja;
+  const spine=[],surf=[];const push=(u)=>{const n=[-Math.sin(th),Math.cos(th)],h=thick(u,p.bulge||0,p.back||0);spine.push(pos.slice());surf.push([pos[0]+n[0]*h,pos[1]+n[1]*h])};
+  [[G.L1,p.phi1,40],[G.L2,p.phi2||0,16]].forEach(([len,phi,n],seg)=>{const k=phi/len,ds=len/n;
+    for(let i=0;i<n;i++){push((seg*G.L1+i*ds)/(G.L1+G.L2));pos=[pos[0]+ds*Math.cos(th+k*ds/2),pos[1]+ds*Math.sin(th+k*ds/2)];th+=k*ds}});
+  push(1);return{spine,surf};
+}
+function lowerLip(p){const t=rot([7.0,8.75],G.tmj,-0.22*p.jaw);return t[1]-0.15-1.1*p.lips}
+
+// ---------- 画剖面 ----------
+const cv=$("cv"),g=cv.getContext("2d");
+const VIEW={x0:-1.2,x1:8.8,y0:0.6,y1:11.0};
+const X=x=>(x-VIEW.x0)/(VIEW.x1-VIEW.x0)*cv.width, Y=y=>(VIEW.y1-y)/(VIEW.x1-VIEW.x0)*cv.width;
+let curSet="both", curV="i", anim=null;
+function draw(p,v,mark){
+  const W=cv.width,H=cv.height;g.clearRect(0,0,W,H);
+  const ink=css("--ink"),ink2=css("--ink-2"),tg=css("--tongue"),hu=css("--human"),no=css("--no");
+  // 上壁
+  g.strokeStyle=ink2;g.lineWidth=3;g.beginPath();D.wall.forEach(([x,y],i)=>i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y)));g.stroke();
+  // 口底（随下巴）
+  const ja=-0.22*p.jaw,f0=rot([2.0,2.2],G.tmj,ja),f1=rot([6.7,7.6],G.tmj,ja);
+  g.setLineDash([5,5]);g.lineWidth=1.5;g.beginPath();g.moveTo(X(f0[0]),Y(f0[1]));g.lineTo(X(f1[0]),Y(f1[1]));g.stroke();g.setLineDash([]);
+  // 舌头
+  const {spine,surf}=tongue(p);
+  g.fillStyle=tg;g.globalAlpha=.88;g.beginPath();surf.forEach(([x,y],i)=>i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y)));
+  for(let i=spine.length-1;i>=0;i--)g.lineTo(X(spine[i][0]),Y(spine[i][1]));g.closePath();g.fill();g.globalAlpha=1;
+  g.strokeStyle=ink;g.lineWidth=1.5;g.beginPath();surf.forEach(([x,y],i)=>i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y)));g.stroke();
+  g.strokeStyle=ink2;g.lineWidth=2;g.setLineDash([2,4]);g.beginPath();spine.forEach(([x,y],i)=>i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y)));g.stroke();g.setLineDash([]);
+  // 滑台
+  const b=spine[0];g.fillStyle=ink2;g.fillRect(X(b[0])-14,Y(b[1])-4,28,8);
+  // 嘴唇
+  const ll=lowerLip(p);g.strokeStyle=tg;g.lineWidth=9;g.lineCap="round";
+  g.beginPath();g.moveTo(X(6.9),Y(8.95));g.lineTo(X(8.1),Y(8.95));g.stroke();g.beginPath();g.moveTo(X(6.9),Y(ll));g.lineTo(X(8.1),Y(ll));g.stroke();g.lineCap="butt";
+  // 收紧点
+  if(mark){
+    const [hx,hy]=mark.h,[cx,cy]=mark.c,[nx,ny]=mark.hn;
+    g.strokeStyle=hu;g.lineWidth=5;g.beginPath();g.moveTo(X(hx-nx*1.4),Y(hy-ny*1.4));g.lineTo(X(hx+nx*1.4),Y(hy+ny*1.4));g.stroke();
+    g.fillStyle=no;g.beginPath();g.arc(X(cx),Y(cy),8,0,Math.PI*2);g.fill();
+  }
+  g.fillStyle=ink;g.font=`600 ${Math.round(W/24)}px "Noto Serif SC",serif`;g.fillText(v,14,Math.round(W/18));
+  g.fillStyle=ink2;g.font=`${Math.round(W/52)}px "Noto Sans SC",sans-serif`;
+  g.fillText("硬腭",X(4.0),Y(10.45));g.fillText("咽后壁",X(-1.1),Y(4.0));g.fillText("嘴唇",X(7.2),Y(9.5));g.fillText("舌根滑台",X(b[0])+18,Y(b[1])+5);
+}
+function show(){
+  if(anim)return;
+  const r=D.sets[curSet][curV];
+  draw(r.p,curV,D.marks[curSet][curV]);
+  const sh=Math.abs(r.dloc)<=D.tol, ok=r.heard===curV;
+  $("shapeNote").innerHTML=`<b>${SETS[curSet]} · ${curV}</b>
+    <span>听成 <b style="color:var(--${ok?"ok":"no"})">${r.heard}</b>，共振峰 ${Math.round(r.f[0])}/${Math.round(r.f[1])} Hz（目标 ${D.targets[curV].join("/")}），误差 ${pct(r.err)}。</span>
+    <span>最窄处离声门 ${r.loc.toFixed(1)} cm，人约 ${D.ref_loc[curV]} cm：<b style="color:var(--${sh?"ok":"no"})">${sh?"形状像人":"差 "+Math.abs(r.dloc).toFixed(1)+" cm，不像人"}</b>。</span>
+    <span>${D.explain[curSet][curV]||""}</span>
+    <button class="play" id="sayBtn">听这个音</button> <button class="play" id="aiueoBtn">说 あいうえお（看动作）</button>`;
+  $("sayBtn").onclick=e=>play(`${curSet}_${curV}`,e.currentTarget);
+  $("aiueoBtn").onclick=e=>speakAnim(e.currentTarget);
+}
+function speakAnim(btn){
+  const durs=[0.26,0.26,0.26,0.26,0.36],ps=VOW.map(v=>D.sets[curSet][v].p),keys=Object.keys(ps[0]);
+  play(`${curSet}_aiueo`,btn,(now,total)=>{
+    anim=true;
+    const tick=()=>{const t=now();if(t>total+0.05){anim=null;show();return}
+      let acc=0,k=0;while(k<4&&t>acc+durs[k]){acc+=durs[k];k++}
+      const prev=ps[Math.max(0,k-1)],cur=ps[k],w=k===0?1:Math.min(1,(t-acc)/0.06),p={};
+      for(const q of keys)p[q]=prev[q]+(cur[q]-prev[q])*w;
+      draw(p,VOW[k],null);requestAnimationFrame(tick)};
+    requestAnimationFrame(tick);
+  });
+}
+(function shapeUI(){
+  $("setBtns").innerHTML=["sound","both"].map(k=>`<button data-s="${k}" aria-pressed="${k===curSet}">${SETS[k]}</button>`).join("");
+  $("vowBtns").innerHTML=VOW.map(v=>`<button data-v="${v}" aria-pressed="${v===curV}">${v}</button>`).join("");
+  $("setBtns").onclick=e=>{const b=e.target.closest("button");if(!b)return;curSet=b.dataset.s;for(const x of $("setBtns").children)x.setAttribute("aria-pressed",x===b);anim=null;show()};
+  $("vowBtns").onclick=e=>{const b=e.target.closest("button");if(!b)return;curV=b.dataset.v;for(const x of $("vowBtns").children)x.setAttribute("aria-pressed",x===b);anim=null;show()};
+  show();
+})();
+
+// ---------- 力学 ----------
+(function facts(){
+  const m=D.mech;
+  const F=[
+    ["舌体弯曲：线拉力 / 电机扭矩",`${m["舌体"].tension_N.toFixed(1)} N / ${m["舌体"].torque_Ncm.toFixed(1)} N·cm`,"ok","微型减速电机能做到"],
+    ["舌尖弯曲：线拉力 / 电机扭矩",`${m["舌尖"].tension_N.toFixed(1)} N / ${m["舌尖"].torque_Ncm.toFixed(1)} N·cm`,"hard","舌尖短，拉力大；可减小弯角"],
+    ["镍钛脊柱的最大应变",`${m["舌体"].strain_pct.toFixed(1)}% / ${m["舌尖"].strain_pct.toFixed(1)}%`,"hard","镍钛可承受 6–8%；弹簧钢只有 0.5%，会断"],
+    ["t / n 密封：接触压力 vs 口腔气压",`${m.seal_contact_kPa.toFixed(1)} vs ${m.seal_needed_kPa} kPa`,"ok","软皮肤压入 0.1 mm 就能封住"],
+    ["线的伸长",`${Math.round(m.stretch_um_per_N)} µm / N`,"hard","拉力变化几牛就超过 s 允许的 ±14 µm"],
+    ["速度：线速度 / 绕线轮转速",`${Math.round(m.cable_speed_mm_s)} mm/s / ${Math.round(m.spool_rpm)} rpm`,"ok","70 ms 完成一个元音过渡"],
+    ["气腔流量",`${m.chamber_flow_ml_per_s.toFixed(1)} ml/s`,"ok","微型气泵约 5 ml/s"],
+    ["舌头峰值功率",`${m.power_W.toFixed(2)} W`,"ok","可以忽略"],
+  ];
+  $("facts").innerHTML=F.map(([t,n,c,s])=>`<div class="fact"><span class="t">${t}</span><span class="n">${n}</span><span class="s ${c}">${s}</span></div>`).join("");
+})();
+
+// ---------- s 闭环 ----------
+(function loops(){
+  const order=["open","model","trial","both_loops","touch"];
+  const desc={open:"出厂标定一次，之后不再修正。",model:"根据当时的线拉力预测伸长并补偿，但温度漂移和摩擦补偿不了。",trial:"每说完一次 s 听一下，下次修正。每次的拉力不同，修正跟不上。",both_loops:"补偿 + 说 s 的 100 ms 里每 30 ms 听一次修正 + 逐次学习。",touch:"再加舌尖触觉：直接测舌尖到齿龈的距离，每 10 ms 修正。人发 s 也靠舌尖的触觉。"};
+  $("loops").innerHTML=order.map(k=>`<div class="loop"><div class="top"><h3>${D.loop[k].name}</h3><span class="pct" style="color:var(--${D.loop[k].success>.9?"ok":D.loop[k].success>.3?"hard":"no"})">${pct(D.loop[k].success)}</span></div><canvas width="500" height="200" data-k="${k}"></canvas><p>${desc[k]}</p></div>`).join("");
+  const drawAll=()=>{for(const c of document.querySelectorAll(".loop canvas")){
+    const q=c.getContext("2d"),W=c.width,H=c.height,gaps=D.loop[c.dataset.k].gaps,lo=-0.5,hi=1.5,pl=40,pb=24;
+    const Yg=v=>8+(H-8-pb)*(hi-clamp(v,lo,hi))/(hi-lo),Xg=i=>pl+(W-pl-6)*i/(gaps.length-1);
+    q.clearRect(0,0,W,H);
+    q.fillStyle=css("--ok");q.globalAlpha=.18;q.fillRect(pl,Yg(D.gap0+D.tol_gap),W-pl-6,Yg(D.gap0-D.tol_gap)-Yg(D.gap0+D.tol_gap));q.globalAlpha=1;
+    q.strokeStyle=css("--rule");q.fillStyle=css("--ink-2");q.font='13px "JetBrains Mono",monospace';q.lineWidth=1;
+    for(const v of [0,0.47,1.0,1.5]){q.beginPath();q.moveTo(pl,Yg(v));q.lineTo(W-6,Yg(v));q.stroke();q.fillText(v.toFixed(v===0.47?2:1),2,Yg(v)+4)}
+    q.fillText("第 1 次",pl,H-6);q.fillText("第 300 次",W-80,H-6);
+    q.fillStyle=css("--ink");
+    gaps.forEach((v,i)=>{const out=v<lo||v>hi;q.globalAlpha=out?.35:.85;q.beginPath();q.arc(Xg(i),Yg(v),out?2:2.4,0,Math.PI*2);q.fill()});q.globalAlpha=1;
+  }};
+  drawAll();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{drawAll();show()});
+})();
+</script>

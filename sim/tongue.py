@@ -46,6 +46,7 @@ RANGES = {
     "phi1": (-2.4, 0.6),      # 第一段总弯角，rad（负 = 向前卷）
     "phi2": (-1.2, 1.8),      # 第二段总弯角，rad（正 = 舌尖上卷）
     "bulge": (-0.4, 0.5),     # 气腔：厚度 ×(1+bulge)
+    "back": (0.0, 0.8),       # 舌根气腔放气：舌根厚度 ×(1-back)
     "jaw": (0.0, 1.0),        # 下巴张开（0–0.22 rad）
     "lips": (0.0, 1.0),       # 嘴唇开口
     "round": (0.0, 1.0),      # 圆唇 / 前伸
@@ -55,10 +56,11 @@ CONFIGS = {                     # 只搜索舌头本身；下巴和嘴唇按人�
     "两段": ("slide", "phi1", "phi2"),
     "两段+升降": ("slide", "lift", "phi1", "phi2"),
     "两段+升降+气腔": ("slide", "lift", "phi1", "phi2", "bulge"),
+    "两段+升降+双气腔": ("slide", "lift", "phi1", "phi2", "bulge", "back"),
 }
-MOTORS = {"一段": 2, "两段": 3, "两段+升降": 4, "两段+升降+气腔": 4}
+MOTORS = {"一段": 2, "两段": 3, "两段+升降": 4, "两段+升降+气腔": 4, "两段+升降+双气腔": 4}
 BEST = "两段+升降"
-GRID = {"一段": 41, "两段": 15, "两段+升降": 9, "两段+升降+气腔": 6}
+GRID = {"一段": 41, "两段": 15, "两段+升降": 9, "两段+升降+气腔": 6, "两段+升降+双气腔": 4}
 # 每个音的下巴、嘴唇（接近人的做法）
 FIXED = {
     "a": dict(jaw=0.9, lips=0.85, round=0.0),
@@ -68,7 +70,7 @@ FIXED = {
     "o": dict(jaw=0.6, lips=0.45, round=0.7),
     "cons": dict(jaw=0.2, lips=0.45, round=0.0),
 }
-REST = dict(lift=0.0, slide=0.0, phi1=-0.7, phi2=0.0, bulge=0.0, jaw=0.3, lips=0.5, round=0.0)
+REST = dict(back=0.0, lift=0.0, slide=0.0, phi1=-0.7, phi2=0.0, bulge=0.0, jaw=0.3, lips=0.5, round=0.0)
 
 
 def rot(p, c, a):
@@ -77,11 +79,14 @@ def rot(p, c, a):
     return c + np.array([co * d[0] - s * d[1], s * d[0] + co * d[1]])
 
 
-def thickness(u, bulge):
-    """舌头厚度沿长度的分布（u：0 舌根 → 1 舌尖）。"""
+def thickness(u, bulge, back=0.0):
+    """舌头厚度沿长度的分布（u：0 舌根 → 1 舌尖）。
+    bulge：舌体前部气腔，充气变厚；back：舌根气腔，放气变薄（让咽腔变宽，像人发 i 时舌根前移）。"""
     body = 0.25 + 2.35 * np.sin(np.pi * np.clip(u / 0.82, 0, 1)) ** 0.7
     body = np.where(u > 0.82, 0.25 + (body - 0.25) * 0, body)
-    return np.maximum(body * (1 + bulge * (u < 0.8)), 0.2)
+    front = (u > 0.35) & (u < 0.8) if back else (u < 0.8)
+    root = (u <= 0.35) * np.clip((0.45 - u) / 0.2, 0, 1)
+    return np.maximum(body * (1 + bulge * front - back * root), 0.2)
 
 
 def tongue(p):
@@ -103,7 +108,7 @@ def tongue(p):
             th += k * ds
     pts.append(pos.copy()); normals.append(np.array([-math.sin(th), math.cos(th)])); us.append(1.0)
     pts, normals, us = np.array(pts), np.array(normals), np.array(us)
-    h = thickness(us, p.get("bulge", 0.0))
+    h = thickness(us, p.get("bulge", 0.0), p.get("back", 0.0))
     return pts + normals * h[:, None], pts
 
 
