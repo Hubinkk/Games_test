@@ -1,0 +1,647 @@
+<title>人偶声道</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* 布局：左边是头部 X 光里的声道（可点的部件编号），右边是发音器官的控制台；下面依次是频谱、自己学说话、机械化难度 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --hard:#b9800f; --no:#cf3b3d;
+  --air:#7fb8e6; --tongue:#d98a8a; --bone:#9aa5b5;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --air:#6fc3ff; --tongue:#e08f8f; --bone:#5d6a7d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --air:#6fc3ff; --tongue:#e08f8f; --bone:#5d6a7d; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+header{display:grid;gap:8px;max-width:72ch}
+.eyebrow{font-family:var(--f-data);font-size:12px;letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase}
+h1{font-family:var(--f-display);font-size:clamp(28px,4vw,40px);line-height:1.2;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:22px;margin:0;text-wrap:balance}
+p{margin:0}
+.lede{color:var(--ink-2);font-size:15px}
+.lede b{color:var(--ink);font-weight:600}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:20px;align-items:start}
+@media (max-width:860px){.stage{grid-template-columns:minmax(0,1fr)}}
+.xray{background:var(--stage);border-radius:10px;position:relative;overflow:hidden}
+.xray canvas{display:block;width:100%;height:auto;max-width:100%}
+.xray .tag{position:absolute;left:12px;top:10px;font-family:var(--f-data);font-size:12px;color:var(--ink-2)}
+.xray .size{position:absolute;left:12px;bottom:10px;right:12px;font-size:12.5px;color:var(--ink-2)}
+.console{display:grid;gap:16px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:14px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:7px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--calm)}
+button:focus-visible,input:focus-visible,select:focus-visible,.pad:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+button.primary{background:var(--calm);border-color:var(--calm);color:var(--paper);font-weight:600}
+button[aria-pressed="true"]{border-color:var(--calm);box-shadow:inset 0 0 0 1px var(--calm);color:var(--calm);font-weight:600}
+.lbl{font-size:12px;color:var(--ink-2);letter-spacing:.04em}
+.group{display:grid;gap:8px}
+.padbox{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.pad{width:170px;height:130px;background:var(--panel);border:1px solid var(--rule);border-radius:8px;position:relative;touch-action:none;cursor:crosshair}
+.pad .dot{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--tongue);border:2px solid var(--ink)}
+.pad .ax{position:absolute;font-size:11px;color:var(--ink-2)}
+.sliders{display:grid;gap:6px;min-width:0}
+.sl{display:grid;grid-template-columns:3.6em 1fr 2.6em;gap:8px;align-items:center;font-size:13px}
+.sl input{width:100%;min-width:0;accent-color:var(--calm)}
+.sl output{font-family:var(--f-data);font-size:12px;color:var(--ink-2);text-align:right}
+select{font:inherit;font-size:14px;background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:7px;padding:5px 8px;max-width:100%}
+.state-note{font-size:13px;color:var(--ink-2);min-height:1.6em}
+.say{font-family:var(--f-data)}
+.panes{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px}
+@media (max-width:860px){.panes{grid-template-columns:minmax(0,1fr)}}
+.pane{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px;display:grid;gap:8px;min-width:0}
+.pane canvas{width:100%;height:auto;display:block;max-width:100%}
+.cap{font-size:13px;color:var(--ink-2)}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.learn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.learn{grid-template-columns:minmax(0,1fr)}}
+.log{font-family:var(--f-data);font-size:12.5px;background:var(--stage);border-radius:8px;padding:10px 12px;min-height:150px;max-height:220px;overflow:auto;white-space:pre-wrap;color:var(--ink)}
+.section{display:grid;gap:12px}
+.section > p{max-width:72ch;color:var(--ink-2);font-size:14.5px}
+.parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.part{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;display:grid;gap:6px;cursor:default}
+.part.on{border-color:var(--calm)}
+.part h3{margin:0;font-size:15px;display:flex;gap:8px;align-items:baseline}
+.part h3 .n{font-family:var(--f-data);font-size:12px;color:var(--ink-2)}
+.part p{font-size:13.5px;color:var(--ink-2)}
+.chip{font-size:11.5px;font-weight:600;border-radius:99px;padding:1px 8px;margin-left:auto;white-space:nowrap}
+.chip.ok{color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok)}
+.chip.hard{color:var(--hard);box-shadow:inset 0 0 0 1px var(--hard)}
+.chip.no{color:var(--no);box-shadow:inset 0 0 0 1px var(--no)}
+.verdict{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:6px;max-width:80ch}
+.verdict b{color:var(--ink)}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;font-size:13px;min-width:560px}
+th,td{border-bottom:1px solid var(--rule);padding:6px 10px;text-align:left}
+th{color:var(--ink-2);font-weight:500}
+td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+td:first-child{font-family:var(--f-body)}
+.foot{font-size:12.5px;color:var(--ink-2);max-width:80ch}
+code{font-family:var(--f-data);font-size:.92em}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">55 cm 人偶 · 发声 · 发音器官合成</div>
+    <h1>人偶声道</h1>
+    <p class="lede">声音来自身体的形状。声门振动产生"嗡嗡"的原始声音；舌头、下巴、嘴唇改变一根软管各处的粗细，管子里的共振把它变成 a、i、u。机器人说话时<b>知道自己的舌头在哪里</b>，听别人说话时也能反过来推想"要发出这个声音，舌头该在哪里"。</p>
+  </header>
+
+  <section class="stage">
+    <div class="xray">
+      <canvas id="xray" width="760" height="858" aria-label="头部侧面 X 光：声道、舌头、嘴唇、软腭和鼻腔"></canvas>
+      <div class="tag" id="xtag">声道剖面 · 气流从下往上</div>
+      <div class="size" id="sizeNote"></div>
+    </div>
+
+    <div class="console">
+      <div class="row">
+        <button class="primary" id="hold" aria-pressed="false">按住发声</button>
+        <span class="cap" id="audioNote">点一下开始声音（浏览器要求先点击才能出声）</span>
+      </div>
+
+      <div class="group">
+        <span class="lbl">元音（人的姿势，由 sim/voice.py 从共振峰反推）</span>
+        <div class="row" id="vowels"></div>
+      </div>
+
+      <div class="group">
+        <span class="lbl">舌体：左右 = 后 ↔ 前，上下 = 高 ↔ 低（可拖动，也可用方向键）</span>
+        <div class="padbox">
+          <div class="pad" id="pad" tabindex="0" role="slider" aria-label="舌位"><span class="ax" style="left:6px;top:4px">后·高</span><span class="ax" style="right:6px;top:4px">前·高</span><span class="ax" style="left:6px;bottom:4px">后·低</span><span class="ax" style="right:6px;bottom:4px">前·低</span><div class="dot" id="dot"></div></div>
+          <div class="sliders" id="sliders"></div>
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="lbl">声道长度与音高</span>
+        <div class="row">
+          <select id="size" aria-label="声道长度">
+            <option value="17">成年男性 · 17 cm</option>
+            <option value="14.5" selected>成年女性 · 14.5 cm</option>
+            <option value="12">十岁儿童 · 12 cm</option>
+            <option value="8">55 cm 人偶头内 · 8 cm</option>
+          </select>
+          <div class="sl" style="grid-template-columns:2.4em 1fr 4em;flex:1;min-width:180px"><label for="f0">音高</label><input id="f0" type="range" min="90" max="420" value="280"><output id="f0o" class="num">280 Hz</output></div>
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="lbl">身体状态（来自身体地图）→ 声门怎么振动</span>
+        <div class="row" id="states"></div>
+        <div class="state-note" id="stateNote"></div>
+      </div>
+
+      <div class="group">
+        <span class="lbl">说一句</span>
+        <div class="row" id="phrases"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panes">
+    <div class="pane">
+      <span class="lbl">频谱：共振曲线（形状决定）＋ 实际声音</span>
+      <canvas id="spec" width="720" height="300" aria-label="频谱与共振峰"></canvas>
+      <p class="cap" id="fmt">F1 / F2 / F3</p>
+    </div>
+    <div class="pane">
+      <span class="lbl">元音图：F2（左前右后）× F1（上高下低）</span>
+      <canvas id="chart" width="440" height="300" aria-label="元音图"></canvas>
+      <p class="cap">灰色字母是日语元音的典型位置（按当前声道长度换算），实心点是现在的姿势。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>让它自己学会一个元音</h2>
+    <p>只告诉机器人"目标声音"的共振峰，不告诉它舌头该放哪。它从中性姿势开始乱发音，听自己的声音，保留更接近的那次，一轮轮调整。这就是"分析—合成"：用自己的身体去解释听到的声音。</p>
+    <div class="learn">
+      <div class="group">
+        <div class="row" id="learnBtns"></div>
+        <div class="log" id="log" aria-live="polite">选一个目标元音。每一轮的最好姿势会播放出来（先点"按住发声"上方的任意按钮开启声音）。</div>
+      </div>
+      <div class="group">
+        <p class="cap" id="learnNote">同一个声音可以由好几种姿势发出（多对一）。它找到的姿势听起来对，却不一定和人一样。人的婴儿也经历过这一步，后来是看着大人的嘴、在身体结构的限制下，才收敛到"人的发法"。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>哪些部件很难做成机械成品</h2>
+    <p>把鼠标移到卡片上，左边图里对应的编号会亮起。评级以"装进 55 cm 人偶、能长期使用的成品"为标准，和人偶机体图的三档一致。</p>
+    <div class="parts" id="parts"></div>
+    <div class="verdict">
+      <b>结论：在人偶身上，发声用软件，嘴巴用机械。</b>
+      <p class="cap">声道在头里的计算单元上实时计算，从扬声器发出；下巴和嘴唇做成真实的动作，由同一组发音参数驱动。机器人"知道自己怎么发音"所需要的，是这套声道模型本身，而不是一根真的硅胶管。完整的机械声道（会振动的声带、能变形的舌头）更适合单独做成一件装置作品。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>模型校验（sim/voice.py）</h2>
+    <p>只给出目标共振峰，从教科书式的粗略姿势出发搜索。成年男性 17 cm 声道，日语元音的文献值本身相差约 ±15%。</p>
+    <div class="tblwrap"><table>
+      <thead><tr><th>元音</th><th>目标 F1 / F2</th><th>粗略姿势</th><th>调整后</th><th>舌 前 / 高</th><th>下巴</th><th>嘴唇 / 圆唇</th></tr></thead>
+      <tbody>
+        <tr><td>a</td><td>750 / 1200</td><td>592 / 1377</td><td>639 / 1201</td><td>0.02 / 0.00</td><td>0.92</td><td>0.85 / 0</td></tr>
+        <tr><td>i</td><td>280 / 2250</td><td>240 / 2021</td><td>281 / 2045</td><td>0.94 / 0.94</td><td>0.24</td><td>0.56 / 0</td></tr>
+        <tr><td>u</td><td>320 / 1350</td><td>328 / 1213</td><td>322 / 1348</td><td>0.09 / 0.97</td><td>0.06</td><td>0.37 / 0.3</td></tr>
+        <tr><td>e</td><td>480 / 1900</td><td>387 / 1822</td><td>434 / 1893</td><td>0.92 / 0.52</td><td>0.48</td><td>0.88 / 0</td></tr>
+        <tr><td>o</td><td>480 / 850</td><td>293 / 762</td><td>475 / 850</td><td>0.00 / 0.24</td><td>0.67</td><td>0.65 / 0.7</td></tr>
+      </tbody>
+    </table></div>
+    <div class="tblwrap"><table>
+      <thead><tr><th>同一套姿势，换声道长度</th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th></tr></thead>
+      <tbody>
+        <tr><td>成年男性 17 cm</td><td>639/1201</td><td>281/2045</td><td>322/1348</td><td>434/1893</td><td>475/850</td></tr>
+        <tr><td>成年女性 14.5 cm</td><td>756/1441</td><td>334/2402</td><td>381/1600</td><td>510/2238</td><td>568/1020</td></tr>
+        <tr><td>十岁儿童 12 cm</td><td>914/1723</td><td>404/2906</td><td>457/1910</td><td>615/2695</td><td>697/1236</td></tr>
+        <tr><td>人偶头内 8 cm</td><td>1377/2648</td><td>615/4359</td><td>691/2871</td><td>932/4072</td><td>1031/1840</td></tr>
+      </tbody>
+    </table></div>
+    <p class="foot">a 的 F1 偏低约 15%，是这个简化舌头模型的上限。8 cm 的共振峰约为成年女性的 1.8 倍，听起来像小动物，这就是人偶"物理上的嗓音"。模型：Kelly-Lochbaum 波导，每段约 0.36 cm，软腭处三通接出鼻腔；声源为声门气流导数脉冲加气声噪声。</p>
+  </section>
+</div>
+
+<script>
+"use strict";
+// ================= 声道模型（与 sim/voice.py 相同） =================
+const C = 35000, L_ADULT = 17, G_REFL = 0.75, LIP_REFL = -0.85, NOSE_REFL = -0.85, FADE = 0.999, A_MIN = 1e-3;
+const KEYS = ["front","height","jaw","tip","lips","round","velum"];
+const NEUTRAL = {front:.5,height:.35,jaw:.35,tip:0,lips:.6,round:0,velum:0};
+const V = {
+  a:{front:.017,height:0,jaw:.915,tip:0,lips:.852,round:0,velum:0},
+  i:{front:.938,height:.94,jaw:.242,tip:0,lips:.558,round:0,velum:0},
+  u:{front:.088,height:.967,jaw:.057,tip:0,lips:.368,round:.3,velum:0},
+  e:{front:.92,height:.521,jaw:.481,tip:0,lips:.876,round:0,velum:0},
+  o:{front:0,height:.239,jaw:.672,tip:0,lips:.65,round:.7,velum:0},
+};
+const TARGETS = {a:[750,1200],i:[280,2250],u:[320,1350],e:[480,1900],o:[480,850]};
+const lerp=(a,b,t)=>a+(b-a)*t, clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const sstep=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0),0,1);return t*t*(3-2*t)};
+
+function geometry(scale, rnd, fsi){
+  const length=(L_ADULT+rnd)*scale;
+  const n=Math.max(8,Math.round(length*fsi/C));
+  const lipN=Math.max(1,Math.round(scale*(1+rnd)*fsi/C));
+  const vel=Math.round(n*0.52/(1+0.06*rnd));
+  return {length,n,lipN,vel};
+}
+function areaOf(p, scale, fsi){
+  const {n,lipN}=geometry(scale,p.round,fsi), a=new Float64Array(n);
+  const f=p.front, jaw=p.jaw, hh=clamp(p.height-0.25*(jaw-0.35),0,1);
+  const xc=lerp(lerp(.30,.60,hh),lerp(.62,.74,hh),f), ac=lerp(lerp(.32,.40,hh),lerp(2.2,.22,hh),f), w=.13+.05*f*hh;
+  const aLip=(0.05+3.2*Math.pow(p.lips,1.5))*(1-0.7*p.round)*(0.7+0.6*jaw);
+  for(let i=0;i<n;i++){
+    const x=(i+.5)/n, a0=1.2+1.8*sstep(.05,.12,x);
+    let v=a0-(a0-ac)*Math.exp(-(((x-xc)/w)**2));
+    v+=2.4*f*Math.exp(-(((x-.26)/.10)**2))+1.4*(1-f)*Math.exp(-(((x-.84)/.07)**2));
+    v*=1+(jaw-.35)*2.2*sstep(.68,.86,x);
+    const tg=Math.exp(-(((x-.90)/.035)**2)); v=v-(v-A_MIN)*p.tip*tg;
+    if(i>=n-lipN) v = p.lips>0.02 ? Math.min(v,aLip) : A_MIN;
+    a[i]=Math.max(v,A_MIN)*scale*scale;
+  }
+  return a;
+}
+function noseOf(scale, velum, fsi){
+  const nn=Math.max(6,Math.round(11*scale*fsi/C)), a=new Float64Array(nn);
+  for(let i=0;i<nn;i++){const x=(i+.5)/nn;a[i]=(0.6+1.6*Math.sin(Math.PI*clamp(x*1.15,0,1))+0.4*x)*scale*scale}
+  a[0]=Math.max(velum*0.6*scale*scale,A_MIN);
+  return a;
+}
+// 一根声道：状态（前行波 R、回行波 L，鼻腔 NR、NL）＋ 由面积算出的接头权重
+class Tube{
+  constructor(p,scale,fsi){this.fsi=fsi;this.scale=scale;this.n=0;this.nn=0;this.set(p)}
+  set(p){
+    const A=areaOf(p,this.scale,this.fsi), An=noseOf(this.scale,p.velum,this.fsi), n=A.length, nn=An.length;
+    const vel=geometry(this.scale,p.round,this.fsi).vel;
+    if(n!==this.n||nn!==this.nn){
+      const keep=(o,m)=>{const z=new Float64Array(m);if(o)z.set(o.subarray(0,Math.min(m,o.length)));return z};
+      this.R=keep(this.R,n);this.L=keep(this.L,n);this.R2=new Float64Array(n);this.L2=new Float64Array(n);
+      this.NR=keep(this.NR,nn);this.NL=keep(this.NL,nn);this.NR2=new Float64Array(nn);this.NL2=new Float64Array(nn);
+      this.wa=new Float64Array(n-1);this.wb=new Float64Array(n-1);this.nwa=new Float64Array(nn-1);this.nwb=new Float64Array(nn-1);
+      this.n=n;this.nn=nn;
+    }
+    for(let i=0;i<n-1;i++){const s=A[i]+A[i+1];this.wa[i]=2*A[i]/s;this.wb[i]=2*A[i+1]/s}
+    for(let i=0;i<nn-1;i++){const s=An[i]+An[i+1];this.nwa[i]=2*An[i]/s;this.nwb[i]=2*An[i+1]/s}
+    const s3=A[vel-1]+A[vel]+An[0];this.k1=2*A[vel-1]/s3;this.k2=2*A[vel]/s3;this.k3=2*An[0]/s3;this.v=vel;
+    this.A=A;
+    let mi=0;for(let i=1;i<n-1;i++) if(A[i]<A[mi]) mi=i; this.narrow=mi;
+  }
+  step(src, noise){
+    const {R,L,R2,L2,NR,NL,NR2,NL2,wa,wb,nwa,nwb,n,nn,v}=this;
+    const pv=this.k1*R[v-1]+this.k2*L[v]+this.k3*NL[0];
+    for(let i=0;i<n-1;i++){
+      const p=(i===v-1)?pv:wa[i]*R[i]+wb[i]*L[i+1];
+      R2[i+1]=(p-L[i+1])*FADE; L2[i]=(p-R[i])*FADE;
+    }
+    R2[0]=(G_REFL*L[0]+src)*FADE; L2[n-1]=LIP_REFL*R[n-1]*FADE;
+    for(let i=0;i<nn-1;i++){const p=nwa[i]*NR[i]+nwb[i]*NL[i+1];NR2[i+1]=(p-NL[i+1])*FADE;NL2[i]=(p-NR[i])*FADE}
+    NR2[0]=(pv-NL[0])*FADE; NL2[nn-1]=NOSE_REFL*NR[nn-1]*FADE;
+    if(noise){const j=Math.min(n-1,this.narrow+1);R2[j]+=noise*.5;L2[j]+=noise*.5}
+    const out=R[n-1]*(1+LIP_REFL)+NR[nn-1]*(1+NOSE_REFL);
+    this.R=R2;this.R2=R;this.L=L2;this.L2=L;this.NR=NR2;this.NR2=NR;this.NL=NL2;this.NL2=NL;
+    return out;
+  }
+}
+// 冲激响应 → 频谱 → 共振峰（与 voice.py 的 formants 相同）
+function fft(re,im){
+  const n=re.length;
+  for(let i=1,j=0;i<n;i++){let b=n>>1;for(;j&b;b>>=1)j^=b;j^=b;if(i<j){[re[i],re[j]]=[re[j],re[i]];[im[i],im[j]]=[im[j],im[i]]}}
+  for(let len=2;len<=n;len<<=1){const ang=-2*Math.PI/len,wr=Math.cos(ang),wi=Math.sin(ang);
+    for(let i=0;i<n;i+=len){let cr=1,ci=0;for(let k=0;k<len/2;k++){const a=i+k,b=a+len/2,tr=re[b]*cr-im[b]*ci,ti=re[b]*ci+im[b]*cr;
+      re[b]=re[a]-tr;im[b]=im[a]-ti;re[a]+=tr;im[a]+=ti;const t=cr*wr-ci*wi;ci=cr*wi+ci*wr;cr=t}}}
+}
+const FSI_REF=96000, NFFT=16384;
+function response(p, scale, steps=4096){
+  const t=new Tube(p,scale,FSI_REF), re=new Float64Array(NFFT), im=new Float64Array(NFFT);
+  for(let i=0;i<steps;i++) re[i]=t.step(i===0?1:0,0);
+  fft(re,im);
+  const db=new Float64Array(NFFT/2+1);
+  for(let i=0;i<=NFFT/2;i++) db[i]=20*Math.log10(Math.hypot(re[i],im[i])+1e-12);
+  return db;
+}
+function peaks(db, scale, nf=3){
+  const sm=new Float64Array(db.length), df=FSI_REF/NFFT, fmax=6000/scale, out=[];
+  for(let i=0;i<db.length;i++){let s=0,c=0;for(let k=-2;k<=2;k++){const j=i+k;if(j>=0&&j<db.length){s+=db[j];c++}}sm[i]=s/5}
+  for(let i=2;i<sm.length-2&&out.length<nf;i++){const f=i*df;if(f<=150||f>=fmax)continue;
+    if(sm[i]>sm[i-1]&&sm[i]>=sm[i+1]){let mn=Infinity;for(let k=Math.max(0,i-40);k<Math.min(sm.length,i+40);k++)mn=Math.min(mn,sm[k]);if(sm[i]-mn>3)out.push(f)}}
+  return out;
+}
+function formantsOf(p,scale,steps){return peaks(response(p,scale,steps),scale)}
+
+// ================= 声源 =================
+function glottal(ph,oq,tense){
+  const tp=oq*(0.55+0.25*tense), tn=oq-tp;
+  if(ph<tp) return Math.sin(Math.PI*ph/tp)*(Math.PI/tp)*0.5;
+  if(ph<oq) return -Math.sin(Math.PI/2*(ph-tp)/tn)*(Math.PI/2/tn)*(0.6+0.6*tense);
+  return 0;
+}
+const STATES = {
+  calm:{name:"平静",f0:1,oq:.6,tense:.5,breath:.03,jit:.003,trem:0,tempo:1,fall:.12,note:"正常振动。声门开合干净，几乎没有气声。"},
+  hot:{name:"过热",f0:1.03,oq:.74,tense:.3,breath:.22,jit:.006,trem:.03,tempo:.95,fall:.12,note:"「有点热」：声门关不严，漏出气声；音高有轻微的颤动。"},
+  tired:{name:"疲惫",f0:.82,oq:.7,tense:.25,breath:.1,jit:.004,trem:0,tempo:1.35,fall:.3,note:"「累了」：音高变低、句尾往下掉，说得更慢，声音发松。"},
+  strain:{name:"吃力",f0:1.08,oq:.45,tense:.92,breath:.02,jit:.016,trem:0,tempo:.9,fall:.06,note:"「吃力」：声门挤得很紧，声音发紧、发粗糙（周期不稳）。"},
+};
+
+// ================= 合成器（在浏览器里实时运行） =================
+class Synth{
+  constructor(sr){
+    this.sr=sr;this.fsi=2*sr;this.scale=14.5/17;this.base=280;this.st=STATES.calm;
+    this.cur={...NEUTRAL};this.tgt={...NEUTRAL};this.tube=new Tube(this.cur,this.scale,this.fsi);
+    this.ph=0;this.voice=0;this.fric=0;this.asp=0;this.voiceT=0;this.fricT=0;this.aspT=0;this.speed=.04;
+    this.hold=false;this.queue=[];this.seg=null;this.segT=0;this.phrase=null;this.lp=0;this.cnt=0;this.trem=0;this.agc=0.02;
+  }
+  setScale(s){this.scale=s;this.tube=new Tube(this.cur,s,this.fsi)}
+  say(segs){this.queue=segs.slice();this.seg=null;this.phrase={t:0,total:segs.reduce((s,x)=>s+x.dur,0)*this.st.tempo}}
+  control(){
+    const dt=32/this.sr;
+    if(this.seg||this.queue.length){
+      if(!this.seg||this.segT>=this.seg.dur*this.st.tempo){this.seg=this.queue.shift()||null;this.segT=0;
+        if(this.seg){Object.assign(this.tgt,this.seg.p);this.voiceT=this.seg.voiced;this.fricT=this.seg.fric||0;this.aspT=this.seg.asp||0;this.speed=this.seg.speed||.035;onSeg&&onSeg(this.seg)}
+        else{this.phrase=null;this.voiceT=this.hold?1:0;this.fricT=0;this.aspT=0;this.speed=.04;onSeg&&onSeg(null)}}
+      this.segT+=dt; if(this.phrase) this.phrase.t+=dt;
+    } else {this.voiceT=this.hold?1:0}
+    const al=1-Math.exp(-dt/this.speed);
+    for(const k of KEYS) this.cur[k]+= (this.tgt[k]-this.cur[k])*al;
+    this.cur.round=this.tgt.round; // 圆唇改变段数，直接切换
+    const av=1-Math.exp(-dt/.012);
+    this.voice+=(this.voiceT-this.voice)*av;this.fric+=(this.fricT-this.fric)*av;this.asp+=(this.aspT-this.asp)*av;
+    this.tube.set(this.cur);
+  }
+  f0(){
+    const s=this.st;let c=1;
+    if(this.phrase){const u=clamp(this.phrase.t/this.phrase.total,0,1);c=1+0.08-(0.08+s.fall)*u}
+    this.trem+=2*Math.PI*6/this.sr;
+    return this.base*s.f0*c*(1+s.trem*Math.sin(this.trem))*(1+s.jit*(Math.random()*2-1));
+  }
+  render(out){
+    const s=this.st, A=this.tube;
+    let f0=this.f0();
+    for(let i=0;i<out.length;i++){
+      if((this.cnt++&31)===0){this.control();f0=this.f0()}
+      let y=0;
+      for(let k=0;k<2;k++){
+        this.ph+=f0/this.fsi; if(this.ph>=1)this.ph-=1;
+        const g=glottal(this.ph,s.oq,s.tense);
+        const open=this.ph<s.oq?1:0.3;
+        const src=g*this.voice*0.02+(Math.random()*2-1)*0.02*(s.breath*this.voice*open+0.6*this.asp);
+        const a=this.tube.A[this.tube.narrow]/(this.scale*this.scale);
+        const nz=this.fric>0.01&&a<0.4?(Math.random()*2-1)*this.fric*0.006*(1-a/0.4):0;
+        y+=this.tube.step(src,nz);
+      }
+      y*=0.5; this.lp+=(y-this.lp)*0.6;
+      const v=Math.abs(this.lp); this.agc=Math.max(v,this.agc*0.99995,0.004);
+      out[i]=Math.tanh(this.lp/this.agc*0.45);
+    }
+  }
+}
+
+// ================= 句子：辅音是在后面元音的姿势上加的变化 =================
+const PH = {
+  m:(p)=>({p:{...p,lips:0,velum:1},dur:.07,voiced:1,speed:.012}),
+  n:(p)=>({p:{...p,tip:1,velum:1},dur:.06,voiced:1,speed:.012}),
+  s:(p)=>({p:{...p,tip:.86,velum:0},dur:.09,voiced:0,fric:1,speed:.012}),
+  h:(p)=>({p:{...p},dur:.07,voiced:0,asp:1,speed:.02}),
+  t:(p)=>({p:{...p,tip:1,velum:0},dur:.05,voiced:0,speed:.008}),
+  y:()=>({p:{...V.i,front:.9,height:.85},dur:.05,voiced:1,speed:.02}),
+};
+const vow=(k,d)=>({p:{...V[k]},dur:d,voiced:1,speed:.035,v:k});
+const PHRASES = [
+  {say:"あいうえお",segs:[vow("a",.24),vow("i",.24),vow("u",.24),vow("e",.24),vow("o",.34)]},
+  {say:"おはよう",segs:[vow("o",.16),PH.h(V.a),vow("a",.16),PH.y(),vow("o",.34)]},
+  {say:"ねむい",note:"疲惫",segs:[PH.n(V.e),vow("e",.14),PH.m(V.u),vow("u",.12),vow("i",.32)]},
+  {say:"あつい",note:"过热",segs:[vow("a",.18),PH.t(V.u),PH.s(V.u),vow("u",.08),vow("i",.3)]},
+  {say:"いや",note:"说不",segs:[vow("i",.16),PH.y(),vow("a",.36)]},
+];
+
+// ================= 界面 =================
+let ctx=null, synth=new Synth(48000), node=null, onSeg=null;
+const $=id=>document.getElementById(id);
+function ensureAudio(){
+  if(ctx){if(ctx.state==="suspended")ctx.resume();return}
+  try{
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const old=synth; synth=new Synth(ctx.sampleRate);
+    synth.scale=old.scale;synth.base=old.base;synth.st=old.st;Object.assign(synth.cur,old.cur);Object.assign(synth.tgt,old.tgt);synth.setScale(old.scale);
+    node=ctx.createScriptProcessor(1024,0,1);
+    node.onaudioprocess=e=>synth.render(e.outputBuffer.getChannelData(0));
+    analyser=ctx.createAnalyser();analyser.fftSize=4096;analyser.smoothingTimeConstant=.6;
+    node.connect(analyser);analyser.connect(ctx.destination);
+    $("audioNote").textContent="声音已开启";
+  }catch(err){$("audioNote").textContent="这个浏览器无法播放声音，图形部分仍然可用"}
+}
+let analyser=null;
+
+// 控件
+const SL=[["jaw","下巴"],["tip","舌尖"],["lips","嘴唇开"],["round","圆唇"],["velum","软腭"]];
+const ui={...V.a};
+function setPose(p,announce){Object.assign(ui,p);Object.assign(synth.tgt,p);syncUI();dirty=true}
+function syncUI(){
+  for(const [k] of SL){$("s_"+k).value=Math.round(ui[k]*100);$("o_"+k).textContent=ui[k].toFixed(2)}
+  const pad=$("pad"),d=$("dot");d.style.left=(6+ui.front*88)+"%";d.style.top=(8+(1-ui.height)*84)+"%";
+  pad.setAttribute("aria-valuetext",`前 ${ui.front.toFixed(2)}，高 ${ui.height.toFixed(2)}`);
+}
+(function build(){
+  const sl=$("sliders");
+  for(const [k,name] of SL){
+    const r=document.createElement("div");r.className="sl";
+    r.innerHTML=`<label for="s_${k}">${name}</label><input id="s_${k}" type="range" min="0" max="100"><output id="o_${k}"></output>`;
+    sl.appendChild(r);
+    r.querySelector("input").addEventListener("input",e=>{ui[k]=e.target.value/100;synth.tgt[k]=ui[k];syncUI();dirty=true});
+  }
+  for(const k of "aiueo"){const b=document.createElement("button");b.textContent=k;b.className="say";
+    b.onclick=()=>{ensureAudio();setPose(V[k]);if(!synth.hold){synth.say([vow(k,.45)])}};$("vowels").appendChild(b)}
+  for(const [k,s] of Object.entries(STATES)){const b=document.createElement("button");b.textContent=s.name;b.dataset.k=k;
+    b.setAttribute("aria-pressed",k==="calm");b.onclick=()=>setState(k);$("states").appendChild(b)}
+  for(const ph of PHRASES){const b=document.createElement("button");b.innerHTML=ph.say+(ph.note?` <span class="cap">· ${ph.note}</span>`:"");
+    b.onclick=()=>{ensureAudio();if(ph.note){const m={疲惫:"tired",过热:"hot",说不:null}[ph.note];if(m)setState(m)}synth.say(ph.segs)};$("phrases").appendChild(b)}
+  for(const k of "aiueo"){const b=document.createElement("button");b.textContent="学会 "+k;b.className="say";b.onclick=()=>{ensureAudio();learn(k)};$("learnBtns").appendChild(b)}
+  setState("calm");syncUI();
+})();
+function setState(k){synth.st=STATES[k];for(const b of $("states").children)b.setAttribute("aria-pressed",b.dataset.k===k);$("stateNote").textContent=STATES[k].note}
+onSeg=(seg)=>{if(seg){Object.assign(ui,seg.p);uiDirty=true}};
+let uiDirty=false;
+const hold=$("hold");
+const holdOn=e=>{e.preventDefault();ensureAudio();synth.hold=true;hold.setAttribute("aria-pressed","true")};
+const holdOff=()=>{synth.hold=false;hold.setAttribute("aria-pressed","false")};
+hold.addEventListener("pointerdown",holdOn);hold.addEventListener("pointerup",holdOff);hold.addEventListener("pointerleave",holdOff);
+hold.addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"){if(!synth.hold)holdOn(e)}});hold.addEventListener("keyup",holdOff);
+$("f0").addEventListener("input",e=>{synth.base=+e.target.value;$("f0o").textContent=e.target.value+" Hz"});
+$("size").addEventListener("change",e=>{synth.setScale(+e.target.value/17);dirty=true});
+(function pad(){
+  const pad=$("pad");let drag=false;
+  const mv=e=>{const r=pad.getBoundingClientRect();ui.front=clamp(((e.clientX-r.left)/r.width-.06)/.88,0,1);ui.height=clamp(1-((e.clientY-r.top)/r.height-.08)/.84,0,1);
+    synth.tgt.front=ui.front;synth.tgt.height=ui.height;syncUI();dirty=true};
+  pad.addEventListener("pointerdown",e=>{drag=true;pad.setPointerCapture(e.pointerId);mv(e)});
+  pad.addEventListener("pointermove",e=>{if(drag)mv(e)});
+  pad.addEventListener("pointerup",()=>drag=false);
+  pad.addEventListener("keydown",e=>{const d=.04;const m={ArrowLeft:["front",-d],ArrowRight:["front",d],ArrowUp:["height",d],ArrowDown:["height",-d]}[e.key];
+    if(!m)return;e.preventDefault();ui[m[0]]=clamp(ui[m[0]]+m[1],0,1);synth.tgt[m[0]]=ui[m[0]];syncUI();dirty=true});
+})();
+
+// ================= 头部 X 光 =================
+const xc=$("xray"), xg=xc.getContext("2d");
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// 坐标：厘米，原点在头的中心，y 向下。声道画成 8 cm 的人偶比例（头里能放下的样子）
+const VIEW={x0:-6.6,x1:7.4,y0:-5.6,y1:10.2};
+function toPx(x,y){const s=xc.width/(VIEW.x1-VIEW.x0);return[(x-VIEW.x0)*s,(y-VIEW.y0)*s]}
+const SPX=()=>xc.width/(VIEW.x1-VIEW.x0);
+function centerline(u, rnd){
+  // u：0 = 声门，1 = 嘴唇。嘴唇在前，口腔水平向后，转弯，咽部向下
+  const lipX=3.25+rnd*0.45, oral=3.65+rnd*0.45, R=1.0, arc=Math.PI*R/2, phar=8-3.65-arc, tot=oral+arc+phar;
+  const d=(1-u)*tot; // 距嘴唇
+  if(d<=oral) return {x:lipX-d,y:2.3,nx:0,ny:1};
+  if(d<=oral+arc){const th=-Math.PI/2-(d-oral)/R, cx=lipX-oral, cy=2.3+R;return{x:cx+R*Math.cos(th),y:cy+R*Math.sin(th),nx:-Math.cos(th),ny:-Math.sin(th)}}
+  const cx=lipX-oral-R; return {x:cx,y:2.3+R+(d-oral-arc),nx:1,ny:0};
+}
+let hi=null;
+function drawXray(){
+  const g=xg, W=xc.width, H=xc.height, s=SPX();
+  g.clearRect(0,0,W,H);
+  const ink=css("--ink"), ink2=css("--ink-2"), bone=css("--bone"), air=css("--air"), tong=css("--tongue"), calm=css("--calm"), rule=css("--rule");
+  // 身体轮廓：大头、细颈、胸
+  g.lineWidth=2;g.strokeStyle=bone;g.fillStyle="transparent";
+  g.beginPath();
+  let [x,y]=toPx(0,0);g.arc(x,y,4.6*s,Math.PI*0.62,Math.PI*0.08,false);
+  const pts=[[4.15,1.6],[3.9,2.6],[3.3,3.7],[2.4,4.35],[1.3,4.4],[0.9,4.6]];
+  for(const [a,b] of pts){const q=toPx(a,b);g.lineTo(q[0],q[1])}
+  g.stroke();
+  // 颈与胸
+  g.beginPath();[x,y]=toPx(0.9,4.6);g.moveTo(x,y);[x,y]=toPx(1.0,6.6);g.lineTo(x,y);[x,y]=toPx(4.4,7.6);g.lineTo(x,y);[x,y]=toPx(4.6,11);g.lineTo(x,y);
+  g.moveTo(...toPx(-2.7,3.4));g.lineTo(...toPx(-2.4,6.6));g.lineTo(...toPx(-5.2,7.6));g.lineTo(...toPx(-5.4,11));g.stroke();
+  // 头里的计算单元和扬声器（软件发声方案）
+  g.setLineDash([4,4]);g.strokeStyle=rule;g.strokeRect(...toPx(-3.2,-3.4),2.6*s,1.6*s);g.setLineDash([]);
+  g.fillStyle=ink2;g.font=`${Math.round(11*W/760)}px "JetBrains Mono",monospace`;g.fillText("计算单元",...toPx(-3.05,-2.35));
+  // 鼻腔
+  const vel=centerline(0.52/(1+0.06*synth.cur.round)*1.0, synth.cur.round);
+  const tube=synth.tube, n=tube.n, A=tube.A, sc=synth.scale*synth.scale;
+  const dia=a=>2*Math.sqrt(a/sc/Math.PI)*0.47; // 按 8 cm 比例画
+  g.globalAlpha=0.25+0.75*clamp(synth.cur.velum,0,1);
+  g.strokeStyle=air;g.lineWidth=0.5*s;g.lineCap="round";g.beginPath();
+  g.moveTo(...toPx(vel.x-0.2,vel.y-0.5));g.bezierCurveTo(...toPx(vel.x+0.1,0.6),...toPx(2.2,0.4),...toPx(3.95,0.85));g.stroke();
+  g.globalAlpha=1;g.lineCap="butt";
+  // 软腭（一个小翻板）
+  g.strokeStyle=tong;g.lineWidth=0.22*s;g.beginPath();g.moveTo(...toPx(vel.x+0.5,vel.y-0.55));
+  g.lineTo(...toPx(vel.x-0.25+0.0,vel.y-0.55+0.5*(1-synth.cur.velum)));g.stroke();
+  // 声道：沿中线逐段画
+  const outer=[],inner=[];
+  for(let i=0;i<n;i++){const u=(i+.5)/n,c=centerline(u,synth.cur.round),d=dia(A[i])/2;
+    outer.push([c.x-c.nx*d,c.y-c.ny*d]);inner.push([c.x+c.nx*d,c.y+c.ny*d])}
+  // 舌头：内侧壁到舌根
+  g.fillStyle=tong;g.globalAlpha=.85;g.beginPath();
+  const tStart=Math.floor(n*0.18), tEnd=Math.floor(n*0.93);
+  g.moveTo(...toPx(...inner[tStart]));for(let i=tStart;i<=tEnd;i++)g.lineTo(...toPx(...inner[i]));
+  const jawDrop=(synth.cur.jaw-.35)*0.9;
+  g.lineTo(...toPx(2.0,3.6+jawDrop));g.lineTo(...toPx(0.6,4.3+jawDrop*0.5));g.lineTo(...toPx(inner[tStart][0]+0.6,inner[tStart][1]));g.closePath();g.fill();g.globalAlpha=1;
+  // 气道
+  g.fillStyle=air;g.globalAlpha=.55;g.beginPath();g.moveTo(...toPx(...outer[0]));
+  for(const p of outer)g.lineTo(...toPx(...p));for(let i=n-1;i>=0;i--)g.lineTo(...toPx(...inner[i]));g.closePath();g.fill();g.globalAlpha=1;
+  g.strokeStyle=ink;g.lineWidth=1.4;g.beginPath();outer.forEach((p,i)=>i?g.lineTo(...toPx(...p)):g.moveTo(...toPx(...p)));g.stroke();
+  // 下巴
+  g.strokeStyle=bone;g.lineWidth=2.2;g.beginPath();g.moveTo(...toPx(0.2,4.5+jawDrop*0.4));g.lineTo(...toPx(2.3,3.9+jawDrop));g.lineTo(...toPx(3.15,3.35+jawDrop));g.stroke();
+  // 嘴唇
+  const L=centerline(1,synth.cur.round), ld=dia(A[n-1])/2+0.05;
+  g.fillStyle=tong;g.beginPath();g.ellipse(...toPx(L.x+0.2,L.y-ld-0.22),0.42*s,0.22*s,0,0,Math.PI*2);g.fill();
+  g.beginPath();g.ellipse(...toPx(L.x+0.15,L.y+ld+0.24+jawDrop*0.4),0.42*s,0.24*s,0,0,Math.PI*2);g.fill();
+  // 声带
+  const G=centerline(0,synth.cur.round), vib=synth.voice*Math.sin(performance.now()/12)*0.12;
+  g.strokeStyle=ink;g.lineWidth=2.4;g.beginPath();g.moveTo(...toPx(G.x-0.55,G.y));g.lineTo(...toPx(G.x-0.08-vib,G.y-0.05));
+  g.moveTo(...toPx(G.x+0.55,G.y));g.lineTo(...toPx(G.x+0.08+vib,G.y-0.05));g.stroke();
+  // 肺（气源）
+  g.strokeStyle=rule;g.setLineDash([3,5]);g.beginPath();g.ellipse(...toPx(-1.0,9.2),1.9*s,1.0*s,0,0,Math.PI*2);g.stroke();g.setLineDash([]);
+  g.beginPath();g.moveTo(...toPx(G.x,G.y));g.lineTo(...toPx(-1.0,8.0));g.stroke();
+  // 部件编号
+  const tc=centerline(.6,synth.cur.round);
+  const anchors={lung:[-1.0,9.2],fold:[G.x,G.y],phar:[centerline(.2,0).x,centerline(.2,0).y],velum:[vel.x,vel.y-0.5],tongue:[tc.x+0.9,tc.y+0.9],tip:[2.5,2.8],lips:[L.x+0.3,L.y],jaw:[2.7,3.4+jawDrop],nose:[2.6,0.6],ctrl:[-1.9,-2.6]};
+  for(const pt of PARTS){const a=anchors[pt.id];if(!a)continue;const [px,py]=toPx(...a), on=hi===pt.id;
+    g.fillStyle=on?css("--"+pt.r):css("--panel");g.strokeStyle=css("--"+pt.r);g.lineWidth=on?3:1.5;
+    g.beginPath();g.arc(px,py,(on?13:10)*W/760,0,Math.PI*2);g.fill();g.stroke();
+    g.fillStyle=on?css("--paper"):ink;g.font=`600 ${Math.round(12*W/760)}px "JetBrains Mono",monospace`;g.textAlign="center";g.textBaseline="middle";g.fillText(pt.n,px,py);
+    g.textAlign="start";g.textBaseline="alphabetic"}
+}
+const sizeNote=()=>{const L=+$("size").value;
+  $("sizeNote").textContent= L<=8 ? "8 cm：55 cm 人偶的头和短脖子里能放下的声道长度。图按这个比例画。"
+    : `${L} cm 的声道放不进人偶的头（最多约 8 cm）。图仍按 8 cm 画，声音按 ${L} cm 计算：只能在软件里发出，或者把"喉咙"移进胸腔。`};
+
+// ================= 频谱与元音图 =================
+const sp=$("spec"), sg=sp.getContext("2d"), ch=$("chart"), cg=ch.getContext("2d");
+let curF=[], curDb=null, dirty=true;
+function recompute(){curDb=response(synth.cur,synth.scale);curF=peaks(curDb,synth.scale);
+  $("fmt").innerHTML=`共振峰 <span class="num">F1 ${curF[0]?Math.round(curF[0]):"–"} · F2 ${curF[1]?Math.round(curF[1]):"–"} · F3 ${curF[2]?Math.round(curF[2]):"–"} Hz</span>　声道长 <span class="num">${geometry(synth.scale,synth.cur.round,1).length.toFixed(1)} cm</span>`}
+function drawSpec(){
+  const g=sg,W=sp.width,H=sp.height,fmax=Math.min(12000,Math.max(5000,5000/synth.scale)),pad=34;
+  g.clearRect(0,0,W,H);
+  g.strokeStyle=css("--rule");g.fillStyle=css("--ink-2");g.lineWidth=1;g.font='12px "JetBrains Mono",monospace';
+  const step=fmax>8000?2000:1000;
+  for(let f=0;f<=fmax;f+=step){const x=pad+(W-pad-8)*f/fmax;g.beginPath();g.moveTo(x,8);g.lineTo(x,H-22);g.stroke();g.fillText(f>=1000?(f/1000)+"k":"0",x-6,H-6)}
+  const X=f=>pad+(W-pad-8)*f/fmax;
+  if(curDb){let mx=-1e9;const df=FSI_REF/NFFT;for(let i=0;i*df<fmax;i++)mx=Math.max(mx,curDb[i]);
+    g.strokeStyle=css("--calm");g.lineWidth=2;g.beginPath();
+    for(let i=1;i*df<fmax;i++){const y=8+(H-30)*clamp((mx-curDb[i])/50,0,1);i===1?g.moveTo(X(i*df),y):g.lineTo(X(i*df),y)}g.stroke()}
+  if(analyser&&ctx&&ctx.state==="running"){const d=new Float32Array(analyser.frequencyBinCount);analyser.getFloatFrequencyData(d);
+    const df=ctx.sampleRate/analyser.fftSize;g.strokeStyle=css("--ink-2");g.globalAlpha=.6;g.lineWidth=1;g.beginPath();let st=false;
+    for(let i=1;i*df<fmax;i++){const y=8+(H-30)*clamp((-10-d[i])/80,0,1);if(!st){g.moveTo(X(i*df),y);st=true}else g.lineTo(X(i*df),y)}g.stroke();g.globalAlpha=1}
+  g.fillStyle=css("--ink");g.font='600 12px "JetBrains Mono",monospace';
+  curF.forEach((f,i)=>{const x=X(f);g.strokeStyle=css("--hard");g.setLineDash([3,3]);g.beginPath();g.moveTo(x,8);g.lineTo(x,H-22);g.stroke();g.setLineDash([]);g.fillText("F"+(i+1),x+3,20)});
+}
+function drawChart(){
+  const g=cg,W=ch.width,H=ch.height,k=1/synth.scale,pad=34;
+  const F1=[200*k,1000*k],F2=[500*k,3000*k];
+  const X=f2=>W-8-(W-pad-8)*(f2-F2[0])/(F2[1]-F2[0]), Y=f1=>10+(H-40)*(f1-F1[0])/(F1[1]-F1[0]);
+  g.clearRect(0,0,W,H);g.strokeStyle=css("--rule");g.fillStyle=css("--ink-2");g.font='11px "JetBrains Mono",monospace';
+  g.strokeRect(pad,10,W-pad-8,H-40);
+  g.fillText("F2 "+Math.round(F2[1])+"",pad+2,H-12);g.fillText(Math.round(F2[0])+" Hz",W-70,H-12);
+  g.save();g.translate(12,H/2+20);g.rotate(-Math.PI/2);g.fillText("F1 → 低",0,0);g.restore();
+  g.font='600 16px "Noto Sans SC",sans-serif';
+  for(const [v,[f1,f2]] of Object.entries(TARGETS)){g.fillStyle=css("--ink-2");g.fillText(v,X(f2*k)-5,Y(f1*k)+5)}
+  if(curF.length>=2){g.fillStyle=css("--tongue");g.strokeStyle=css("--ink");g.lineWidth=2;g.beginPath();g.arc(clamp(X(curF[1]),pad,W-8),clamp(Y(curF[0]),10,H-30),7,0,Math.PI*2);g.fill();g.stroke()}
+}
+
+// ================= 自己学说话（分析—合成） =================
+let learning=false;
+async function learn(v){
+  if(learning)return;learning=true;
+  const k=1/synth.scale, tgt=TARGETS[v].map(f=>f*k), log=$("log"), keys=["front","height","jaw","lips","round"];
+  log.textContent=`目标：${v}　F1 ${Math.round(tgt[0])} / F2 ${Math.round(tgt[1])} Hz（只给了声音）\n`;
+  let center={...NEUTRAL}, best={...NEUTRAL}, bestE=1e9, width=.45;
+  const err=f=>f.length<2?10:Math.abs(Math.log(f[0]/tgt[0]))+Math.abs(Math.log(f[1]/tgt[1]));
+  for(let r=1;r<=10;r++){
+    const cands=[{...center}];
+    for(let j=0;j<23;j++){const c={...center};for(const q of keys)c[q]=clamp(center[q]+(Math.random()*2-1)*width,0,1);
+      c.round=Math.round(c.round*3)/3;cands.push(c)}
+    for(const c of cands){const f=formantsOf(c,synth.scale,2048),e=err(f)+0.15*keys.reduce((s,q)=>s+(c[q]-NEUTRAL[q])**2,0);if(e<bestE){bestE=e;best={...c};best._f=f}}
+    center={...best};width*=.72;
+    const f=best._f;
+    log.textContent+=`第 ${String(r).padStart(2)} 轮：F1 ${Math.round(f[0]||0)} / F2 ${Math.round(f[1]||0)}，差 ${Math.round(err(f)/2*100)}%\n`;log.scrollTop=log.scrollHeight;
+    setPose(Object.fromEntries(KEYS.map(q=>[q,best[q]])));
+    if(ctx)synth.say([{p:Object.fromEntries(KEYS.map(q=>[q,best[q]])),dur:.22,voiced:1,speed:.03}]);
+    await new Promise(r=>setTimeout(r,320));
+  }
+  const h=V[v], d=keys.map(q=>`${{front:"舌前",height:"舌高",jaw:"下巴",lips:"嘴唇",round:"圆唇"}[q]} ${best[q].toFixed(2)}（人 ${h[q].toFixed(2)}）`).join("　");
+  log.textContent+=`\n它找到的姿势：\n${d}\n`;log.scrollTop=log.scrollHeight;
+  learning=false;
+}
+
+// ================= 机械化难度 =================
+const PARTS=[
+  {id:"lung",n:1,r:"ok",name:"气源（肺）",t:"能实现",d:"微型隔膜泵加一个小气囊，放在胸腔。代价是泵的噪声和耗电，还要占用胸腔里本来就紧张的空间。"},
+  {id:"fold",n:2,r:"hard",name:"声带",t:"很难",d:"硅胶或弹性体做的声带在实验室里能被气流吹得自己振动（早稻田大学的说话机器人就这样做）。但音高范围窄，每秒振动几百次很快疲劳，只能当消耗品。电磁振动片容易做，声音却像电子喉。"},
+  {id:"phar",n:3,r:"hard",name:"咽壁与喉的升降",t:"很难",d:"人的咽壁是软的，喉头能上下移动约 2 cm 来改变声道长度。人偶的脖子只有 2.2 cm 长，还要穿过颈部电机和线缆。"},
+  {id:"velum",n:4,r:"ok",name:"软腭",t:"能实现",d:"本质上是一个阀门：打开时声音进入鼻腔（m、n）。一个小翻板加微型舵机就够了。"},
+  {id:"tongue",n:5,r:"no",name:"舌体",t:"目前做不到",d:"舌头没有骨头，靠 8 块肌肉改变自己的形状（肌肉静水骨骼），说话时每秒要变形十几次。现有说话机器人用电机和连杆近似出几个自由度，整套机构比人偶的头还大。"},
+  {id:"tip",n:6,r:"hard",name:"舌尖与摩擦音",t:"很难",d:"t、n 要和齿龈严丝合缝地闭合；s 要留出约 1 毫米的缝，让足够的气流吹出湍流噪声。尺寸越小，缝越难控制，气流也越弱。"},
+  {id:"lips",n:7,r:"hard",name:"嘴唇",t:"很难",d:"开合（m、p）不难，圆唇和前伸要用软硅胶和几个驱动。嘴唇同时是表情的一部分，要和表情共用。"},
+  {id:"jaw",n:8,r:"ok",name:"下巴",t:"能实现",d:"一个转动关节、一个微型电机。也是最容易被看见的部分，值得优先做。"},
+  {id:"nose",n:9,r:"ok",name:"鼻腔、硬腭、牙齿",t:"能实现",d:"形状固定的腔体，3D 打印即可。"},
+  {id:"ctrl",n:10,r:"hard",name:"协调与时序",t:"很难",d:"每秒 10–15 个音素，七八个器官要按毫秒对齐，和打字一样是时序问题。软件声道里这一步最便宜，机械声道里每个驱动都有延迟和惯性。"},
+  {id:"size",n:11,r:"no",name:"尺寸：头里只有 8 cm",t:"目前做不到（像人的嗓音）",d:"8 cm 的声道共振峰约为成年女性的 1.8 倍，物理上会是小动物一样的声音。要接近角色声线需要约 14.5 cm，可以把'喉咙'挪进胸腔（鸟的鸣管就长在胸腔里），但舌头和嘴唇仍在头里，两者要用一根长软管连起来。"},
+];
+(function buildParts(){
+  const box=$("parts");
+  for(const p of PARTS){const el=document.createElement("article");el.className="part";el.tabIndex=0;
+    el.innerHTML=`<h3><span class="n">${p.n}</span>${p.name}<span class="chip ${p.r}">${p.t}</span></h3><p>${p.d}</p>`;
+    const on=()=>{hi=p.id;for(const c of box.children)c.classList.toggle("on",c===el)},off=()=>{hi=null;el.classList.remove("on")};
+    el.addEventListener("mouseenter",on);el.addEventListener("mouseleave",off);el.addEventListener("focus",on);el.addEventListener("blur",off);
+    box.appendChild(el)}
+})();
+
+// ================= 主循环 =================
+let lastShape="";
+function frame(){
+  if(uiDirty){syncUI();uiDirty=false}
+  if(!ctx){Object.assign(synth.cur,synth.tgt);synth.tube.set(synth.cur)}
+  const shape=KEYS.map(k=>synth.cur[k].toFixed(2)).join()+synth.scale;
+  if(shape!==lastShape||dirty){lastShape=shape;dirty=false;recompute();sizeNote()}
+  drawXray();drawSpec();drawChart();
+  requestAnimationFrame(frame);
+}
+setPose(V.a);requestAnimationFrame(frame);
+window.__voice={formantsOf,V,TARGETS,areaOf,Synth,PHRASES};
+</script>
