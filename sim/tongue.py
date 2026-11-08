@@ -6,11 +6,11 @@
 
 结构（每一段都是"常曲率"连续体，像章鱼触手 / 医疗内窥镜）：
   - 舌根滑台：整根舌头前后移动（1 个电机）；可选再加升降（1 个电机），像人的舌骨和颏舌肌把整个舌体推上去
-  - 第一段（舌体，6.5 cm）：一对拮抗的线，让它整体前卷或后仰（1 个电机，差动绕法）
-  - 第二段（舌尖，2.2 cm）：一对线，舌尖上卷 / 下压（1 个电机）
+  - 第一段（舌体中轴 4.5 cm）：一对拮抗的线，让它整体前卷或后仰（1 个电机，差动绕法）
+  - 第二段（舌尖中轴 1.8 cm）：一对线，舌尖上卷 / 下压（1 个电机）
   - 可选：内部气腔，充气让舌体变厚（气泵 + 阀）
   - 下巴：转动，带着整根舌头和下唇一起下降（1 个电机）
-外面是硅胶皮肤，舌体最厚约 2 cm，舌尖约 0.25 cm。
+外面是硅胶软体和皮肤，舌体最厚约 2.6 cm，舌尖约 0.25 cm。舌头必须留在口腔里（不能穿过上腭、口底和牙齿）。
 尺寸按成年人（声道约 17 cm）建模，便于与人的元音数据对比；人偶上整体缩到 8/17。
 
 声学：在中矢状面上用"半极坐标网格"量出舌面到上腭 / 咽后壁的距离 d，
@@ -36,7 +36,7 @@ PHAR_Y = np.arange(1.0, 7.01, 0.5)    # 咽部的水平网格线
 RAY_DEG = np.arange(160, 31, -8.0)    # 口腔的放射网格线（从软腭到齿龈）
 ALV = RAY_DEG <= 48                   # 齿龈区（t、n、s）
 VEL = (RAY_DEG >= 112) & (RAY_DEG <= 152)   # 软腭区（k）
-L1, L2 = 6.5, 2.2                     # 两段长度
+L1, L2 = 4.5, 1.8                     # 两段中轴长度（软体包在外面，舌背比中轴长）
 CABLE_R = 0.5                         # 线到中轴的距离（成人尺寸），人偶上 ×8/17
 
 # 各结构的可动参数与范围
@@ -68,7 +68,7 @@ FIXED = {
     "o": dict(jaw=0.6, lips=0.45, round=0.7),
     "cons": dict(jaw=0.2, lips=0.45, round=0.0),
 }
-REST = dict(lift=0.0, slide=0.0, phi1=-1.0, phi2=0.0, bulge=0.0, jaw=0.3, lips=0.5, round=0.0)
+REST = dict(lift=0.0, slide=0.0, phi1=-0.7, phi2=0.0, bulge=0.0, jaw=0.3, lips=0.5, round=0.0)
 
 
 def rot(p, c, a):
@@ -79,7 +79,7 @@ def rot(p, c, a):
 
 def thickness(u, bulge):
     """舌头厚度沿长度的分布（u：0 舌根 → 1 舌尖）。"""
-    body = 0.25 + 2.15 * np.sin(np.pi * np.clip(u / 0.82, 0, 1)) ** 0.7
+    body = 0.25 + 2.35 * np.sin(np.pi * np.clip(u / 0.82, 0, 1)) ** 0.7
     body = np.where(u > 0.82, 0.25 + (body - 0.25) * 0, body)
     return np.maximum(body * (1 + bulge * (u < 0.8)), 0.2)
 
@@ -268,10 +268,23 @@ def penetration(d):
     return max(0.0, -d.min())
 
 
-def outside(p):
-    """舌头伸出下门牙之外的距离（cm）：舌头必须留在口腔里。"""
+def out_of_mouth(p):
+    """舌头离开口腔的程度（cm）：不能穿过上腭和咽后壁，不能低于口底，不能伸出下门牙。
+    网格线只沿固定方向量距离，量不到"舌尖从侧面穿出去"，所以要单独检查。"""
     surf, spine = tongue(p)
-    return max(0.0, max(surf[:, 0].max(), spine[:, 0].max()) - 6.7)
+    pts = np.vstack([surf, spine])
+    x, y = pts[:, 0], pts[:, 1]
+    ja = -0.22 * p["jaw"]
+    wall_y = np.interp(x, WALL[2:, 0], WALL[2:, 1], left=np.inf, right=8.8)
+    up = np.max(np.maximum(0, y - wall_y))                          # 穿过上腭
+    back = np.max(np.maximum(0, -0.3 - x))                          # 穿过咽后壁
+    front = np.max(np.maximum(0, x - 6.7))                          # 伸出下门牙
+    # 口底：下巴上从舌根到下门牙的一条线（随下巴转动）
+    f0, f1 = rot(np.array([2.0, 2.2]), TMJ, ja), rot(np.array([6.7, 7.6]), TMJ, ja)
+    t = (x - f0[0]) / (f1[0] - f0[0])
+    floor = f0[1] + t * (f1[1] - f0[1])
+    down = np.max(np.where((t > 0.1) & (t < 1.0), np.maximum(0, floor - y), 0))
+    return up + back + front + down
 
 
 def vowel_cost(tgt):
@@ -281,7 +294,7 @@ def vowel_cost(tgt):
         if np.isnan(f[0]) or np.isnan(f[1]):
             return 10
         e = abs(math.log(f[0] / tgt[0])) + abs(math.log(f[1] / tgt[1]))
-        return e + 5 * (d[:-3].min() < 0.15) + 2 * penetration(d) + 10 * outside(p)   # 元音时声道不能闭合；舌头不能伸出牙齿
+        return e + 5 * (d[:-3].min() < 0.15) + 2 * penetration(d) + 10 * out_of_mouth(p)   # 元音时声道不能闭合；舌头不能伸出牙齿
     return c
 
 
@@ -297,7 +310,7 @@ def closure_cost(region, gap=0.0):
             e += 2 * max(0, -m)                         # 窄缝不能变成闭合
         e += 2 * max(0, 0.35 - outside.min())           # 别处要通畅
         e += 3 * max(0, penetration(d) - 0.25)          # 软皮肤可以压进去一点，太深就不现实
-        e += 10 * outside(p)
+        e += 10 * out_of_mouth(p)
         return e
     return c
 
