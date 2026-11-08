@@ -67,6 +67,7 @@ def like_cost(v, w):
         if w:
             loc, _ = loc_tentacle(p)
             e += w * max(0.0, abs(loc - REF_LOC[v]) - 0.5)
+            e += 0.3 * max(0.0, abs(p["phi2"]) - 0.5)      # 元音时舌尖放松，不卷成钩子（人的舌尖不会这样）
         return e
     return c
 
@@ -140,9 +141,14 @@ if __name__ == "__main__":
         "e": dict(V.NEUTRAL, front=.92, height=.521, jaw=.481, lips=.876),
         "o": dict(V.NEUTRAL, front=0, height=.239, jaw=.672, lips=.65, round=.7),
     }
+    import sys
+    only_both = "--both-only" in sys.argv          # 只重算"声音和形状都求"，其余沿用上次结果
+    old = json.load(open(os.path.join(HERE, "tongue_like.json"), encoding="utf-8")) if only_both else None
     data = {"ref_loc": REF_LOC, "tol": LIKE_TOL, "sets": {}}
     sols = {"human": HUMAN}
-    for name, w in (("sound", 0.0), ("both", 0.25)):
+    if only_both:
+        sols["sound"] = {v: old["sets"]["sound"][v]["p"] for v in "aiueo"}
+    for name, w in ((("both", 0.25),) if only_both else (("sound", 0.0), ("both", 0.25))):
         sols[name] = {}
         for v in "aiueo":
             p, c = T.search(like_cost(v, w), KEYS, dict(T.REST, **T.FIXED[v]), 4, iters=10, seed=4)
@@ -164,8 +170,8 @@ if __name__ == "__main__":
             print(f"  [{name}] {v}: F {f[0]:.0f}/{f[1]:.0f} 误差 {err*100:.0f}%  听成 {rows[v]['heard']}  收紧点 {loc:.1f} cm（人 {REF_LOC[v]}，差 {loc-REF_LOC[v]:+.1f}）")
         data["sets"][name] = rows
     # 声音
-    audio = {}
-    for name in ("human", "sound", "both"):
+    audio = json.load(open(os.path.join(HERE, "tongue_audio.json"))) if only_both else {}
+    for name in (("both",) if only_both else ("human", "sound", "both")):
         get = human_areas if name == "human" else (lambda p: T.area_fn(p)[:2])
         for v in "aiueo":
             audio[f"{name}_{v}"] = wav_b64(speak([get(sols[name][v])], [0.55]))
