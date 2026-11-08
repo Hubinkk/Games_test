@@ -268,6 +268,12 @@ def penetration(d):
     return max(0.0, -d.min())
 
 
+def outside(p):
+    """舌头伸出下门牙之外的距离（cm）：舌头必须留在口腔里。"""
+    surf, spine = tongue(p)
+    return max(0.0, max(surf[:, 0].max(), spine[:, 0].max()) - 6.7)
+
+
 def vowel_cost(tgt):
     def c(p):
         a, seg, d = area_fn(p)
@@ -275,7 +281,7 @@ def vowel_cost(tgt):
         if np.isnan(f[0]) or np.isnan(f[1]):
             return 10
         e = abs(math.log(f[0] / tgt[0])) + abs(math.log(f[1] / tgt[1]))
-        return e + 5 * (d[:-3].min() < 0.15) + 2 * penetration(d)    # 元音时声道不能闭合
+        return e + 5 * (d[:-3].min() < 0.15) + 2 * penetration(d) + 10 * outside(p)   # 元音时声道不能闭合；舌头不能伸出牙齿
     return c
 
 
@@ -291,6 +297,7 @@ def closure_cost(region, gap=0.0):
             e += 2 * max(0, -m)                         # 窄缝不能变成闭合
         e += 2 * max(0, 0.35 - outside.min())           # 别处要通畅
         e += 3 * max(0, penetration(d) - 0.25)          # 软皮肤可以压进去一点，太深就不现实
+        e += 10 * outside(p)
         return e
     return c
 
