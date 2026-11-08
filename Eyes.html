@@ -1,0 +1,388 @@
+<title>人偶的眼睛</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* 布局：上方左边是人偶的脸（眼睛），右边是瞳孔里的摄像头真正看到的画面；下面是方案对比和眼睛单元的剖面 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --hard:#b9800f; --no:#cf3b3d;
+  --skin:#f4dccf; --hair:#6b5a8e; --iris:#4a7fd0; --lid:#e9c9b8;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.6}
+.wrap{max-width:1160px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:36px}
+header{display:grid;gap:8px;max-width:74ch}
+.eyebrow{font-family:var(--f-data);font-size:12px;letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase}
+h1{font-family:var(--f-display);font-size:clamp(30px,4.4vw,44px);line-height:1.15;margin:0}
+h2{font-family:var(--f-display);font-size:22px;margin:0}
+p{margin:0}
+.lede{color:var(--ink-2);font-size:15.5px}
+.lede b{color:var(--ink)}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.stage{grid-template-columns:minmax(0,1fr)}}
+.view{background:var(--stage);border-radius:12px;overflow:hidden;position:relative;display:grid}
+.view canvas{display:block;width:100%;height:auto;max-width:100%;touch-action:none}
+.view .cap{position:absolute;left:12px;top:10px;font-family:var(--f-data);font-size:12px;color:var(--ink-2);background:color-mix(in srgb,var(--stage) 80%,transparent);padding:1px 6px;border-radius:4px}
+.cam{background:#0b0d10}
+.cam .cap{color:#c9d2de;background:rgba(0,0,0,.45)}
+.status{display:grid;gap:8px}
+.flag{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--ok);border-radius:8px;padding:9px 12px;font-size:13.5px}
+.flag.bad{border-left-color:var(--no)}
+.flag b{white-space:nowrap}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.group{display:grid;gap:7px;align-content:start}
+.lbl{font-size:12px;color:var(--ink-2);letter-spacing:.04em}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button,.btn{font:inherit;font-size:13.5px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:7px;padding:5px 11px;cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--calm);color:var(--calm);box-shadow:inset 0 0 0 1px var(--calm);font-weight:600}
+.btn.primary{background:var(--calm);border-color:var(--calm);color:var(--paper);font-weight:600}
+button:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.hint{font-size:12.5px;color:var(--ink-2)}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+th,td{border-bottom:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:top}
+th{color:var(--ink-2);font-weight:500;font-size:12.5px}
+tr.sel td{background:color-mix(in srgb,var(--calm) 10%,transparent)}
+.y{color:var(--ok);font-weight:600}.n{color:var(--no);font-weight:600}.m{color:var(--hard);font-weight:600}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.anat{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.anat{grid-template-columns:minmax(0,1fr)}}
+.anat svg{width:100%;height:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+.parts{display:grid;gap:8px}
+.part{background:var(--panel);border:1px solid var(--rule);border-radius:9px;padding:10px 12px;font-size:13.5px;color:var(--ink-2)}
+.part b{color:var(--ink)}
+section{display:grid;gap:12px}
+section > p{max-width:74ch;color:var(--ink-2);font-size:14.5px}
+.foot{font-size:12.5px;color:var(--ink-2);max-width:80ch}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">55 cm 人偶 · 感官 · 眼睛</div>
+    <h1>人偶的眼睛</h1>
+    <p class="lede">二次元的表情交给圆形小屏幕，摄像头藏在瞳孔正中，外面加一片会合上的物理眼睑。这样<b>它看向哪里，就真的在看哪里；它闭上眼，就真的看不见</b>。把鼠标（或手指）放在左边的脸前面，你就是站在它面前的人。</p>
+  </header>
+
+  <section class="stage" aria-label="眼睛演示">
+    <div class="view">
+      <canvas id="face" width="760" height="620" aria-label="人偶的脸，眼睛会看向你或物体"></canvas>
+      <span class="cap" id="faceCap">它的脸</span>
+    </div>
+    <div class="status">
+      <div class="view cam">
+        <canvas id="cam" width="760" height="500" aria-label="瞳孔里的摄像头看到的画面"></canvas>
+        <span class="cap" id="camCap">摄像头看到的</span>
+      </div>
+      <div class="flag" id="flagGaze"></div>
+      <div class="flag" id="flagLid"></div>
+    </div>
+  </section>
+
+  <section class="controls" aria-label="控制">
+    <div class="group">
+      <span class="lbl">方案</span>
+      <div class="seg" id="modes"></div>
+      <span class="hint" id="modeNote"></span>
+    </div>
+    <div class="group">
+      <span class="lbl">它要看什么</span>
+      <div class="seg" id="targets"></div>
+      <span class="hint">"你"跟着鼠标或手指。屏幕眼睛方案里，眼睛总是"看你"，摄像头却看着任务目标。</span>
+    </div>
+    <div class="group">
+      <span class="lbl">表情（屏幕画）与身体状态</span>
+      <div class="seg" id="faces"></div>
+    </div>
+    <div class="group">
+      <span class="lbl">眼睑</span>
+      <div class="seg">
+        <button class="btn primary" id="sleep">睡觉</button>
+        <button class="btn" id="look">"我不看"</button>
+      </div>
+      <div class="seg" id="blinkMode"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>四种做法对比</h2>
+    <div class="tblwrap"><table id="cmp">
+      <thead><tr><th>方案</th><th>头里多几个电机</th><th>视线是真的吗</th><th>闭眼时真的看不见吗</th><th>表情</th><th>像人的程度</th></tr></thead>
+      <tbody>
+        <tr data-m="screen"><td><b>纯屏幕眼睛</b><br><span class="hint">摄像头在额头</span></td><td class="num">0</td><td class="n">不是：可以假装看你</td><td class="n">不是：画的闭眼</td><td class="y">最多</td><td>卡通，讨喜</td></tr>
+        <tr data-m="A"><td><b>A：屏幕眼 + 瞳孔摄像头 + 眼睑</b></td><td class="num">1</td><td class="y">是，但只能靠转头</td><td class="y">是</td><td class="y">多</td><td>视线慢半拍</td></tr>
+        <tr data-m="B"><td><b>B：A + 眼球云台（两眼联动）</b></td><td class="num">3</td><td class="y">是，先转眼再转头</td><td class="y">是</td><td class="y">多</td><td>最像：眼睛先到，头再跟上</td></tr>
+        <tr><td><b>真的机械眼球</b><br><span class="hint">iCub、仿真人</span></td><td class="num">6–8</td><td class="y">是</td><td class="y">是</td><td class="n">少（只有转动和眨眼）</td><td>最真，也最容易掉进恐怖谷</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>眼睛单元（方案 B，人偶尺寸）</h2>
+    <div class="anat">
+      <svg viewBox="0 0 560 360" role="img" aria-label="眼睛单元剖面：透明眼罩、圆形屏幕、瞳孔中的摄像头、眼睑、云台">
+        <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--ink-2)"/></marker></defs>
+        <!-- 头壳 -->
+        <path d="M40,40 Q300,0 520,60 L520,330 Q300,350 40,320 Z" fill="none" stroke="var(--rule)" stroke-width="2"/>
+        <!-- 云台框 -->
+        <rect x="150" y="105" width="150" height="150" rx="12" fill="none" stroke="var(--ink-2)" stroke-dasharray="5 5" stroke-width="1.5"/>
+        <circle cx="225" cy="180" r="5" fill="var(--ink-2)"/>
+        <!-- 屏幕 -->
+        <rect x="262" y="120" width="12" height="120" rx="3" fill="var(--iris)"/>
+        <!-- 透明眼罩 -->
+        <path d="M276,112 Q330,180 276,248" fill="none" stroke="var(--calm)" stroke-width="3"/>
+        <!-- 摄像头 -->
+        <rect x="218" y="168" width="44" height="24" rx="4" fill="var(--ink)"/>
+        <rect x="262" y="174" width="12" height="12" fill="var(--ink)"/>
+        <!-- 眼睑 -->
+        <path d="M268,104 Q338,150 330,196" fill="none" stroke="var(--lid)" stroke-width="9" stroke-linecap="round"/>
+        <circle cx="250" cy="104" r="5" fill="var(--hard)"/>
+        <line x1="250" y1="104" x2="268" y2="104" stroke="var(--hard)" stroke-width="3"/>
+        <!-- 电机 -->
+        <rect x="90" y="70" width="40" height="26" rx="4" fill="none" stroke="var(--hard)" stroke-width="2"/>
+        <line x1="130" y1="83" x2="250" y2="104" stroke="var(--hard)" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <rect x="90" y="270" width="40" height="26" rx="4" fill="none" stroke="var(--ink-2)" stroke-width="2"/>
+        <rect x="140" y="270" width="40" height="26" rx="4" fill="none" stroke="var(--ink-2)" stroke-width="2"/>
+        <line x1="160" y1="270" x2="200" y2="255" stroke="var(--ink-2)" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <!-- 视线 -->
+        <line x1="274" y1="180" x2="440" y2="180" stroke="var(--ok)" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+        <!-- 标注 -->
+        <g font-size="13" fill="var(--ink)" font-family="Noto Sans SC, sans-serif">
+          <text x="340" y="118">透明眼罩</text><line x1="338" y1="122" x2="300" y2="140" stroke="var(--ink-2)"/>
+          <text x="355" y="232">圆形屏幕（中间留孔）</text><line x1="353" y1="228" x2="276" y2="215" stroke="var(--ink-2)"/>
+          <text x="380" y="170">视线 = 镜头方向</text>
+          <text x="150" y="160">摄像头</text>
+          <text x="300" y="80">眼睑（两眼联动）</text><line x1="320" y1="84" x2="300" y2="118" stroke="var(--ink-2)"/>
+          <text x="60" y="62">眼睑电机</text>
+          <text x="60" y="318">云台：左右 / 上下（两眼共用）</text>
+          <text x="160" y="96">转动中心</text>
+        </g>
+      </svg>
+      <div class="parts">
+        <div class="part"><b>圆形小屏幕</b>：直径约 18–24 mm，中间留一个约 3 mm 的孔，或者让瞳孔区域透明，摄像头从后面看出去。中间开孔的圆屏需要定制。</div>
+        <div class="part"><b>摄像头</b>：微型模组，镜头约 3 mm。两只眼睛各一个，相距约 3 cm，可以算距离（双目）。</div>
+        <div class="part"><b>眼睑</b>：薄壳，绕眼睛上方的轴转动，两只眼用一根连杆联动，1 个微型舵机，合上约 0.1–0.15 秒。合上时完全挡住镜头。</div>
+        <div class="part"><b>眼球云台（方案 B）</b>：两只眼睛装在同一个框里，左右、上下各 1 个电机，转 ±20°。人看东西也是眼睛先到、头再跟上。</div>
+        <div class="part"><b>代价</b>：方案 B 比纯屏幕多 3 个电机，大约 15 g、6 cm³。体积预算里头部还有约 200 cm³ 的空余，放得下。</div>
+      </div>
+    </div>
+    <p class="foot">演示里摄像头的画面是合成的场景（网页拿不到真实摄像头）。视场角按 64° × 43° 计算；转头最快约 120°/s，眼球云台约 400°/s。</p>
+  </section>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const MODES={
+  screen:{name:"纯屏幕眼睛",note:"摄像头在额头，跟着头转。眼睛是画出来的，可以朝任何方向看。"},
+  A:{name:"A：瞳孔摄像头 + 眼睑",note:"眼睛不能单独转，看东西全靠转头，所以视线慢半拍。"},
+  B:{name:"B：再加眼球云台",note:"眼睛先快速转过去（±20°），头再慢慢跟上，眼睛回到正中。"},
+};
+const TARGETS={you:{name:"你"},cup:{name:"桌上的杯子",yaw:-28,pitch:-24},win:{name:"窗外",yaw:40,pitch:12}};
+const FACES={normal:"普通",happy:"开心",surprise:"惊讶",sleepy:"困了",hot:"有点热"};
+const S={mode:"B",target:"you",face:"normal",you:{yaw:0,pitch:4},neck:{yaw:0,pitch:0},eye:{yaw:0,pitch:0},
+  lid:0,lidT:0,drawnBlink:0,nextBlink:5,blinkPhys:false,sleeping:false,notLooking:false,lostFrames:0,frames:0,eyeSpeed:0};
+
+function seg(id,obj,key,cb){
+  const box=$(id);box.innerHTML=Object.entries(obj).map(([k,v])=>`<button data-k="${k}" aria-pressed="${S[key]===k}">${v.name||v}</button>`).join("");
+  box.onclick=e=>{const b=e.target.closest("button");if(!b)return;S[key]=b.dataset.k;for(const x of box.children)x.setAttribute("aria-pressed",x===b);cb&&cb()};
+}
+seg("modes",MODES,"mode",()=>{$("modeNote").textContent=MODES[S.mode].note;for(const r of $("cmp").tBodies[0].rows)r.classList.toggle("sel",r.dataset.m===S.mode)});
+seg("targets",TARGETS,"target");
+seg("faces",FACES,"face");
+(function(){const box=$("blinkMode");const o={screen:"平时眨眼：屏幕画",phys:"平时眨眼：物理眼睑"};
+  box.innerHTML=Object.entries(o).map(([k,v])=>`<button data-k="${k}" aria-pressed="${k==="screen"}">${v}</button>`).join("");
+  box.onclick=e=>{const b=e.target.closest("button");if(!b)return;S.blinkPhys=b.dataset.k==="phys";for(const x of box.children)x.setAttribute("aria-pressed",x===b);S.lostFrames=0;S.frames=0}})();
+$("modeNote").textContent=MODES[S.mode].note;
+for(const r of $("cmp").tBodies[0].rows)r.classList.toggle("sel",r.dataset.m===S.mode);
+$("sleep").onclick=()=>{S.sleeping=!S.sleeping;S.notLooking=false;$("sleep").textContent=S.sleeping?"醒来":"睡觉";$("look").textContent='"我不看"'};
+$("look").onclick=()=>{S.notLooking=!S.notLooking;S.sleeping=false;$("look").textContent=S.notLooking?"可以看了":'"我不看"';$("sleep").textContent="睡觉"};
+
+// 你的位置：鼠标或手指在脸的画面上
+const face=$("face"),fg=face.getContext("2d"),cam=$("cam"),cg=cam.getContext("2d");
+function setYou(e){const r=face.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+  S.you.yaw=clamp(x*90,-55,55);S.you.pitch=clamp(-y*55+4,-30,30)}
+face.addEventListener("pointermove",setYou);face.addEventListener("pointerdown",setYou);
+
+function targetAngles(){return S.target==="you"?S.you:TARGETS[S.target]}
+function step(dt){
+  const T=targetAngles(), m=S.mode;
+  const mv=(cur,goal,vmax)=>cur+clamp(goal-cur,-vmax*dt,vmax*dt);
+  // 头（脖子）：最快 120°/s，范围 ±60° / ±35°
+  const ny=clamp(T.yaw,-60,60), np=clamp(T.pitch,-35,35);
+  if(m==="B"){
+    // 眼睛先到：眼球云台 400°/s，±20°；头以较慢的速度跟上，眼睛随之回中
+    const e0={...S.eye};
+    S.neck.yaw=mv(S.neck.yaw,ny,70);S.neck.pitch=mv(S.neck.pitch,np,50);
+    S.eye.yaw=mv(S.eye.yaw,clamp(T.yaw-S.neck.yaw,-20,20),400);S.eye.pitch=mv(S.eye.pitch,clamp(T.pitch-S.neck.pitch,-20,20),400);
+    S.eyeSpeed=Math.hypot(S.eye.yaw-e0.yaw,S.eye.pitch-e0.pitch)/dt;
+  }else{
+    S.neck.yaw=mv(S.neck.yaw,ny,120);S.neck.pitch=mv(S.neck.pitch,np,90);
+    S.eye.yaw=mv(S.eye.yaw,0,400);S.eye.pitch=mv(S.eye.pitch,0,400);S.eyeSpeed=0;
+  }
+  // 眼睑
+  const physWanted=(S.sleeping||S.notLooking)&&m!=="screen";
+  S.drawnBlink=Math.max(0,S.drawnBlink-dt);S.nextBlink-=dt*(S.face==="sleepy"?0.6:1);
+  let physBlink=0;
+  if(S.nextBlink<=0){S.nextBlink=2.5+Math.random()*3;S.drawnBlink=0.14}
+  if(S.blinkPhys&&m!=="screen"&&S.drawnBlink>0)physBlink=Math.sin(Math.PI*(1-S.drawnBlink/0.14));
+  const goal=physWanted?1:physBlink;
+  S.lid=physWanted?mv(S.lid,1,4):(S.blinkPhys&&m!=="screen"?goal:mv(S.lid,0,8));
+  S.frames++; if(S.lid>0.5&&!physWanted)S.lostFrames++;
+}
+// ---------- 摄像头画面 ----------
+function camDir(){
+  const m=S.mode;
+  if(m==="B")return{yaw:S.neck.yaw+S.eye.yaw,pitch:S.neck.pitch+S.eye.pitch};
+  return{yaw:S.neck.yaw,pitch:S.neck.pitch+(m==="screen"?2:0)};
+}
+const FOVX=64,FOVY=43;
+let lastCam=null;
+function drawCam(){
+  const W=cam.width,H=cam.height,c=camDir(),g=cg;
+  const blur=S.eyeSpeed>200;
+  if(blur&&lastCam){g.globalAlpha=0.45}else g.globalAlpha=1;
+  const P=(y,p)=>[W/2+(y-c.yaw)/FOVX*W,H/2-(p-c.pitch)/FOVY*H];
+  // 房间
+  const [,hz]=P(0,-12);
+  let grd=g.createLinearGradient(0,0,0,H);grd.addColorStop(0,"#d9d3c7");grd.addColorStop(1,"#c9c0b0");g.fillStyle=grd;g.fillRect(0,0,W,H);
+  g.fillStyle="#8a6a4f";g.fillRect(0,hz,W,H-hz);g.fillStyle="#9b7a5c";g.fillRect(0,hz,W,8);
+  // 墙上的竖线（看得出转动）
+  g.strokeStyle="rgba(0,0,0,.08)";g.lineWidth=2;for(let a=-180;a<=180;a+=15){const [x]=P(a,0);if(x>-10&&x<W+10){g.beginPath();g.moveTo(x,0);g.lineTo(x,hz);g.stroke()}}
+  // 窗户
+  let [wx,wy]=P(40-15,12+11),[wx2,wy2]=P(40+15,12-11);
+  g.fillStyle="#9cc6e8";g.fillRect(wx,wy,wx2-wx,wy2-wy);g.strokeStyle="#f3efe7";g.lineWidth=8;g.strokeRect(wx,wy,wx2-wx,wy2-wy);
+  g.beginPath();g.moveTo((wx+wx2)/2,wy);g.lineTo((wx+wx2)/2,wy2);g.stroke();
+  g.fillStyle="#6fa36a";g.beginPath();g.ellipse((wx+wx2)/2+30,wy2-20,60,30,0,Math.PI,0);g.fill();
+  // 杯子
+  let [cx,cy]=P(-28,-24);const cs=W/FOVX*6;
+  g.fillStyle="#e9eef2";g.fillRect(cx-cs/2,cy-cs*0.6,cs,cs*1.2);g.strokeStyle="#e9eef2";g.lineWidth=cs*0.14;g.beginPath();g.arc(cx+cs*0.6,cy,cs*0.3,-1.2,1.2);g.stroke();
+  g.fillStyle="#7a4a2a";g.fillRect(cx-cs/2+3,cy-cs*0.6+3,cs-6,cs*0.18);
+  // 你
+  const [yx,yy]=P(S.you.yaw,S.you.pitch);const ys=W/FOVX*9;
+  g.fillStyle="#3c3a4a";g.beginPath();g.ellipse(yx,yy+ys*2.2,ys*1.6,ys*1.3,0,Math.PI,0);g.fill();
+  g.fillStyle="#efd2bf";g.beginPath();g.ellipse(yx,yy,ys*0.75,ys*0.9,0,0,Math.PI*2);g.fill();
+  g.fillStyle="#3c3a4a";g.beginPath();g.ellipse(yx,yy-ys*0.45,ys*0.8,ys*0.5,0,Math.PI,0);g.fill();
+  g.fillStyle="#222";g.beginPath();g.arc(yx-ys*0.28,yy+ys*0.05,ys*0.08,0,7);g.arc(yx+ys*0.28,yy+ys*0.05,ys*0.08,0,7);g.fill();
+  g.globalAlpha=1;
+  // 注意点
+  g.strokeStyle="rgba(120,255,200,.9)";g.lineWidth=2;g.beginPath();g.arc(W/2,H/2,16,0,7);g.moveTo(W/2-28,H/2);g.lineTo(W/2-18,H/2);g.moveTo(W/2+18,H/2);g.lineTo(W/2+28,H/2);g.stroke();
+  // 物理眼睑：从上往下挡住
+  if(S.lid>0.01){const h=H*S.lid*1.05;g.fillStyle="#120c0a";g.fillRect(0,0,W,h);const gr=g.createLinearGradient(0,h-30,0,h);gr.addColorStop(0,"rgba(18,12,10,1)");gr.addColorStop(1,"rgba(18,12,10,0)");g.fillStyle=gr;g.fillRect(0,h-30,W,30)}
+  if(blur){g.fillStyle="rgba(255,255,255,.85)";g.font='600 22px "Noto Sans SC",sans-serif';g.fillText("转得太快，画面糊了",18,H-20)}
+  $("camCap").textContent=S.mode==="screen"?"额头摄像头看到的":"瞳孔里的摄像头看到的";
+  lastCam=true;
+}
+// ---------- 脸 ----------
+function drawFace(){
+  const g=fg,W=face.width,H=face.height,m=S.mode;
+  g.clearRect(0,0,W,H);
+  const ny=S.neck.yaw,np=S.neck.pitch;
+  const cx=W/2+Math.sin(ny*Math.PI/180)*90, cy=H*0.5-np*2.2, sx=Math.cos(ny*Math.PI/180);
+  const hair=css("--hair"),skin=css("--skin"),ink=css("--ink");
+  // 后发
+  g.fillStyle=hair;g.beginPath();g.ellipse(W/2+ny*0.6,H*0.5-np*1.2,250,265,0,0,Math.PI*2);g.fill();
+  g.beginPath();g.moveTo(W/2-245+ny*0.6,H*0.5);g.lineTo(W/2-235+ny*0.6,H*0.98);g.quadraticCurveTo(W/2+ny*0.6,H*1.02,W/2+235+ny*0.6,H*0.98);g.lineTo(W/2+245+ny*0.6,H*0.5);g.fill();
+  // 脸
+  g.fillStyle=skin;g.beginPath();g.ellipse(cx,cy+30,195*sx+20,205,0,0,Math.PI*2);g.fill();
+  g.beginPath();g.moveTo(cx-170*sx,cy+60);g.quadraticCurveTo(cx,cy+300,cx+170*sx,cy+60);g.fill();
+  // 额头摄像头（纯屏幕方案）
+  if(m==="screen"){g.fillStyle="#1b1f27";g.beginPath();g.arc(cx,cy-120,9,0,7);g.fill();g.fillStyle="rgba(120,180,255,.6)";g.beginPath();g.arc(cx-3,cy-123,3,0,7);g.fill()}
+  // 眼睛
+  const eyeSep=105*sx, ey=cy+40;
+  let iy=S.eye.yaw, ip=S.eye.pitch;
+  if(m==="screen"){ // 画出来的眼睛：永远"看你"
+    iy=clamp(S.you.yaw-ny,-25,25);ip=clamp(S.you.pitch-np,-20,20);
+  }
+  for(const side of [-1,1])drawEye(g,cx+side*eyeSep,ey,sx,iy,ip,side);
+  // 嘴、脸颊
+  g.strokeStyle="#a0564e";g.lineWidth=4;g.lineCap="round";g.beginPath();
+  if(S.face==="happy"){g.arc(cx,cy+165,22,0.2,Math.PI-0.2)}else if(S.face==="surprise"){g.ellipse(cx,cy+175,10,14,0,0,7)}else if(S.face==="sleepy"||S.face==="hot"){g.moveTo(cx-14,cy+175);g.quadraticCurveTo(cx,cy+168,cx+14,cy+175)}else{g.moveTo(cx-16,cy+172);g.quadraticCurveTo(cx,cy+180,cx+16,cy+172)}
+  g.stroke();
+  if(S.face==="hot"||S.face==="happy"){g.fillStyle="rgba(240,120,120,.35)";g.beginPath();g.ellipse(cx-150*sx,cy+120,34,16,0,0,7);g.ellipse(cx+150*sx,cy+120,34,16,0,0,7);g.fill()}
+  if(S.face==="hot"){g.fillStyle="rgba(120,190,255,.85)";g.beginPath();g.moveTo(cx+200*sx,cy-40);g.quadraticCurveTo(cx+222*sx,cy-6,cx+200*sx,cy+4);g.quadraticCurveTo(cx+180*sx,cy-6,cx+200*sx,cy-40);g.fill()}
+  // 刘海
+  g.fillStyle=hair;g.beginPath();g.moveTo(cx-238,cy-10);
+  for(let i=0;i<=8;i++){const x=cx-220+i*55,y=cy-((i%2)?55:-5)-(i===4?-15:0);g.quadraticCurveTo(x-25,cy-110,x,y)}
+  g.lineTo(cx+238,cy-10);g.ellipse(cx,cy-20,238,250,0,0,Math.PI,true);g.closePath();g.fill();
+  g.fillStyle="rgba(255,255,255,.12)";g.beginPath();g.ellipse(cx-60,cy-190,90,22,-0.25,0,Math.PI*2);g.fill();
+  // 视线箭头（真实的摄像头方向）
+  const c=camDir();
+  g.fillStyle=ink;g.font='13px "JetBrains Mono",monospace';
+  g.fillText(`头 ${ny.toFixed(0)}° / ${np.toFixed(0)}°   ${m==="B"?`眼 ${S.eye.yaw.toFixed(0)}° / ${S.eye.pitch.toFixed(0)}°`:""}`,14,H-14);
+}
+function drawEye(g,x,y,sx,iy,ip,side){
+  const rw=58*sx+6, rh=70, m=S.mode;
+  // 眼白（屏幕）
+  g.save();g.beginPath();g.ellipse(x,y,rw,rh,0,0,Math.PI*2);g.clip();
+  g.fillStyle="#fbfbfd";g.fillRect(x-rw,y-rh,rw*2,rh*2);
+  // 画出来的眼睑（屏幕眨眼、困、开心）
+  let drawnClose=0;
+  if(S.drawnBlink>0&&!(S.blinkPhys&&m!=="screen"))drawnClose=Math.sin(Math.PI*(1-S.drawnBlink/0.14));
+  if(S.face==="sleepy")drawnClose=Math.max(drawnClose,0.45);
+  if(m==="screen"&&(S.sleeping||S.notLooking))drawnClose=1;
+  const happy=S.face==="happy";
+  // 虹膜：屏幕方案可以随意移动；A/B 方案虹膜围绕镜头（B 是整个眼睛转动）
+  const offx=clamp(iy/25,-1,1)*rw*0.38, offy=-clamp(ip/20,-1,1)*rh*0.3;
+  const ix=x+offx, iyy=y+offy, irw=rw*(S.face==="surprise"?0.5:0.62), irh=rh*(S.face==="surprise"?0.55:0.72);
+  if(!happy){
+    const grd=g.createLinearGradient(0,iyy-irh,0,iyy+irh);grd.addColorStop(0,"#2a3f7a");grd.addColorStop(0.55,css("--iris"));grd.addColorStop(1,"#9fd0ff");
+    g.fillStyle=grd;g.beginPath();g.ellipse(ix,iyy,irw,irh,0,0,Math.PI*2);g.fill();
+    g.fillStyle="#141a2c";g.beginPath();g.ellipse(ix,iyy+4,irw*0.42,irh*0.42,0,0,Math.PI*2);g.fill();
+    // 镜头：在瞳孔正中（A/B 方案镜头和虹膜一起动；纯屏幕方案没有镜头）
+    if(m!=="screen"){g.fillStyle="#05070b";g.beginPath();g.arc(ix,iyy+4,7,0,7);g.fill();g.fillStyle="rgba(140,190,255,.7)";g.beginPath();g.arc(ix-2,iyy+2,2.4,0,7);g.fill()}
+    g.fillStyle="#fff";g.beginPath();g.ellipse(ix-irw*0.35,iyy-irh*0.4,irw*0.28,irh*0.2,-0.4,0,7);g.fill();
+    g.beginPath();g.arc(ix+irw*0.3,iyy+irh*0.35,irw*0.12,0,7);g.fill();
+  }else{
+    g.fillStyle="#fbfbfd";g.fillRect(x-rw,y-rh,rw*2,rh*2);
+    g.strokeStyle="#2a3f7a";g.lineWidth=9;g.lineCap="round";g.beginPath();g.arc(x,y+18,rw*0.7,Math.PI*1.15,Math.PI*1.85);g.stroke();
+  }
+  // 屏幕画的眼睑
+  if(drawnClose>0){g.fillStyle=css("--skin");g.fillRect(x-rw,y-rh,rw*2,rh*2*drawnClose);g.strokeStyle="#5a3d3a";g.lineWidth=4;g.beginPath();g.moveTo(x-rw,y-rh+rh*2*drawnClose);g.lineTo(x+rw,y-rh+rh*2*drawnClose);g.stroke()}
+  g.restore();
+  // 透明眼罩的反光
+  g.strokeStyle="rgba(255,255,255,.5)";g.lineWidth=3;g.beginPath();g.ellipse(x,y,rw+3,rh+3,0,Math.PI*1.1,Math.PI*1.45);g.stroke();
+  g.strokeStyle="#3b2f3f";g.lineWidth=5;g.beginPath();g.ellipse(x,y,rw,rh,0,Math.PI*1.08,Math.PI*1.92);g.stroke();
+  // 物理眼睑（A/B）：真的盖住整个眼睛
+  if(m!=="screen"&&S.lid>0.01){
+    g.save();g.beginPath();g.ellipse(x,y,rw+8,rh+8,0,0,Math.PI*2);g.clip();
+    g.fillStyle=css("--lid");const h=(rh+8)*2*S.lid;g.fillRect(x-rw-8,y-rh-8,rw*2+16,h);
+    g.restore();
+    // 眼睑的边缘（睫毛线），合上时停在眼睛下部
+    const ly=Math.min(y-rh-8+h,y+rh*0.45);
+    g.strokeStyle="#3b2f3f";g.lineWidth=5;g.lineCap="round";g.beginPath();g.moveTo(x-rw*0.95,ly-6);g.quadraticCurveTo(x,ly+14*S.lid,x+rw*0.95,ly-6);g.stroke();
+    if(S.lid>0.9){g.lineWidth=3;for(const k of [-0.6,0,0.6]){g.beginPath();g.moveTo(x+k*rw*0.8,ly+7);g.lineTo(x+k*rw*0.9,ly+16);g.stroke()}}
+    g.strokeStyle="rgba(90,61,58,.35)";g.lineWidth=2;g.beginPath();g.ellipse(x,y,rw+8,rh+8,0,Math.PI*1.05,Math.PI*1.95);g.stroke();
+  }
+}
+// ---------- 状态说明 ----------
+function flags(){
+  const m=S.mode,c=camDir(),T=targetAngles();
+  let appear;
+  if(m==="screen")appear={yaw:S.neck.yaw+clamp(S.you.yaw-S.neck.yaw,-25,25),pitch:S.neck.pitch+clamp(S.you.pitch-S.neck.pitch,-20,20)};
+  else appear=c;
+  const diff=Math.hypot(appear.yaw-c.yaw,appear.pitch-c.pitch);
+  const fG=$("flagGaze"),fL=$("flagLid");
+  if(m==="screen"&&diff>6){fG.className="flag bad";fG.innerHTML=`<b>视线不诚实</b><span>眼睛看起来在看你，摄像头实际对着${TARGETS[S.target].name==="你"?"别处":TARGETS[S.target].name}（相差 ${diff.toFixed(0)}°）。</span>`}
+  else{const lag=Math.hypot(T.yaw-c.yaw,T.pitch-c.pitch);fG.className="flag"+(lag>8?" ":"");fG.innerHTML=`<b>视线是真的</b><span>${m==="screen"?"此刻眼睛和摄像头恰好看同一个方向。":"眼睛朝向 = 镜头朝向。"}${lag>8?` 还在转过去（差 ${lag.toFixed(0)}°）。`:""}</span>`}
+  const closed=S.sleeping||S.notLooking;
+  if(m==="screen"&&closed){fL.className="flag bad";fL.innerHTML=`<b>闭眼是画的</b><span>看起来${S.sleeping?"睡着了":"不看"}，额头的摄像头还开着。</span>`}
+  else if(closed){fL.className="flag";fL.innerHTML=`<b>真的看不见</b><span>物理眼睑${S.lid>0.98?"已经合上":"正在合上"}，挡住了镜头。</span>`}
+  else if(S.blinkPhys&&m!=="screen"){const lost=S.frames?S.lostFrames/S.frames*100:0;fL.className="flag";fL.innerHTML=`<b>用物理眼睑眨眼</b><span>每次眨眼画面会黑一下，大约丢失 ${lost.toFixed(1)}% 的画面。平时用屏幕画眨眼就不会丢。</span>`}
+  else{fL.className="flag";fL.innerHTML=`<b>眼睛睁着</b><span>${m==="screen"?"平时的眨眼是屏幕画的。":"平时的眨眼是屏幕画的，镜头不受影响；睡觉或\"我不看\"时才用物理眼睑。"}</span>`}
+}
+let last=performance.now();
+function loop(t){const dt=Math.min(0.05,(t-last)/1000);last=t;step(dt);drawFace();drawCam();flags();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script>
