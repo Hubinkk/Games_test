@@ -276,11 +276,17 @@ function drawCam(){
   g.fillStyle="#3c3a4a";g.beginPath();g.ellipse(yx,yy-ys*0.45,ys*0.8,ys*0.5,0,Math.PI,0);g.fill();
   g.fillStyle="#222";g.beginPath();g.arc(yx-ys*0.28,yy+ys*0.05,ys*0.08,0,7);g.arc(yx+ys*0.28,yy+ys*0.05,ys*0.08,0,7);g.fill();
   g.globalAlpha=1;
+  g.font='600 22px "Noto Sans SC",sans-serif';g.textAlign="center";
+  g.fillStyle="rgba(0,0,0,.55)";g.fillRect(yx-62,yy-ys*1.55-26,124,32);g.fillStyle="#fff";g.fillText("你（鼠标）",yx,yy-ys*1.55-3);
+  g.textAlign="start";
   // 注意点
   g.strokeStyle="rgba(120,255,200,.9)";g.lineWidth=2;g.beginPath();g.arc(W/2,H/2,16,0,7);g.moveTo(W/2-28,H/2);g.lineTo(W/2-18,H/2);g.moveTo(W/2+18,H/2);g.lineTo(W/2+28,H/2);g.stroke();
+  g.fillStyle="rgba(120,255,200,.95)";g.font='18px "Noto Sans SC",sans-serif';g.fillText("它正在看的地方",W/2+24,H/2+34);
+  g.fillStyle="rgba(255,255,255,.9)";g.font='20px "Noto Sans SC",sans-serif';
+  g.fillText(S.target==="you"?"它一直在看你，所以你总在画面中间":`它在看${TARGETS[S.target].name}，你不在中间`,18,H-18);
   // 物理眼睑：从上往下挡住
   if(S.lid>0.01){const h=H*S.lid*1.05;g.fillStyle="#120c0a";g.fillRect(0,0,W,h);const gr=g.createLinearGradient(0,h-30,0,h);gr.addColorStop(0,"rgba(18,12,10,1)");gr.addColorStop(1,"rgba(18,12,10,0)");g.fillStyle=gr;g.fillRect(0,h-30,W,30)}
-  if(blur){g.fillStyle="rgba(255,255,255,.85)";g.font='600 22px "Noto Sans SC",sans-serif';g.fillText("转得太快，画面糊了",18,H-20)}
+  if(blur){g.fillStyle="rgba(255,255,255,.85)";g.font='600 22px "Noto Sans SC",sans-serif';g.fillText("转得太快，画面糊了",18,H-52)}
   $("camCap").textContent=S.mode==="screen"?"额头摄像头看到的":"瞳孔里的摄像头看到的";
   lastCam=true;
 }
