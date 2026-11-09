@@ -37,11 +37,38 @@ def sm(a):
     return 0.5 - 0.5 * math.cos(math.pi * a)
 
 
+VARIANT = os.environ.get("GETUP_VARIANT", "")   # 诊断用："torque2"（扭矩加倍）、"range"（关节范围加大）、"both"
+
+
+def apply_variant(sim, v):
+    """诊断：放宽某一项限制，看是不是它卡住了起身。"""
+    import tendon_knee as tk
+    m = sim.m
+    if v in ("torque2", "both"):
+        for i in range(m.nu):
+            n = m.actuator(i).name
+            if n[:2] not in ("L_", "R_") and not n.endswith(("_quad", "_ham")):
+                m.actuator_forcerange[i] *= 2
+                sim.limit[n] = sim.limit.get(n, 0) * 2
+        tk.KNEE_LIMIT *= 2
+        tk.TMAX *= 2
+        for i in range(m.nu):
+            if m.actuator(i).name.endswith(("_quad", "_ham")):
+                m.actuator_ctrlrange[i] = (-tk.TMAX, 0)
+    if v in ("range", "both"):
+        for j, lo, hi in (("waist_pitch", -0.3, 1.4), ("l_hip_pitch", -2.6, 0.7), ("r_hip_pitch", -2.6, 0.7),
+                          ("l_knee", 0, 2.7), ("r_knee", 0, 2.7), ("l_ankle_pitch", -1.3, 1.0), ("r_ankle_pitch", -1.3, 1.0)):
+            m.jnt_range[m.joint(j).id] = (lo, hi)
+        RANGES.update(hp2=(-2.6, -1.2), hp3=(-2.6, -1.4), kn2=(1.6, 2.7), kn3=(1.8, 2.7), an3=(-1.3, -0.2), wp2=(-0.3, 1.4), wp3=(-0.3, 1.4))
+
+
 def get_sim():
     global _SIM
     if _SIM is None:
         figure_test.MODEL = fb.OUT
         _SIM = FD.FullSim()
+        if VARIANT:
+            apply_variant(_SIM, VARIANT)
     return _SIM
 
 
@@ -139,5 +166,5 @@ if __name__ == "__main__":
     s, x, r = best
     print("最好的动作：", {k: round(v, 2) for k, v in x.items()})
     print("过程（时间, 骨盆高 cm, 倾斜°）：", r["hist"])
-    json.dump(dict(x=x, result={k: v for k, v in r.items() if k != "hist"}, hist=r["hist"]),
-              open(os.path.join(HERE, "getup_best.json"), "w"), ensure_ascii=False, indent=1)
+    json.dump(dict(x=x, result={k: v for k, v in r.items() if k != "hist"}, hist=r["hist"], variant=VARIANT),
+              open(os.path.join(HERE, f"getup_best{'_' + VARIANT if VARIANT else ''}.json"), "w"), ensure_ascii=False, indent=1)
