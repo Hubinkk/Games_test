@@ -89,8 +89,8 @@ section > p{max-width:74ch;color:var(--ink-2);font-size:14.5px}
   </section>
 
   <section aria-labelledby="h-vr">
-    <h2 id="h-vr">VR 模式：主人通过它的眼睛看</h2>
-    <p>开始以后，你就是戴着头显的主人。在左边的画面上移动鼠标（或手指），就是在转头。机器人的眼球和脖子会跟着你转，但电机比你的头慢，脖子也只能转 ±57°。对比两种显示方式，看哪种会让人晕。</p>
+    <h2 id="h-vr">VR 模式：育苗人通过它的眼睛看</h2>
+    <p>开始以后，你就是戴着头显的育苗人。在左边的画面上移动鼠标（或手指），就是在转头。机器人的眼球和脖子会跟着你转，但电机比你的头慢，脖子也只能转 ±57°。对比两种显示方式，看哪种会让人晕。</p>
     <div class="seg">
       <button class="btn primary" id="vrBtn">开始 VR</button>
       <span class="seg" id="reproj"></span>
@@ -310,7 +310,7 @@ function drawCam(){
   g.strokeStyle="rgba(120,255,200,.9)";g.lineWidth=2;g.beginPath();g.arc(W/2,H/2,16,0,7);g.moveTo(W/2-28,H/2);g.lineTo(W/2-18,H/2);g.moveTo(W/2+18,H/2);g.lineTo(W/2+28,H/2);g.stroke();
   g.fillStyle="rgba(120,255,200,.95)";g.font='18px "Noto Sans SC",sans-serif';g.fillText("它正在看的地方",W/2+24,H/2+34);
   g.fillStyle="rgba(255,255,255,.9)";g.font='20px "Noto Sans SC",sans-serif';
-  g.fillText(S.vr?"VR 中：它跟着主人的头转":S.target==="you"?"它一直在看你，所以你总在画面中间":`它在看${TARGETS[S.target].name}，你不在中间`,18,H-18);
+  g.fillText(S.vr?"VR 中：它跟着育苗人的头转":S.target==="you"?"它一直在看你，所以你总在画面中间":`它在看${TARGETS[S.target].name}，你不在中间`,18,H-18);
   if(S.lid>0.01){const h=H*S.lid*1.05;g.fillStyle="#120c0a";g.fillRect(0,0,W,h);const gr=g.createLinearGradient(0,h-30,0,h);gr.addColorStop(0,"rgba(18,12,10,1)");gr.addColorStop(1,"rgba(18,12,10,0)");g.fillStyle=gr;g.fillRect(0,h-30,W,30)}
   if(blur){g.fillStyle="rgba(255,255,255,.85)";g.font='600 22px "Noto Sans SC",sans-serif';g.fillText("转得太快，画面糊了",18,H-52)}
   $("camCap").textContent=S.mode==="screen"?"额头摄像头看到的":"瞳孔里的摄像头看到的";
@@ -539,7 +539,7 @@ function drawTop(c,o){
   // 机器人的头
   g.fillStyle=css("--panel");g.strokeStyle=css("--ink");g.lineWidth=2;g.beginPath();g.arc(cx,cy,26,0,7);g.fill();g.stroke();
   g.textAlign="start";g.font='15px "Noto Sans SC",sans-serif';
-  const leg=[[css("--ink-2"),"脖子（±57°，灰色弧线）"],[css("--ok"),"摄像头 = 脖子 + 眼球（绿色扇形是广角画面）"],[css("--hard"),"主人的头（虚线扇形是头显视野）"]];
+  const leg=[[css("--ink-2"),"脖子（±57°，灰色弧线）"],[css("--ok"),"摄像头 = 脖子 + 眼球（绿色扇形是广角画面）"],[css("--hard"),"育苗人的头（虚线扇形是头显视野）"]];
   leg.forEach(([col,t],i)=>{g.fillStyle=col;g.fillRect(14,H-78+i*24,18,6);g.fillStyle=css("--ink");g.fillText(t,40,H-70+i*24)});
 }
 let last=performance.now();
