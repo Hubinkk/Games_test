@@ -1,0 +1,280 @@
+<title>人偶灵活度</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* 布局：结论 → 评分表（每一项都和参照比）→ 三维回放 → 活动范围 → 真正缺的东西（按"硬件 / 控制"分开） */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --hard:#b9800f; --no:#cf3b3d;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.6}
+.wrap{max-width:1160px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:40px}
+header{display:grid;gap:10px;max-width:76ch}
+.eyebrow{font-family:var(--f-data);font-size:12px;letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase}
+h1{font-family:var(--f-display);font-size:clamp(30px,4.4vw,44px);line-height:1.15;margin:0}
+h2{font-family:var(--f-display);font-size:23px;margin:0}
+h3{margin:0;font-size:15.5px}
+p{margin:0}
+.lede{color:var(--ink-2);font-size:15.5px}
+.lede b{color:var(--ink)}
+section{display:grid;gap:14px}
+section > p{max-width:76ch;color:var(--ink-2);font-size:14.5px}
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.split{grid-template-columns:minmax(0,1fr)}}
+.verdict{background:var(--panel);border:1px solid var(--rule);border-top:5px solid var(--ok);border-radius:10px;padding:16px 18px;display:grid;gap:8px}
+.verdict.no{border-top-color:var(--no)}
+.verdict .big{font-family:var(--f-display);font-size:24px;line-height:1.25}
+.verdict ul{margin:0;padding-left:1.2em;color:var(--ink-2);font-size:14px;display:grid;gap:4px}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:13.5px}
+th,td{border-bottom:1px solid var(--rule);padding:9px 10px;text-align:left;vertical-align:top}
+th{color:var(--ink-2);font-weight:500;font-size:12.5px}
+td.n{font-family:var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip{display:inline-block;font-size:12px;font-weight:600;border-radius:99px;padding:1px 9px;white-space:nowrap}
+.chip.ok{color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok)}.chip.hard{color:var(--hard);box-shadow:inset 0 0 0 1px var(--hard)}.chip.no{color:var(--no);box-shadow:inset 0 0 0 1px var(--no)}
+tr.grp td{background:var(--stage);font-weight:600;font-size:12.5px;color:var(--ink-2);letter-spacing:.04em}
+.viewer-wrap{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.viewer-wrap{grid-template-columns:minmax(0,1fr)}}
+#viewer{position:relative;background:var(--stage);border-radius:12px;aspect-ratio:4/3;max-width:100%;overflow:hidden;cursor:grab;touch-action:none}
+#viewer canvas{width:100%;height:100%;display:block}
+#viewer .lab{position:absolute;left:12px;top:10px;font-family:var(--f-data);font-size:12.5px;color:var(--ink-2)}
+#nogl{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-2);padding:20px;text-align:center}
+.tabs,.ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tabs button,.ctl button{font:inherit;font-size:13.5px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.ctl input[type=range]{flex:1;min-width:120px;accent-color:var(--calm)}
+.ctl .t{font-family:var(--f-data);font-size:12px;color:var(--ink-2)}
+.side{display:grid;gap:10px}
+.note{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;display:grid;gap:6px;font-size:13.5px;color:var(--ink-2)}
+.note b{color:var(--ink)}
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:7.5em minmax(0,1fr) 4.5em;gap:8px;align-items:center;font-size:12.5px}
+.bar .b{height:8px;background:var(--stage);border-radius:4px;overflow:hidden}
+.bar .b div{height:100%;background:var(--calm);width:0}
+.bar .v{font-family:var(--f-data);text-align:right;color:var(--ink-2)}
+.rom{display:grid;gap:8px}
+.romrow{display:grid;grid-template-columns:7em minmax(0,1fr) 10.5em;gap:10px;align-items:center;font-size:13.5px}
+.track{position:relative;height:16px;background:var(--stage);border-radius:4px}
+.track .have{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--calm);opacity:.75}
+.track .need{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--ink)}
+.romrow .v{font-family:var(--f-data);font-size:12.5px;color:var(--ink-2)}
+.romrow .v.bad{color:var(--no)}
+.gaps{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.gap{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:13px 15px;display:grid;gap:6px;align-content:start}
+.gap .top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.gap .pr{font-family:var(--f-data);font-size:12px;color:var(--ink-2)}
+.gap p{font-size:13.5px;color:var(--ink-2)}
+.gap p b{color:var(--ink)}
+.tag{font-size:11.5px;border-radius:4px;padding:0 6px;font-weight:600}
+.tag.ctrl{background:color-mix(in srgb,var(--calm) 18%,transparent);color:var(--calm)}
+.tag.hw{background:color-mix(in srgb,var(--hard) 20%,transparent);color:var(--hard)}
+.tag.real{background:color-mix(in srgb,var(--no) 16%,transparent);color:var(--no)}
+.foot{font-size:12.5px;color:var(--ink-2);max-width:82ch}
+code{font-family:var(--f-data);font-size:.92em}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">55 cm 人偶 · 整体模型 · 灵活度测试</div>
+    <h1>人偶灵活度</h1>
+    <p class="lede">在整体模型上实际测了一遍：活动范围、速度、挥手、站起、抗推、走路、摔倒后爬起。每个关节都按真实电机加了扭矩和转速上限。参照对象是同样大小的 RoboCup 少年组人形机器人，比如 ROBOTIS OP3（51 cm、3.5 kg）：它们能每秒走几十厘米，摔倒了能自己爬起来。<b>结论分两半：上半身已经灵活，下半身还差得远；而下半身差的主要不是电机，是控制。</b></p>
+  </header>
+
+  <section aria-labelledby="h-v">
+    <h2 id="h-v">结论</h2>
+    <div class="split">
+      <div class="verdict">
+        <span class="eyebrow">上半身：头、手臂、手、眼睛</span>
+        <span class="big">已经达到"灵活"</span>
+        <ul>
+          <li>转头约 46° 只要 0.12 秒，举手过头 0.22 秒。</li>
+          <li>挥手到每秒 6 次，幅度还保持 74%，比人平时挥手（每秒 2–3 次）快得多。</li>
+          <li>手指能比 V、OK，6 电机手打字每秒 2.8 个字符；眼睛能先转再转头（见眼睛小样）。</li>
+          <li>不足：脖子只能转 ±57°、低头 34°，比人小。</li>
+        </ul>
+      </div>
+      <div class="verdict no">
+        <span class="eyebrow">下半身：走、站、扛、爬</span>
+        <span class="big">还没达到</span>
+        <ul>
+          <li>走路最快约 1.1 cm/s；参照的同尺寸机器人约 20–30 cm/s，差约 20 倍。</li>
+          <li>摔倒后爬不起来：能撑成手脚着地，但重心挪不回脚上。</li>
+          <li>被推只能扛住 5 N（0.1 秒），不会迈步去接；从深蹲站起最快 1 秒，再快就倒。</li>
+          <li>但走路时关节只用到 3 rad/s（电机可到 10），站起时膝盖扭矩只用到 59%。<b>电机有余量，缺的是会动态走路、会爬起来的控制。</b></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-t">
+    <h2 id="h-t">逐项结果</h2>
+    <div class="tblwrap"><table id="tbl"></table></div>
+    <p class="foot">参照栏里的数值是大致范围：同尺寸 RoboCup 少年组机器人的公开表现，以及把人的动作按身高换算后的量级。"按身高换算的人"走路速度按弗劳德数（腿长 27 cm）估算，约 0.8 m/s。</p>
+  </section>
+
+  <section aria-labelledby="h-r">
+    <h2 id="h-r">看回放</h2>
+    <div class="viewer-wrap">
+      <div style="display:grid;gap:8px">
+        <div class="tabs" id="tabs"></div>
+        <div id="viewer"><span class="lab" id="label">—</span></div>
+        <div class="ctl"><button id="play">暂停</button><button id="speed">1×</button><input type="range" id="scrub" min="0" max="1" value="0" aria-label="时间"><span class="t" id="time">0.00 s</span></div>
+      </div>
+      <div class="side">
+        <div class="note" id="sceneNote"></div>
+        <div class="note"><b>此刻的用力</b><div class="bars" id="bars"></div></div>
+        <p class="foot">拖动画面可以转视角，滚轮或双指缩放。</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-rom">
+    <h2 id="h-rom">活动范围：够不够做人的动作</h2>
+    <p>蓝色是模型里关节能转到的角度，黑线是做这个动作需要的角度。</p>
+    <div class="rom" id="rom"></div>
+  </section>
+
+  <section aria-labelledby="h-g">
+    <h2 id="h-g">真正缺的东西</h2>
+    <p>按对"灵活"的影响排序。标签说明它属于哪一类：<span class="tag ctrl">控制</span> 要写或训练控制程序，硬件不用改；<span class="tag hw">硬件</span> 要改设计；<span class="tag real">实物</span> 仿真里测不出来，要做出来才知道。</p>
+    <div class="gaps" id="gaps"></div>
+  </section>
+
+  <p class="foot">数据来自 <code>sim/agility.py</code>（全部测试）和 <code>sim/getup.py</code>（起身动作搜索）。模型是 <code>sim/figure55_full.xml</code>：3.17 kg、24 个身体关节、绳驱膝、两只 6 电机手。所有关节加了 10 rad/s 的转速上限（常见微型舵机和膝关节 v1 的目标）。控制器和之前的整体模型相同：重心反馈平衡、静步行；起身动作由程序在 4 个关键帧上搜索了约 400 次，并在"扭矩加倍""关节范围加大"两种放宽条件下各再搜一次做诊断。</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="agility_frames.js"></script>
+<script id="res" type="application/json">/*RES_START*/{"rom":[{"act":"举手过头","joint":"l_shoulder_roll","need":170,"have":160,"ok":false,"note":"手臂从身体侧面举到头顶"},{"act":"左右转头","joint":"neck_yaw","need":80,"have":57,"ok":false,"note":"人约 ±80°"},{"act":"低头","joint":"neck_pitch","need":50,"have":34,"ok":false,"note":"看自己的手和脚边"},{"act":"抬头","joint":"neck_pitch","need":45,"have":29,"ok":false,"note":"仰头看高处"},{"act":"弯腰","joint":"waist_pitch","need":70,"have":34,"ok":false,"note":"弯腰捡东西、鞠躬（人约 90°）"},{"act":"扭腰","joint":"waist_yaw","need":40,"have":46,"ok":true,"note":"回头、转身"},{"act":"深蹲 / 跪坐","joint":"l_knee","need":145,"have":143,"ok":true,"note":"跪坐、蹲到底"},{"act":"抬腿","joint":"l_hip_pitch","need":120,"have":126,"ok":true,"note":"抱膝、爬起来时收腿"},{"act":"勾脚","joint":"l_ankle_pitch","need":30,"have":57,"ok":true,"note":"深蹲时脚跟不离地"},{"act":"屈肘","joint":"l_elbow","need":140,"have":138,"ok":false,"note":"手碰到肩膀"}],"head":{"t90":0.116,"deg":46,"fell":false},"arm":{"t90":0.224,"fell":false},"wave":[{"f":1.0,"ratio":0.99,"fell":false},{"f":2.0,"ratio":0.98,"fell":false},{"f":3.0,"ratio":0.95,"fell":false},{"f":4.0,"ratio":0.92,"fell":false},{"f":5.0,"ratio":0.86,"fell":false},{"f":6.0,"ratio":0.74,"fell":false}],"rise":[{"T":1.0,"knee_Nm":1.64,"fell":false},{"T":0.6,"knee_Nm":1.91,"fell":true},{"T":0.4,"knee_Nm":2.38,"fell":true},{"T":0.3,"knee_Nm":2.8,"fell":true},{"T":0.25,"knee_Nm":2.8,"fell":true},{"T":0.2,"knee_Nm":2.8,"fell":true}],"vmax_speed_tests":{"waist_yaw":0.1,"waist_pitch":4.0,"neck_yaw":10.9,"neck_pitch":13.9,"l_shoulder_pitch":6.0,"l_shoulder_roll":0.2,"l_shoulder_yaw":0.0,"l_elbow":1.1,"r_shoulder_pitch":6.0,"r_shoulder_roll":10.8,"r_shoulder_yaw":9.8,"r_elbow":7.3,"l_hip_yaw":0.1,"l_hip_roll":0.2,"l_hip_pitch":7.0,"l_knee":14.7,"l_ankle_pitch":7.4,"l_ankle_roll":0.1,"r_hip_yaw":0.1,"r_hip_roll":0.2,"r_hip_pitch":7.0,"r_knee":14.7,"r_ankle_pitch":7.4,"r_ankle_roll":0.1},"push":[{"F":2,"ok":true},{"F":3,"ok":true},{"F":4,"ok":true},{"F":5,"ok":true},{"F":6,"ok":false},{"F":8,"ok":false},{"F":10,"ok":false}],"walk":[{"stride":0.03,"T":2.4,"v_cm_s":1.11,"fell":false,"dx_cm":10.7},{"stride":0.03,"T":1.6,"v_cm_s":-5.1,"fell":true,"dx_cm":-32.6},{"stride":0.04,"T":1.6,"v_cm_s":-5.42,"fell":true,"dx_cm":-34.7},{"stride":0.03,"T":1.2,"v_cm_s":-7.3,"fell":true,"dx_cm":-35.0},{"stride":0.04,"T":1.2,"v_cm_s":-7.26,"fell":true,"dx_cm":-34.9},{"stride":0.05,"T":1.2,"v_cm_s":-7.08,"fell":true,"dx_cm":-34.0},{"stride":0.03,"T":0.9,"v_cm_s":-2.31,"fell":true,"dx_cm":-8.3},{"stride":0.04,"T":0.9,"v_cm_s":-2.02,"fell":true,"dx_cm":-7.3},{"stride":0.03,"T":0.7,"v_cm_s":-2.79,"fell":true,"dx_cm":-7.8}],"getup":{"score":0.4152670471215858,"ok":false,"z_cm":3.100153136821203,"tilt":91.70799149197786,"best_progress":0.6516720965331392,"t_total":7.388536954733327},"vmax":{"wave":["r_shoulder_roll",10.842553846771764],"push":["l_ankle_pitch",1.0904442389845668],"walk":["r_knee",3.0216582750165544],"getup":["l_knee",5.860556572201626]},"getup_hist":[[0.0,6.0,90.0],[0.25,2.9,89.0],[0.5,2.9,89.0],[0.75,2.9,89.0],[1.0,2.9,89.0],[1.25,2.9,89.0],[1.5,3.5,89.0],[1.75,3.3,90.0],[2.0,3.1,90.0],[2.25,3.1,90.0],[2.5,3.1,90.0],[2.75,3.4,92.0],[3.0,5.0,97.0],[3.25,6.8,102.0],[3.5,8.6,108.0],[3.75,10.0,112.0],[4.0,10.9,115.0],[4.25,11.3,115.0],[4.5,11.5,115.0],[4.75,11.9,112.0],[5.0,12.5,109.0],[5.25,13.0,105.0],[5.5,13.2,100.0],[5.75,13.2,95.0],[6.0,12.9,91.0],[6.25,12.8,89.0],[6.5,12.9,89.0],[6.75,13.3,86.0],[7.0,13.7,83.0],[7.25,12.8,87.0],[7.5,10.7,88.0],[7.75,8.2,88.0],[8.0,5.7,87.0],[8.25,4.5,87.0],[8.5,3.4,90.0],[8.75,3.3,91.0],[9.0,3.2,91.0],[9.25,3.2,91.0],[9.5,3.1,92.0],[9.75,3.1,92.0]]}/*RES_END*/</script>
+<script>
+(()=>{
+"use strict";
+const $=s=>document.querySelector(s);
+const R=JSON.parse($("#res").textContent.replace(/\/\*RES_(START|END)\*\//g,""));
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+// ---------- 评分表 ----------
+const waveMax=Math.max(...R.wave.filter(w=>w.ratio>=0.7&&!w.fell).map(w=>w.f));
+const riseMin=Math.min(...R.rise.filter(r=>!r.fell).map(r=>r.T));
+const pushMax=Math.max(...R.push.filter(p=>p.ok).map(p=>p.F));
+const walkMax=Math.max(...R.walk.filter(w=>!w.fell).map(w=>w.v_cm_s));
+const romBad=R.rom.filter(r=>!r.ok).map(r=>r.act);
+const rows=[
+  ["上半身"],
+  ["转头 46°",`${R.head.t90.toFixed(2)} s`,"人约 0.2–0.3 s","ok","够快"],
+  ["举手过头",`${R.arm.t90.toFixed(2)} s`,"人约 0.3–0.5 s","ok","够快"],
+  ["挥手最快",`${waveMax} 次/秒（幅度 ≥70%）`,"人平时 2–3 次/秒","ok","够快"],
+  ["手指","比 V、OK；打字 2.8 字/秒","人打字约 5–8 字/秒","hard","能用，比人慢"],
+  ["脖子、腰的活动范围",`转头 ±57°、低头 34°、弯腰 34°`,"人约 ±80°、50°、90°","hard","偏小（改设计就能加大）"],
+  ["下半身"],
+  ["走路最快",`${walkMax.toFixed(1)} cm/s`,"同尺寸机器人 20–30 cm/s；按身高换算的人约 80 cm/s","no","差约 20 倍"],
+  ["从深蹲站起",`最快 ${riseMin.toFixed(1)} s（再快就倒）`,"人约 1 s","ok","够用"],
+  ["被推一下（推胸口 0.1 s）",`扛住 ${pushMax} N`,"会迈步接住的机器人能扛住大得多的推力","hard","只会站着扛，不会迈步"],
+  ["摔倒后爬起",R.getup.ok?"能":"不能（撑起到手脚着地，重心过不去）","同尺寸机器人能在几秒内爬起","no","没做到"],
+  ["电机余量"],
+  ["走路时最快的关节",`${R.vmax.walk[1].toFixed(1)} rad/s`,"电机上限 10 rad/s","ok","只用了约 30%"],
+  ["站起时膝盖扭矩",`${R.rise[0].knee_Nm.toFixed(2)} N·m`,"膝关节 v1 峰值 2.8 N·m","ok","只用了约 59%"],
+];
+const chip=(c,t)=>`<span class="chip ${c}">${t}</span>`;
+$("#tbl").innerHTML=`<thead><tr><th>项目</th><th>人偶（仿真）</th><th>参照</th><th>评价</th></tr></thead><tbody>`+
+  rows.map(r=>r.length===1?`<tr class="grp"><td colspan="4">${r[0]}</td></tr>`:`<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td>${r[2]}</td><td>${chip(r[3],r[4])}</td></tr>`).join("")+"</tbody>";
+// ---------- 活动范围 ----------
+$("#rom").innerHTML=R.rom.map(r=>{const max=180;return`<div class="romrow"><span>${r.act}</span><div class="track" title="${r.note}"><div class="have" style="width:${Math.min(100,r.have/max*100)}%"></div><div class="need" style="left:${Math.min(99.5,r.need/max*100)}%"></div></div><span class="v ${r.ok?"":"bad"}">有 ${r.have}° / 要 ${r.need}°</span></div>`}).join("");
+// ---------- 真正缺的 ----------
+const G=[
+  ["动态走路","ctrl","最大的差距。现在的静步行每一步都要先把重心挪到脚上方，所以很慢。电机速度和扭矩都有余量，缺的是动态走路的控制器：用强化学习在仿真里训练（MuJoCo Playground 或台式机上的 Isaac Lab），同尺寸机器人靠这个走到每秒几十厘米。"],
+  ["摔倒后自己爬起来","ctrl","搜索了约 400 种关键帧组合都没成功。把扭矩加倍后，它力气大到能把自己撑成倒立，却还是站不起来，说明卡住它的主要是动作控制，而不是力气。要专门设计起身动作，或者和走路一起用强化学习训练。"],
+  ["被推时迈步","ctrl","现在只会靠脚踝和髋部站着扛，扛不住就倒。人和好的机器人会迈一步去接。这是动态走路控制器的一部分。"],
+  ["快速动作时的平衡","ctrl","从深蹲 0.6 秒站起时，膝盖扭矩还没用满，人偶却向后倒了：重心控制跟不上快动作。"],
+  ["脖子和腰的活动范围","hw","转头 ±57°、低头 34°、弯腰 34°，都比人小，看起来会显得僵。改关节结构就能加大：颈部换成并联机构或加大行程，腰部俯仰从 34° 提到 60° 以上。弯腰也会帮助爬起来。"],
+  ["电机在真实负载下的发热","real","仿真没有算温度。走路、站立时电机持续出力会发热，可能限制能连续动多久。要在膝关节台架上测（膝关节 v1 的 11 项测试里有）。"],
+  ["摩擦、间隙、线的伸长","real","仿真里的减速器和绳驱都是理想的。实物会有间隙和摩擦，控制会变难，舌头的 s 已经显示了线伸长的影响。要靠实物测出来，再把这些误差加进仿真里训练。"],
+  ["续航","real","30 Wh 电池估计 30–60 分钟。动态走路比站着耗电得多，实际可能更短。"],
+];
+$("#gaps").innerHTML=G.map(([t,k,d],i)=>`<div class="gap"><div class="top"><span class="pr">${String(i+1).padStart(2,"0")}</span><h3>${t}</h3><span class="tag ${k}">${{ctrl:"控制",hw:"硬件",real:"实物"}[k]}</span></div><p>${d}</p></div>`).join("");
+
+// ---------- 三维回放 ----------
+const D=window.AGI;
+const NOTE={
+  wave:`<b>挥手 ${waveMax} 次/秒</b><span>右臂举起后左右摆动。转速上限 10 rad/s，幅度还保持 ${Math.round(R.wave.find(w=>w.f===waveMax).ratio*100)}%。全程站稳。</span>`,
+  push:`<b>被推 ${pushMax} N（0.1 秒）</b><span>第 1 秒时推胸口。靠脚踝和髋部扛住；再大一点（6 N）就倒，因为它不会迈步。</span>`,
+  walk:`<b>走路 ${walkMax.toFixed(1)} cm/s</b><span>静步行：先把重心挪到支撑脚上方，再迈另一只脚。更快的节奏（每步 1.6 秒及以下）都会摔倒。</span>`,
+  getup:`<b>趴着爬起：没成功</b><span>手撑地、收腿，能撑成手脚着地（骨盆抬高到约 14 cm），但重心挪不回脚上，最后又趴了回去。这是程序搜索到的最好动作。</span>`,
+};
+const BARS=[["tilt","躯干倾斜","°",90],["hip_r","右髋俯仰","N·m",2.8],["ankle_r","右踝俯仰","N·m",1.5],["quad_r","右膝前线","N",250]];
+$("#bars").innerHTML=BARS.map(([k,n])=>`<div class="bar"><span>${n}</span><div class="b"><div id="b-${k}"></div></div><span class="v" id="v-${k}">0</span></div>`).join("");
+const viewer=$("#viewer"),T=window.THREE;let renderer=null;
+if(!D){viewer.insertAdjacentHTML("beforeend",'<div id="nogl">回放数据没有加载成功，请刷新页面。上面的结果仍然有效。</div>');}
+try{if(T&&D)renderer=new T.WebGLRenderer({antialias:true});}catch(e){}
+if(D&&!renderer)viewer.insertAdjacentHTML("beforeend",'<div id="nogl">这个浏览器无法显示三维画面。</div>');
+let scene,camera,root,meshes=[];
+function mergeGeos(gs){const pos=[],nor=[],idx=[];let off=0;
+  gs.forEach(g=>{const p=g.attributes.position,n=g.attributes.normal;for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));nor.push(n.getX(i),n.getY(i),n.getZ(i));}
+    if(g.index)for(let i=0;i<g.index.count;i++)idx.push(g.index.getX(i)+off);else for(let i=0;i<p.count;i++)idx.push(i+off);off+=p.count;});
+  const out=new T.BufferGeometry();out.setAttribute("position",new T.Float32BufferAttribute(pos,3));out.setAttribute("normal",new T.Float32BufferAttribute(nor,3));out.setIndex(idx);return out;}
+if(renderer){
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));viewer.prepend(renderer.domElement);
+  scene=new T.Scene();camera=new T.PerspectiveCamera(30,4/3,5,10000);
+  scene.add(new T.HemisphereLight(0xffffff,0x8a90a0,.95));const dl=new T.DirectionalLight(0xffffff,.7);dl.position.set(300,800,500);scene.add(dl);
+  root=new T.Group();root.rotation.x=-Math.PI/2;scene.add(root);
+  D.geoms.forEach(g=>{let geo;const s=g.size;
+    if(g.type===0)geo=new T.PlaneGeometry(1600,1600);
+    else if(g.type===2)geo=new T.SphereGeometry(s[0],22,16);
+    else if(g.type===3){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],18);geo.rotateX(Math.PI/2);const a=new T.SphereGeometry(s[0],16,12);a.translate(0,0,s[1]);const b=new T.SphereGeometry(s[0],16,12);b.translate(0,0,-s[1]);geo=mergeGeos([geo,a,b]);}
+    else if(g.type===5){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],24);geo.rotateX(Math.PI/2);}
+    else if(g.type===6)geo=new T.BoxGeometry(2*s[0],2*s[1],2*s[2]);
+    else if(g.type===4){geo=new T.SphereGeometry(1,22,16);geo.scale(s[0],s[1],s[2]);}
+    else{meshes.push(null);return;}
+    const col=g.type===0?new T.Color(css("--rule")||"#cdd3da"):new T.Color(g.rgba[0],g.rgba[1],g.rgba[2]);
+    const mat=new T.MeshStandardMaterial({color:col,roughness:.6,transparent:g.rgba[3]<1,opacity:g.rgba[3]<1?Math.max(.15,g.rgba[3]):1});
+    const m=new T.Mesh(geo,mat);root.add(m);meshes.push(m);});
+}
+const ORDER=["walk","getup","push","wave"];
+const P={scene:"walk",i:0,playing:true,speed:1,acc:0};
+const F=()=>D?D.scenes[P.scene].frames:[];
+if(D)$("#tabs").innerHTML=ORDER.filter(k=>D.scenes[k]).map(k=>`<button data-s="${k}" aria-pressed="${k===P.scene}">${D.scenes[k].title}</button>`).join("");
+function show(i){const f=F()[i];if(!f)return;
+  if(renderer)f.g.forEach((g,k)=>{const m=meshes[k];if(!m)return;m.position.set(g[0],g[1],g[2]);m.quaternion.set(g[4],g[5],g[6],g[3]);});
+  $("#label").textContent=f.label||D.scenes[P.scene].title;
+  BARS.forEach(([k,,u,lim])=>{const v=f.v[k]||0;const b=$("#b-"+k);if(b)b.style.width=Math.min(100,v/lim*100)+"%";const t=$("#v-"+k);if(t)t.textContent=(u==="N"||u==="°"?v.toFixed(0):v.toFixed(2))+" "+u;});
+  $("#scrub").value=i;$("#time").textContent=`${(i/30).toFixed(2)} / ${(F().length/30).toFixed(2)} s`;}
+const cam={az:.9,el:.25,dist:1500,gaz:.9,gel:.25,gdist:1500};
+function setScene(s){P.scene=s;P.i=0;$("#scrub").max=F().length-1;[...$("#tabs").children].forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===s));$("#sceneNote").innerHTML=NOTE[s]||"";
+  if(s==="wave"){cam.gaz=.35;cam.gel=.2;cam.gdist=1250;}else if(s==="getup"){cam.gaz=1.5;cam.gel=.35;cam.gdist=1300;}else{cam.gaz=.9;cam.gel=.25;cam.gdist=1500;}show(0);}
+if(D){
+  $("#tabs").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(b){setScene(b.dataset.s);P.playing=true;$("#play").textContent="暂停";}});
+  $("#play").addEventListener("click",()=>{P.playing=!P.playing;$("#play").textContent=P.playing?"暂停":"播放";if(P.playing&&P.i>=F().length-1)P.i=0;});
+  $("#scrub").addEventListener("input",e=>{P.i=+e.target.value;P.playing=false;$("#play").textContent="播放";show(P.i);});
+  const SP=[.25,.5,1,2];$("#speed").addEventListener("click",()=>{P.speed=SP[(SP.indexOf(P.speed)+1)%4];$("#speed").textContent=P.speed+"×";});
+}
+function updCam(dt){const k=Math.min(1,dt*5);cam.az+=(cam.gaz-cam.az)*k;cam.el+=(cam.gel-cam.el)*k;cam.dist+=(cam.gdist-cam.dist)*k;
+  const f=F()[P.i];let cx=0,cz=0;if(f){const pv=f.g[1];cx=pv[0];cz=-pv[1];}
+  const tgt=new T.Vector3(cx,P.scene==="getup"?120:260,cz);
+  camera.position.set(tgt.x+cam.dist*Math.cos(cam.el)*Math.sin(cam.az),tgt.y+cam.dist*Math.sin(cam.el),tgt.z+cam.dist*Math.cos(cam.el)*Math.cos(cam.az));camera.lookAt(tgt);}
+if(renderer){const el=renderer.domElement,pt=new Map();let mv=0,p0=0;
+  el.addEventListener("pointerdown",e=>{el.setPointerCapture(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);mv=0;if(pt.size===2){const [a,b]=[...pt.values()];p0=Math.hypot(a[0]-b[0],a[1]-b[1]);}});
+  el.addEventListener("pointermove",e=>{if(!pt.has(e.pointerId))return;const p=pt.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pt.set(e.pointerId,[e.clientX,e.clientY]);mv+=Math.abs(dx)+Math.abs(dy);
+    if(pt.size===2){const [a,b]=[...pt.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(p0)cam.gdist=Math.min(4000,Math.max(200,cam.gdist*p0/d));p0=d;}
+    else if(mv>3){cam.gaz-=dx*.008;cam.gel=Math.max(-1.2,Math.min(1.45,cam.gel+dy*.006));}});
+  const up=e=>{pt.delete(e.pointerId);if(pt.size<2)p0=0;};el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up);
+  el.addEventListener("wheel",e=>{e.preventDefault();cam.gdist=Math.min(4000,Math.max(200,cam.gdist*(1+e.deltaY*.0012)));},{passive:false});
+  new ResizeObserver(()=>{const w=viewer.clientWidth,h=viewer.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}).observe(viewer);
+  const theme=()=>renderer.setClearColor(new T.Color(css("--stage")||"#dfe3e8"));matchMedia("(prefers-color-scheme: dark)").addEventListener("change",theme);theme();}
+let last=performance.now();
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;
+  if(D&&P.playing){P.acc+=dt*30*P.speed;while(P.acc>=1){P.acc-=1;P.i++;}if(P.i>=F().length)P.i=0;show(P.i);}
+  if(renderer){updCam(dt);renderer.render(scene,camera);}requestAnimationFrame(frame);}
+if(D)setScene("walk");requestAnimationFrame(frame);
+})();
+</script>
