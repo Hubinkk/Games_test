@@ -37,6 +37,10 @@ def sm(a):
     return 0.5 - 0.5 * math.cos(math.pi * a)
 
 
+METHOD = os.environ.get("GETUP_METHOD", "")     # "arms"：育苗人的建议（2026-11-10）：手掌撑地、胳膊发力，脖子不用力
+if METHOD == "arms":
+    # 俯卧撑式：先弯肘把手掌放到肩旁（el1 弯），再伸直胳膊撑起（el2 接近伸直）；头抬起不顶地
+    RANGES.update(sp1=(-1.3, -0.2), el1=(-1.9, -0.6), el2=(-0.5, 0.0), sp2=(-2.0, -0.6))
 VARIANT = os.environ.get("GETUP_VARIANT", "")   # 诊断用："torque2"（扭矩加倍）、"range"（关节范围加大）、"both"
 
 
@@ -55,6 +59,12 @@ def apply_variant(sim, v):
         for i in range(m.nu):
             if m.actuator(i).name.endswith(("_quad", "_ham")):
                 m.actuator_ctrlrange[i] = (-tk.TMAX, 0)
+    if v == "arms2":   # 只有手臂（肩、肘）的力气加倍
+        for i in range(m.nu):
+            n = m.actuator(i).name
+            if "shoulder" in n or "elbow" in n:
+                m.actuator_forcerange[i] *= 2
+                sim.limit[n] = sim.limit.get(n, 0) * 2
     if v in ("range", "both"):
         for j, lo, hi in (("waist_pitch", -0.3, 1.4), ("l_hip_pitch", -2.6, 0.7), ("r_hip_pitch", -2.6, 0.7),
                           ("l_knee", 0, 2.7), ("r_knee", 0, 2.7), ("l_ankle_pitch", -1.3, 1.0), ("r_ankle_pitch", -1.3, 1.0)):
@@ -88,11 +98,13 @@ def keyframes(x):
             p[f"{s}_shoulder_pitch"], p[f"{s}_elbow"] = sp, el
             p[f"{s}_hip_pitch"], p[f"{s}_knee"], p[f"{s}_ankle_pitch"] = hp, kn, an
         p["waist_pitch"] = wp
+        if METHOD == "arms":
+            p["neck_pitch"] = -0.5          # 头抬起来，不顶地
         return p
     t = 1.0
     ks = [(0.0, lying()), (t, lying())]
     t += x["t1"]; ks.append((t, pose(x["sp1"], x["el1"], 0.0, 0.05, 0.0, 0.0)))
-    t += x["t2"]; ks.append((t, pose(x["sp2"], x["el1"], x["hp2"], x["kn2"], x["an2"], x["wp2"])))
+    t += x["t2"]; ks.append((t, pose(x["sp2"], x.get("el2", x["el1"]) if METHOD == "arms" else x["el1"], x["hp2"], x["kn2"], x["an2"], x["wp2"])))
     t += x["t3"]; ks.append((t, pose(x["sp3"], x["el3"], x["hp3"], x["kn3"], x["an3"], x["wp3"])))
     t += x["t4"]; ks.append((t, stand_pose()))
     return ks
@@ -179,5 +191,5 @@ if __name__ == "__main__":
     s, x, r = best
     print("最好的动作：", {k: round(v, 2) for k, v in x.items()})
     print("过程（时间, 骨盆高 cm, 倾斜°）：", r["hist"])
-    json.dump(dict(x=x, result={k: v for k, v in r.items() if k != "hist"}, hist=r["hist"], variant=VARIANT),
-              open(os.path.join(HERE, f"getup_best{'_' + VARIANT if VARIANT else ''}.json"), "w"), ensure_ascii=False, indent=1)
+    json.dump(dict(x=x, result={k: v for k, v in r.items() if k != "hist"}, hist=r["hist"], variant=VARIANT, method=METHOD),
+              open(os.path.join(HERE, f"getup_best{'_' + METHOD if METHOD else ''}{'_' + VARIANT if VARIANT else ''}.json"), "w"), ensure_ascii=False, indent=1)

@@ -47,6 +47,8 @@ for _a in sys.argv[1:]:
         DAY = _a.split("=", 1)[1]
 NEXT = (datetime.date.fromisoformat(DAY) + datetime.timedelta(days=1)).isoformat()
 INBOX = os.path.join(MEM, "inbox")
+GETUP_TAG = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--getup=")), "")   # "arms"：育苗人教的起身方法
+UNDER = None
 FPS = 15
 
 # ---------------- 身体：温度与电量 ----------------
@@ -259,6 +261,38 @@ def read_inbox():
     return msgs
 
 
+def load_understanding():
+    p = os.path.join(INBOX, f"理解-{DAY}.json")
+    return json.load(open(p, encoding="utf-8")) if os.path.exists(p) else None
+
+
+def apply_understanding(u):
+    """把云端整理的理解写进 people/育苗人.md 和 相处之道.md（标明写的人）。"""
+    if not u:
+        return []
+    changes = []
+    p = os.path.join(MEM, "people", "育苗人.md")
+    s = open(p, encoding="utf-8").read()
+    for sec, items in u.get("people", {}).items():
+        head = f"## {sec}\n"
+        if head in s:
+            add = "".join(f"- {x}（{DAY}，云端整理）\n" for x in items if x not in s)
+            i = s.index(head) + len(head)
+            nxt = s.find("\n## ", i)
+            body_end = nxt + 1 if nxt != -1 else len(s)
+            s = s[:body_end].rstrip("\n") + "\n" + add + "\n" + s[body_end:]
+    open(p, "w", encoding="utf-8").write(s)
+    changes.append("关于育苗人的那一页：写下我从你的话里理解到的（云端帮我整理）")
+    p = os.path.join(MEM, "相处之道.md")
+    s = open(p, encoding="utf-8").read()
+    for row in u.get("cases", []):
+        if row not in s:
+            s = s.replace("| | | | | |\n", row + "\n", 1) if "| | | | | |\n" in s else s.rstrip("\n") + "\n" + row + "\n"
+            changes.append("相处之道：记下一个案例（被扶起来时担心麻烦别人）")
+    open(p, "w", encoding="utf-8").write(s)
+    return changes
+
+
 def remember_messages(msgs):
     """记进 people/育苗人.md，标记已读，写回执（Claude 再把回执写回网页）。"""
     if not msgs:
@@ -321,7 +355,10 @@ def write_diary(body, scene_info, results, msgs=()):
         for m in msgs:
             q = f"（回答我问的「{m['question']}」）" if m.get("question") else ""
             lines.append(f"- {q}「{m['text']}」")
-        lines += ["", "我记下来了。有些我还不太懂，先放在关于育苗人的那一页里，慢慢想。", ""]
+        if UNDER:
+            lines += [""] + [f"{x}" for x in UNDER["diary"]] + ["", "（这一段是云端帮我整理的理解。）", ""]
+        else:
+            lines += ["", "我记下来了。有些我还不太懂，先放在关于育苗人的那一页里，慢慢想。", ""]
     by = {}
     for e in ev:
         by.setdefault(e["scene"], []).append(e)
@@ -333,7 +370,7 @@ def write_diary(body, scene_info, results, msgs=()):
         elif key in ("push1", "push2"):
             extra = "站住了。" if r.get("ok") else "没站住。"
         elif key == "getup":
-            extra = "没爬起来，最后是被扶起来的。" if not r.get("ok") else "自己站起来了！"
+            extra = ("照育苗人教的：头抬起来，手掌撑地，胳膊发力。" if GETUP_TAG == "arms" else "") + ("没爬起来，最后是被扶起来的。" if not r.get("ok") else "自己站起来了！")
         lines.append(f"- {clock[0]:02d}:{clock[1]:02d} {title}。{extra}")
         groups = []
         for e in by.get(key, []):
@@ -447,6 +484,16 @@ def sleep(body, results):
     return changes, queue
 
 
+def getup_try_line(results):
+    g = results.get("getup", {})
+    if GETUP_TAG != "arms":
+        return ""
+    if g.get("ok"):
+        return "今天摔倒以后，我照你说的，先用手掌撑地、胳膊发力，头不顶地——我自己站起来了！"
+    return (f"今天摔倒以后，我照你说的，头抬起来不顶地，手掌撑地、胳膊发力。脖子不累了。"
+            f"不过还是没站起来，最多撑到骨盆离地 {g.get('peak_cm', 0):.0f} 厘米。可能真的要看看我的手臂和结构了。")
+
+
 def still_ask(msgs):
     asked = ["昨天扶我起来的人，会不会觉得麻烦？", "爬起来的时候手臂和脖子很吃力、发热。是我用错了方法，还是手臂本来就太弱了？"]
     answered = {m.get("question") for m in msgs}
@@ -474,7 +521,7 @@ def morning_report(body, results, changes, queue, msgs=()):
     lines = ["---", "类型: 早上的报告", f"日期: {NEXT}", "写的人: 花然", "给: 育苗人", "---", "",
              f"# {NEXT} 早上", "",
              "育苗人，早上好。", "",
-             ] + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] if msgs else []) + [
+             ] + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] + ((["## 我想到的", ""] + [f"{x}" for x in UNDER["report"]] + [getup_try_line(results), ""]) if UNDER else []) if msgs else []) + [
              "## 昨天", "",
              f"- 我走到了窗边，走了 {results['walk']['dx_cm']:.0f} 厘米，每秒 {results['walk']['v_cm_s']:.1f} 厘米。很慢，但没摔。",
              f"- 被人碰了两次，第一次站住了，第二次倒了。" if results["push1"]["ok"] and not results["push2"]["ok"] else
@@ -503,7 +550,9 @@ def main():
     bal = Balance(sim)
     body = Body(sim)
     rec = Rec(sim, body)
-    gx = json.load(open(os.path.join(HERE, "getup_best.json"), encoding="utf-8"))["x"]
+    gfile = "getup_best_arms.json" if GETUP_TAG == "arms" else "getup_best.json"
+    gx = json.load(open(os.path.join(HERE, gfile), encoding="utf-8"))["x"]
+    getup.METHOD = GETUP_TAG
     info, results, spans = [], {}, []
     for key, title, clock, mins, simT, fn, desc in scenes(sim, bal, gx):
         body.scene = dict(key=key, clock=clock)
@@ -532,12 +581,14 @@ def main():
         info.append((key, title, clock, mins, simT, desc))
         print(f"{clock[0]:02d}:{clock[1]:02d} {title}：帧 {len(rec.frames)-f0}，事件 {sum(1 for e in body.events if e['scene']==key)}", flush=True)
     ensure_memory()
+    global UNDER
+    UNDER = load_understanding()
     msgs = read_inbox()
     diary = write_diary(body, info, results, msgs)
     remember_messages(msgs)
     changes, queue = sleep(body, results)
     if msgs:
-        changes.insert(0, f"关于育苗人的那一页：记下了你的 {len(msgs)} 句话")
+        changes[:0] = [f"关于育苗人的那一页：记下了你的 {len(msgs)} 句话"] + apply_understanding(UNDER)
     report = morning_report(body, results, changes, queue, msgs)
     print("\n".join(e["clock"] + " " + e["text"] for e in body.events))
     print(json.dumps(results, ensure_ascii=False))
