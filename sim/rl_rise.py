@@ -31,8 +31,9 @@ from figure_test import stand_pose
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CTRL = ["l_hip_pitch", "r_hip_pitch", "l_hip_roll", "r_hip_roll", "l_knee", "r_knee",
-        "l_ankle_pitch", "r_ankle_pitch", "l_ankle_roll", "r_ankle_roll", "waist_pitch"]
-ACT_SCALE = 0.35          # 每个关节最多修正 ±0.35 rad
+        "l_ankle_pitch", "r_ankle_pitch", "l_ankle_roll", "r_ankle_roll", "waist_pitch",
+        "l_shoulder_pitch", "r_shoulder_pitch"]
+ACT_SCALE = 0.5           # 每个关节最多修正 ±0.5 rad
 POLICY_DT = 0.01          # 每 10 ms 决策一次
 HOLD = 1.5                # 站起后还要站稳 1.5 s
 W_MAX = 10.0              # 转速上限 rad/s
@@ -45,8 +46,22 @@ class Env:
         self.m, self.d = self.sim.m, self.sim.d
         best = json.load(open(os.path.join(HERE, "getup_best_kneel3.json"), encoding="utf-8"))["x"]
         self.ks = getup.keyframes_for(best)
-        self.t_rise = self.ks[-3][0]           # 右腿刚跨出去的那一刻（还没把脚落稳、重心前移）
-        self.T5 = self.ks[-1][0] - self.t_rise  # 策略负责：脚落地、重心前移、站起，再站稳
+        # 第二版（2026-11-12）：上一版的起点其实不是真正的单膝跪地（右脚在左膝后面）。
+        # 改为从"跪直"那一刻开始（两膝着地、上身直立，已验证稳定），用按人的做法重新设计的单膝跪地动作：
+        # 右大腿抬到水平、小腿垂直，脚平放在左膝前方；上身前倾、胳膊往前送来配重；再站起来。
+        kneel_t, kneel = self.ks[-5]
+        self.t_rise = kneel_t
+        half = dict(kneel)
+        lift = dict(kneel)
+        lift.update(r_hip_pitch=-1.5, r_knee=1.7, r_ankle_pitch=-0.2)
+        half.update(r_hip_pitch=-1.45, r_knee=1.5, r_ankle_pitch=0.0, waist_pitch=0.3,
+                    l_shoulder_pitch=-1.2, r_shoulder_pitch=-1.2, l_elbow=-0.2, r_elbow=-0.2)
+        t = kneel_t
+        self.ks = [kp for kp in self.ks if kp[0] <= kneel_t]
+        for dt_, p in ((0.9, lift), (0.9, half), (1.6, stand_pose())):
+            t += dt_
+            self.ks.append((t, p))
+        self.T5 = self.ks[-1][0] - self.t_rise
         self.bal = Balance(self.sim)
         self.state0, self.targets0 = self._capture()
         self.nq = len(CTRL)
@@ -208,7 +223,7 @@ def train(iters=40, ndir=12, top=6, step=0.03, nu=0.05, seed=0):
             okrate = np.mean([r[1] for r in res])
             hist.append(dict(it=it + 1, mean_reward=float(np.mean(rp + rm) / 2), ok_rate=float(okrate)))
             print(f"第 {it+1:2d} 轮：平均得分 {np.mean(rp+rm)/2:.2f}，带扰动的尝试里站起来的比例 {okrate*100:.0f}%（{time.time()-t0:.0f} s）", flush=True)
-            json.dump(dict(W=W.tolist(), mean=mean.tolist(), std=std.tolist(), hist=hist, ctrl=CTRL, act_scale=ACT_SCALE),
+            json.dump(dict(W=W.tolist(), mean=mean.tolist(), std=std.tolist(), hist=hist, ctrl=CTRL, act_scale=ACT_SCALE, version=2),
                       open(os.path.join(HERE, "rl_rise_policy.json"), "w"), ensure_ascii=False)
     return W, mean, std, hist
 
