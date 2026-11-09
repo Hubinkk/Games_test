@@ -116,21 +116,34 @@ def run(x, record=None):
     d.qpos[0:3] = [0, 0, 0.06]
     d.qpos[3:7] = [math.cos(math.pi / 4), 0, math.sin(math.pi / 4), 0]   # 脸朝下趴着
     mujoco.mj_forward(m, d)
+    from balance import Balance
+    bal = Balance(sim)
+    bal.prev = None
     dt = m.opt.timestep
+    t_rise = ks[-2][0]
     t_end = ks[-1][0] + 1.5
-    hist = []
+    hist, best_prog, balancing = [], 0.0, False
     for k in range(int(t_end / dt)):
         t = k * dt
-        sim.set_targets(target(t))
+        tgt = target(t)
+        # 站起阶段：身体接近直立后接上平衡控制（和其他测试同一个控制器）
+        if t > t_rise and sim.tilt_deg() < 35:
+            balancing = True
+        if balancing:
+            tgt = bal.adjust(tgt)
+        sim.set_targets(tgt)
         sim.step()
         if record is not None:
             record(t)
+        z, tilt = float(d.qpos[2]), sim.tilt_deg()
+        best_prog = max(best_prog, min(z, 0.26) / 0.26 + math.cos(math.radians(min(tilt, 180))))
         if k % int(0.25 / dt) == 0:
-            hist.append((round(t, 2), round(float(d.qpos[2]) * 100, 1), round(sim.tilt_deg(), 0)))
+            hist.append((round(t, 2), round(z * 100, 1), round(tilt, 0)))
     z, tilt = float(d.qpos[2]), sim.tilt_deg()
     ok = z > 0.20 and tilt < 20
-    score = min(z, 0.26) / 0.26 + math.cos(math.radians(min(tilt, 180))) + (1.0 if ok else 0.0)
-    return dict(score=score, ok=ok, z_cm=z * 100, tilt=tilt, t_total=ks[-1][0] - 1.0, hist=hist)
+    final = min(z, 0.26) / 0.26 + math.cos(math.radians(min(tilt, 180)))
+    score = 0.5 * best_prog + final + (2.0 if ok else 0.0)
+    return dict(score=score, ok=ok, z_cm=z * 100, tilt=tilt, best_progress=best_prog, t_total=ks[-1][0] - 1.0, hist=hist)
 
 
 def sample(rng, center=None, width=1.0):
@@ -154,9 +167,9 @@ if __name__ == "__main__":
     with Pool(4) as pool:
         res = pool.map(evaluate, [sample(rng) for _ in range(n0)])
         res.sort(key=lambda t: -t[0])
-        print("随机搜索最好的 3 个：", [(round(s, 2), r["ok"], round(r["z_cm"], 1), round(r["tilt"])) for s, _, r in res[:3]], flush=True)
+        print("随机搜索最好的 3 个：", [(round(s, 2), r["ok"], round(r["z_cm"], 1), round(r["tilt"]), round(r["best_progress"], 2)) for s, _, r in res[:3]], flush=True)
         best = res[0]
-        for rnd in range(4):
+        for rnd in range(6):
             cands = [sample(rng, best[1], 1.0 / (rnd + 1)) for _ in range(16)]
             more = pool.map(evaluate, cands)
             more.sort(key=lambda t: -t[0])

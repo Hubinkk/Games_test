@@ -8,7 +8,8 @@
 
 所有测试用同一个整体模型（figure55_full.xml）、同样的扭矩上限和同样的控制器
 （重心反馈平衡、静步行），和 full_demo.py 一致。
-电机转速没有在模型里限制，所以每个测试都记录关节的最高角速度，再和常见电机的转速比较。
+模型本身只限制扭矩；这里另外给每个关节加上电机转速上限（10 rad/s，常见微型舵机和膝关节 v1 的目标），
+并记录每个测试里最快的关节。
 """
 import json
 import math
@@ -50,6 +51,42 @@ class VelTracker:
     def worst(self):
         n = max(self.vmax, key=self.vmax.get)
         return n, self.vmax[n]
+
+
+def add_speed_limit(sim, w=SPEED_LIMIT["big"]):
+    """给每个关节加上电机的转速上限：目标角度每一步最多变化 w·dt（像舵机那样以最高转速追目标）。"""
+    orig_set, orig_reset = sim.set_targets, sim.reset
+    dt = sim.m.opt.timestep
+    last = {}
+
+    def cur(name):
+        try:
+            return joint_q(sim, name)
+        except Exception:
+            return None
+
+    def set_targets(pose):
+        out = {}
+        for k, v in pose.items():
+            if k.startswith("hand_"):
+                out[k] = v
+                continue
+            p = last.get(k)
+            if p is None:
+                p = cur(k)
+                if p is None:
+                    out[k] = v
+                    continue
+            nv = p + max(-w * dt, min(w * dt, v - p))
+            last[k] = nv
+            out[k] = nv
+        orig_set(out)
+
+    def reset():
+        last.clear()
+        orig_reset()
+
+    sim.set_targets, sim.reset = set_targets, reset
 
 
 def attach(sim, record=False):
@@ -133,6 +170,7 @@ def main():
     figure_test.MODEL = fb.OUT
     sim = FD.FullSim()
     getup._SIM = sim          # 起身动作也用这个模型（录制回放需要）
+    add_speed_limit(sim)
     bal = Balance(sim)
     res, scenes = {}, {}
     res["rom"] = rom(sim.m)
@@ -209,7 +247,8 @@ def main():
               "rgba": [round(float(x), 3) for x in m.geom_rgba[i]]} for i in range(m.ngeom)]
     with open(os.path.join(HERE, "..", "agility_frames.js"), "w", encoding="utf-8") as f:
         f.write("window.AGI = " + json.dumps({"geoms": geoms, "scenes": scenes}, ensure_ascii=False, separators=(",", ":")) + ";\n")
-    json.dump(res, open(os.path.join(HERE, "agility_result.json"), "w"), ensure_ascii=False, indent=1)
+    json.dump(res, open(os.path.join(HERE, "agility_result.json"), "w"), ensure_ascii=False, indent=1,
+              default=lambda o: o.item() if hasattr(o, "item") else str(o))
     print("已导出 agility_frames.js 和 agility_result.json")
 
 
