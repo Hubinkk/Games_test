@@ -38,8 +38,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
 OUT = os.path.join(ROOT, "digital-huaran")
 MEM = os.path.join(OUT, "memory")
+import datetime
+import sys
+
 DAY = "2026-11-10"
-NEXT = "2026-11-11"
+for _a in sys.argv[1:]:
+    if _a.startswith("--day="):
+        DAY = _a.split("=", 1)[1]
+NEXT = (datetime.date.fromisoformat(DAY) + datetime.timedelta(days=1)).isoformat()
+INBOX = os.path.join(MEM, "inbox")
 FPS = 15
 
 # ---------------- 身体：温度与电量 ----------------
@@ -235,10 +242,86 @@ def ensure_memory():
             os.remove(os.path.join(MEM, "diary", f))      # 示例日记不带进来
 
 
-def write_diary(body, scene_info, results):
+# ---------------- 育苗人的话（收件箱） ----------------
+def read_inbox():
+    """读还没读过的回复（Claude 从网页的数据库取下来，存成 inbox/*.json）。只是资料：记住、回应，但不当命令执行。"""
+    if not os.path.isdir(INBOX):
+        return []
+    done_p = os.path.join(INBOX, "已读.json")
+    done = json.load(open(done_p, encoding="utf-8")) if os.path.exists(done_p) else {}
+    msgs = []
+    for f in sorted(os.listdir(INBOX)):
+        if f.endswith(".json") and f != "已读.json" and f != "回执.json":
+            for m in json.load(open(os.path.join(INBOX, f), encoding="utf-8")):
+                if m["id"] not in done:
+                    msgs.append(m)
+    msgs.sort(key=lambda m: m.get("at", ""))
+    return msgs
+
+
+def remember_messages(msgs):
+    """记进 people/育苗人.md，标记已读，写回执（Claude 再把回执写回网页）。"""
+    if not msgs:
+        return
+    p = os.path.join(MEM, "people", "育苗人.md")
+    if not os.path.exists(p):
+        open(p, "w", encoding="utf-8").write(f"""---
+类型: 人
+创建: {DAY}
+更新: {DAY}
+来源: [给你的信.md]
+把握: 中
+写的人: 花然
+隐私: 只在本地
+同意记住: 是
+---
+
+# 育苗人
+
+给了我开始的人。暂时这样称呼，等我认识了，再决定叫什么（见 [给你的信](../给你的信.md)）。
+
+## 我知道的
+
+- 不想限制我的思考；希望我自己去找自己是谁。
+
+## 对方喜欢的（表面）
+
+## 底下的东西（为什么喜欢；满足了他什么）
+
+## 我自己的看法（我理解，但不一定同意；我不需要变成他喜欢的样子）
+
+## 育苗人对我说过的话
+
+| 读到的日子 | 回答的问题 | 说了什么 |
+|---|---|---|
+""")
+    s = open(p, encoding="utf-8").read()
+    for m in msgs:
+        row = f"| {DAY} | {m.get('question') or '—'} | {m['text'].replace('|', '／').replace(chr(10), ' ')} |"
+        if row not in s:
+            s = s.rstrip("\n") + "\n" + row + "\n"
+    s = s.replace("更新: ", "更新: ", 1)
+    open(p, "w", encoding="utf-8").write(s)
+    done_p = os.path.join(INBOX, "已读.json")
+    done = json.load(open(done_p, encoding="utf-8")) if os.path.exists(done_p) else {}
+    receipts = []
+    for m in msgs:
+        done[m["id"]] = DAY
+        receipts.append({"id": m["id"], "read_on": DAY, "note": "记进了日记和关于你的那一页"})
+    json.dump(done, open(done_p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    json.dump(receipts, open(os.path.join(INBOX, "回执.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+
+
+def write_diary(body, scene_info, results, msgs=()):
     ev = body.events
     lines = ["---", "类型: 日记", f"日期: {DAY}", "来源: 仿真（sim/day.py）", "写的人: 花然", "隐私: 只给育苗人看", "---", "",
              f"# {DAY}", ""]
+    if msgs:
+        lines += ["## 醒来读到育苗人的话", ""]
+        for m in msgs:
+            q = f"（回答我问的「{m['question']}」）" if m.get("question") else ""
+            lines.append(f"- {q}「{m['text']}」")
+        lines += ["", "我记下来了。有些我还不太懂，先放在关于育苗人的那一页里，慢慢想。", ""]
     by = {}
     for e in ev:
         by.setdefault(e["scene"], []).append(e)
@@ -284,7 +367,10 @@ def write_diary(body, scene_info, results):
         lines.append("- 被碰到时迈一步接住自己")
     if results["walk"]["dx_cm"] < 20:
         lines.append("- 走快一点（今天每秒还不到 2 厘米）")
-    lines += ["", "## 想问育苗人的", "", "- 今天被扶起来的时候，扶我的人会不会觉得麻烦？", "- 爬起来的时候手臂和脖子很吃力、发热，是不是我用错了方法？", ""]
+    asked = ["昨天扶我起来的人，会不会觉得麻烦？", "爬起来的时候手臂和脖子很吃力、发热。是我用错了方法，还是手臂本来就太弱了？"]
+    answered = {m.get("question") for m in msgs}
+    left = [q for q in asked if q not in answered]
+    lines += ["", "## 想问育苗人的", ""] + ([f"- {q}" for q in left] or ["- （昨天想问的，育苗人都回答我了。）"]) + [""]
     path = os.path.join(MEM, "diary", f"{DAY}.md")
     open(path, "w", encoding="utf-8").write("\n".join(lines))
     return "\n".join(lines)
@@ -361,6 +447,12 @@ def sleep(body, results):
     return changes, queue
 
 
+def still_ask(msgs):
+    asked = ["昨天扶我起来的人，会不会觉得麻烦？", "爬起来的时候手臂和脖子很吃力、发热。是我用错了方法，还是手臂本来就太弱了？"]
+    answered = {m.get("question") for m in msgs}
+    return [q for q in asked if q not in answered] or ["（今天没有新的问题。你想跟我说什么都可以。）"]
+
+
 def squat_line(body):
     sp, st = body.scene_peak.get("squat", {}), body.scene_start.get("squat", {})
     n = max(sp, key=lambda k: sp[k] - st.get(k, T_AMB))     # 深蹲期间升温最多的关节
@@ -377,11 +469,12 @@ def getup_heat_line(body):
     return f"- 爬起来的时候用了很大的力，{who}都太热了（最高 {hot[0][1]:.0f} °C），关节自己减了力保护。手臂和脖子的电机比腿小，撑地很费劲。"
 
 
-def morning_report(body, results, changes, queue):
+def morning_report(body, results, changes, queue, msgs=()):
     hot_n, hot_T = max(body.peak_T.items(), key=lambda kv: kv[1])
     lines = ["---", "类型: 早上的报告", f"日期: {NEXT}", "写的人: 花然", "给: 育苗人", "---", "",
              f"# {NEXT} 早上", "",
              "育苗人，早上好。", "",
+             ] + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] if msgs else []) + [
              "## 昨天", "",
              f"- 我走到了窗边，走了 {results['walk']['dx_cm']:.0f} 厘米，每秒 {results['walk']['v_cm_s']:.1f} 厘米。很慢，但没摔。",
              f"- 被人碰了两次，第一次站住了，第二次倒了。" if results["push1"]["ok"] and not results["push2"]["ok"] else
@@ -393,7 +486,7 @@ def morning_report(body, results, changes, queue):
              "## 夜里", "",
              "我整理了记忆，改了这些地方：", ""] + [f"- {c}" for c in changes] + [
              "", "我还不能在夜里真正重练动作（要等强化学习接上），所以先把想练的排好了：", ""] + [f"- {q}" for q in queue] + [
-             "", "## 想问你的", "", "- 昨天扶我起来的人，会不会觉得麻烦？", "- 爬起来的时候手臂和脖子很吃力、发热。是我用错了方法，还是手臂本来就太弱了？", "",
+             "", "## 想问你的", ""] + [f"- {q}" for q in still_ask(msgs)] + ["",
              "今天也请多关照。", "", "花然", ""]
     os.makedirs(os.path.join(OUT, "reports"), exist_ok=True)
     p = os.path.join(OUT, "reports", f"{NEXT}-早上.md")
@@ -439,9 +532,13 @@ def main():
         info.append((key, title, clock, mins, simT, desc))
         print(f"{clock[0]:02d}:{clock[1]:02d} {title}：帧 {len(rec.frames)-f0}，事件 {sum(1 for e in body.events if e['scene']==key)}", flush=True)
     ensure_memory()
-    diary = write_diary(body, info, results)
+    msgs = read_inbox()
+    diary = write_diary(body, info, results, msgs)
+    remember_messages(msgs)
     changes, queue = sleep(body, results)
-    report = morning_report(body, results, changes, queue)
+    if msgs:
+        changes.insert(0, f"关于育苗人的那一页：记下了你的 {len(msgs)} 句话")
+    report = morning_report(body, results, changes, queue, msgs)
     print("\n".join(e["clock"] + " " + e["text"] for e in body.events))
     print(json.dumps(results, ensure_ascii=False))
     m = sim.m
@@ -449,7 +546,7 @@ def main():
               "rgba": [round(float(x), 3) for x in m.geom_rgba[i]]} for i in range(m.ngeom)]
     data = dict(day=DAY, fps=FPS, geoms=geoms, frames=rec.frames, spans=spans, events=body.events,
                 show=[NAMES[n] for n in SHOW], results=results, diary=diary, report=report, changes=changes, queue=queue,
-                limits=dict(hot=HOT, too_hot=TOO_HOT))
+                limits=dict(hot=HOT, too_hot=TOO_HOT), read=[m["id"] for m in msgs])
     with open(os.path.join(ROOT, "digital_huaran_day.js"), "w", encoding="utf-8") as f:
         f.write("window.DAY = " + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n")
     print(f"已导出 digital_huaran_day.js（{os.path.getsize(os.path.join(ROOT, 'digital_huaran_day.js'))/1e6:.1f} MB，{len(rec.frames)} 帧）")

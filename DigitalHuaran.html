@@ -77,6 +77,19 @@ button:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
 .md td,.md th{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:left}
 .letter{font-family:var(--f-display)}
 .note{font-size:12.5px;color:var(--ink-2);max-width:84ch}
+.reply{display:grid;gap:12px;max-width:820px}
+.reply .q{display:grid;gap:6px}
+.reply .q p{font-family:var(--f-display);font-size:14.5px}
+.reply textarea{font:inherit;font-size:14px;width:100%;min-height:64px;resize:vertical;border:1px solid var(--rule);border-radius:8px;padding:8px 10px;background:var(--paper);color:var(--ink)}
+.reply textarea:focus-visible{outline:2px solid var(--calm);outline-offset:1px}
+.reply .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.reply button{font:inherit;font-size:14px;border:1px solid var(--leaf);background:var(--leaf);color:var(--paper);border-radius:8px;padding:6px 16px;cursor:pointer;font-weight:600}
+.reply button:disabled{opacity:.5;cursor:default}
+.sent{display:grid;gap:8px}
+.sent .it{border-left:3px solid var(--leaf);padding:4px 10px;display:grid;gap:2px}
+.sent .it .meta{font-size:12px;color:var(--ink-2)}
+.sent .it .st{font-size:12px}
+.sent .it .st.wait{color:var(--warm)}.sent .it .st.read{color:var(--leaf)}
 code{font-family:var(--f-data);font-size:.92em}
 </style>
 
@@ -117,6 +130,18 @@ code{font-family:var(--f-data);font-size:.92em}
       <div class="card"><h3>它的日记</h3><span class="sub">digital-huaran/memory/diary/</span><div class="md" id="diary"></div></div>
       <div class="card"><h3>睡觉时改了什么</h3><span class="sub">第一版用简单规则整理，不接大模型；真正的重练要等强化学习</span><div class="md" id="changes"></div></div>
       <div class="card letter"><h3>给育苗人的报告</h3><span class="sub">digital-huaran/reports/</span><div class="md" id="report"></div></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-reply">
+    <h2 id="h-reply">回花然的话</h2>
+    <div class="card reply">
+      <span class="sub">写给花然。它下一次醒来时会读到，记进它的记忆，并在早上的报告里回应你。只有育苗人（这个页面的主人）能写。</span>
+      <div id="questions"></div>
+      <div class="q"><p>想对花然说的其他话</p><textarea id="rg" placeholder="比如：今天辛苦了。" aria-label="想对花然说的话" disabled></textarea></div>
+      <div class="row"><button id="send" disabled>交给花然</button><span class="note" id="sendNote">正在连接……</span></div>
+      <h3 style="margin:6px 0 0;font-size:14.5px">已经交给花然的话</h3>
+      <div class="sent" id="sent"><span class="note">还没有。</span></div>
     </div>
   </section>
 
@@ -232,5 +257,52 @@ function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;
   if(D&&P.playing){P.acc+=dt*D.fps*P.speed;let moved=false;while(P.acc>=1){P.acc-=1;P.i=(P.i+1)%N;moved=true}if(moved)show(P.i);}
   if(renderer){updCam(dt);renderer.render(scene,camera);}requestAnimationFrame(frame);}
 if(D)show(0);requestAnimationFrame(frame);
+})();
+</script>
+<script>
+(async()=>{
+"use strict";
+const $=s=>document.querySelector(s);
+const D=window.DAY; if(!D)return;
+// 早上报告里"想问你的"
+const qs=[];let inQ=false;
+for(const line of D.report.split("\n")){if(line.startsWith("## ")){inQ=line.includes("想问你的");continue}if(inQ&&line.startsWith("- "))qs.push(line.slice(2).trim())}
+const qBox=$("#questions");
+qs.forEach((q,i)=>{const d=document.createElement("div");d.className="q";const p=document.createElement("p");p.textContent="花然问："+q;
+  const t=document.createElement("textarea");t.id="rq"+i;t.disabled=true;t.setAttribute("aria-label","回答："+q);t.placeholder="你的回答";d.append(p,t);qBox.append(d)});
+const note=$("#sendNote"),send=$("#send");
+const inputs=()=>[...qs.map((q,i)=>[q,$("#rq"+i)]),["",$("#rg")]];
+let timer=setTimeout(()=>{note.textContent="暂时连不上保存回复的地方，请稍后刷新再试。"},10000);
+const use=n=>(window.claude&&window.claude.use)?window.claude.use(n):Promise.resolve(null);
+const db=await use("db");
+if(!db){clearTimeout(timer);note.textContent="这里现在不能保存回复：请登录 claude.ai，在育苗人自己的账号里打开这个页面。";return}
+const user=await use("user");
+const owner=user?await user.isOwner():false;
+let read={},replies=[];
+function render(){
+  const box=$("#sent");
+  if(!replies.length){box.innerHTML='<span class="note">还没有。</span>';return}
+  box.innerHTML="";
+  for(const r of replies){const it=document.createElement("div");it.className="it";
+    const meta=document.createElement("span");meta.className="meta";meta.textContent=(r.question?"回答「"+r.question+"」":"想说的话")+" · "+new Date(r.at).toLocaleString();
+    const tx=document.createElement("span");tx.textContent=r.text;
+    const st=document.createElement("span");const rd=read[r.id];st.className="st "+(rd?"read":"wait");st.textContent=rd?("花然读到了（"+rd.read_on+"）"+(rd.note?"："+rd.note:"")):"等花然醒来读";
+    it.append(meta,tx,st);box.append(it)}
+}
+db.collection("replies").orderBy("at").onSnapshot(snap=>{clearTimeout(timer);replies=snap.docs.map(d=>({id:d.id,...d.data()}));render();if(owner&&!busy)note.textContent=""},
+  e=>{clearTimeout(timer);note.textContent="读取回复时出错，请稍后刷新。"});
+db.collection("read").onSnapshot(snap=>{read={};snap.docs.forEach(d=>read[d.id]=d.data());render()},()=>{});
+if(!owner){clearTimeout(timer);note.textContent="只有育苗人能写给花然；你可以看已经交给它的话。";return}
+inputs().forEach(([,t])=>t.disabled=false);send.disabled=false;note.textContent="";
+let busy=false;
+send.addEventListener("click",async()=>{
+  const items=inputs().map(([q,t])=>[q,t,t.value.trim()]).filter(x=>x[2]);
+  if(!items.length){note.textContent="先写点什么吧。";return}
+  busy=true;send.disabled=true;note.textContent="正在交给花然……";
+  try{for(const [q,t,text] of items){await db.collection("replies").add({day:D.day,question:q,text,at:new Date().toISOString()});t.value=""}
+    note.textContent="交给花然了。它下次醒来会读到。"}
+  catch(e){note.textContent=e&&e.code==="quota_exceeded"?"保存的空间满了，请告诉 Claude 整理一下。":"没能保存（"+(e&&e.code||"未知原因")+"），请稍后再试。"}
+  finally{busy=false;send.disabled=false}
+});
 })();
 </script>
