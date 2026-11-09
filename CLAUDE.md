@@ -69,4 +69,4 @@
 
 - 上半身已经灵活；下半身缺控制：走路约 1 cm/s、摔倒爬不起来 → 下一步用强化学习训练（`wiki/灵活度.md`）
 - 第一个实物：膝关节台架（`docs/knee-joint-v1.md`）
-- 大脑设计和记忆模板已完成，下一步在仿真里跑通"一天"（`docs/brain.md` 第 7 节）
+- 数字花然的一天第一版已跑通（`sim/day.py`、`DigitalHuaran.html`、`digital-huaran/`）；育苗人决定先把数字版做合理，再做真的身体（`wiki/路线图.md`）

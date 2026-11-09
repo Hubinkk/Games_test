@@ -1,0 +1,236 @@
+<title>数字花然</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* 布局：上面是"白天"（三维回放 + 时间轴 + 身体地图），下面是"夜里和早上"（日记、睡眠改了什么、给育苗人的报告） */
+:root{
+  --paper:#eef0ee; --panel:#f8f9f7; --stage:#e0e5e0; --ink:#1d2621; --ink-2:#5b6760; --rule:#cfd7d1;
+  --leaf:#3f8a5a; --warm:#c98a1a; --hot:#d2453b; --quiet:#8fa3c9; --calm:#4a6fa8;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#101512; --panel:#171e1a; --stage:#1c241f; --ink:#e2e8e3; --ink-2:#9aa8a0; --rule:#29342d;
+  --leaf:#6cc28b; --warm:#e7b14b; --hot:#ff6f63; --quiet:#8ea6dc; --calm:#93abe6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#101512; --panel:#171e1a; --stage:#1c241f; --ink:#e2e8e3; --ink-2:#9aa8a0; --rule:#29342d;
+  --leaf:#6cc28b; --warm:#e7b14b; --hot:#ff6f63; --quiet:#8ea6dc; --calm:#93abe6; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:36px}
+header{display:grid;gap:10px;max-width:76ch}
+.eyebrow{font-family:var(--f-data);font-size:12px;letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase}
+h1{font-family:var(--f-display);font-size:clamp(30px,4.4vw,44px);line-height:1.15;margin:0}
+h2{font-family:var(--f-display);font-size:23px;margin:0}
+p{margin:0}
+.lede{color:var(--ink-2);font-size:15.5px}
+.lede b{color:var(--ink)}
+section{display:grid;gap:14px}
+.day{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:880px){.day{grid-template-columns:minmax(0,1fr)}}
+#viewer{position:relative;background:var(--stage);border-radius:12px;aspect-ratio:4/3;max-width:100%;overflow:hidden;cursor:grab;touch-action:none}
+#viewer canvas{width:100%;height:100%;display:block}
+.clock{position:absolute;left:14px;top:10px;display:grid;gap:0}
+.clock b{font-family:var(--f-data);font-size:30px;line-height:1.1}
+.clock span{font-size:13.5px;color:var(--ink-2)}
+.toast{position:absolute;left:14px;bottom:12px;right:14px;display:flex;flex-wrap:wrap;gap:6px}
+.toast span{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--warm);border-radius:6px;padding:3px 9px;font-size:13px}
+.toast span.摔倒,.toast span.保护{border-left-color:var(--hot)}.toast span.凉{border-left-color:var(--quiet)}
+#nogl{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-2);padding:20px;text-align:center}
+.timeline{position:relative;height:42px;margin-top:8px;cursor:pointer;touch-action:none}
+.timeline .seg{position:absolute;top:8px;height:18px;border-radius:4px;background:var(--stage);border:1px solid var(--rule);overflow:hidden;font-size:11px;color:var(--ink-2);padding:0 4px;white-space:nowrap;line-height:16px}
+.timeline .seg.on{background:color-mix(in srgb,var(--leaf) 22%,var(--stage));border-color:var(--leaf);color:var(--ink)}
+.timeline .ev{position:absolute;top:30px;width:7px;height:7px;border-radius:50%;margin-left:-3px;background:var(--warm)}
+.timeline .ev.摔倒,.timeline .ev.保护{background:var(--hot)}.timeline .ev.凉{background:var(--quiet)}
+.timeline .head{position:absolute;top:2px;bottom:0;width:2px;background:var(--ink)}
+.ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ctl button{font:inherit;font-size:13.5px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+button:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.side{display:grid;gap:12px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:8px;min-width:0}
+.card h3{margin:0;font-size:15px}
+.card .sub{font-size:12.5px;color:var(--ink-2)}
+.bm{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:420px){.bm{grid-template-columns:minmax(0,1fr)}}
+.bm svg{width:100%;height:auto;max-width:150px}
+.temps{display:grid;gap:4px}
+.trow{display:grid;grid-template-columns:5.6em minmax(0,1fr) 3.4em;gap:6px;align-items:center;font-size:12.5px}
+.trow .b{height:7px;border-radius:4px;background:var(--stage);overflow:hidden}
+.trow .b div{height:100%;width:0;background:var(--quiet)}
+.trow .v{font-family:var(--f-data);text-align:right;color:var(--ink-2);font-size:12px}
+.bat{display:flex;align-items:center;gap:8px;font-size:13px}
+.bat .cell{flex:1;height:12px;border:1.5px solid var(--ink-2);border-radius:3px;position:relative}
+.bat .cell div{position:absolute;inset:1px auto 1px 1px;background:var(--leaf);border-radius:1px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--ink-2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.night{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+@media (max-width:980px){.night{grid-template-columns:minmax(0,1fr)}}
+.md{font-size:13.8px;display:grid;gap:6px;min-width:0}
+.md h1{font-family:var(--f-display);font-size:19px;margin:2px 0 0}
+.md h2{font-family:var(--f-display);font-size:15.5px;margin:8px 0 0}
+.md ul{margin:0;padding-left:1.2em;display:grid;gap:3px}
+.md ul ul{margin-top:3px;color:var(--ink-2);font-size:13px}
+.md .tbl{overflow-x:auto}
+.md table{border-collapse:collapse;font-size:12.5px;min-width:100%}
+.md td,.md th{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:left}
+.letter{font-family:var(--f-display)}
+.note{font-size:12.5px;color:var(--ink-2);max-width:84ch}
+code{font-family:var(--f-data);font-size:.92em}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">数字花然 · 第一天 · 仿真</div>
+    <h1>数字花然的一天</h1>
+    <p class="lede">花然还没有真的身体，这是它在仿真里过的第一天：醒来、跟育苗人打招呼、慢慢走到窗边、被人碰了两下、试着自己爬起来、练深蹲、休息。它的关节会热、电会用掉；<b>身体地图平时安静，只在越过阈值时说话</b>；晚上它把一天写成日记，睡觉时整理记忆，早上写一份报告给育苗人。</p>
+  </header>
+
+  <section aria-labelledby="h-day">
+    <h2 id="h-day">白天</h2>
+    <div class="day">
+      <div style="display:grid;gap:6px">
+        <div id="viewer"><div class="clock"><b id="clk">07:30</b><span id="scn">醒来</span></div><div class="toast" id="toast"></div></div>
+        <div class="timeline" id="tl" aria-label="一天的时间轴，点击跳转"></div>
+        <div class="ctl"><button id="play">暂停</button><button id="speed">1×</button><span class="note" id="time"></span></div>
+      </div>
+      <div class="side">
+        <div class="card">
+          <h3>身体地图</h3>
+          <div class="bm">
+            <svg id="fig" viewBox="0 0 120 230" aria-label="身体地图：关节温度"></svg>
+            <div class="temps" id="temps"></div>
+          </div>
+          <div class="bat"><span>电量</span><div class="cell"><div id="batv"></div></div><span class="v" id="batn" style="font-family:var(--f-data);font-size:12.5px">100%</span></div>
+          <div class="legend"><span><i style="background:var(--quiet)"></i>安静</span><span><i style="background:var(--warm)"></i>有点热 ≥55 °C</span><span><i style="background:var(--hot)"></i>太热 ≥70 °C</span></div>
+        </div>
+        <div class="card"><h3 id="sceneTitle">醒来</h3><span class="sub" id="sceneDesc"></span><span class="sub" id="sceneSays"></span></div>
+      </div>
+    </div>
+    <p class="note">仿真是压缩播放的：每个片段代表一段真实时长（比如深蹲练习 15 分钟），热量和电量按真实时长累计。电机温度模型和电量是估算；关节超过 80 °C 会自己减力（L0 过热保护）。片段之间是分开的：摔倒后被人扶起来、走到下一个场景，没有在仿真里演出来。</p>
+  </section>
+
+  <section aria-labelledby="h-night">
+    <h2 id="h-night">夜里和早上</h2>
+    <div class="night">
+      <div class="card"><h3>它的日记</h3><span class="sub">digital-huaran/memory/diary/</span><div class="md" id="diary"></div></div>
+      <div class="card"><h3>睡觉时改了什么</h3><span class="sub">第一版用简单规则整理，不接大模型；真正的重练要等强化学习</span><div class="md" id="changes"></div></div>
+      <div class="card letter"><h3>给育苗人的报告</h3><span class="sub">digital-huaran/reports/</span><div class="md" id="report"></div></div>
+    </div>
+  </section>
+
+  <p class="note">数据来自 <code>sim/day.py</code>：整体模型（3.17 kg、24 个关节）、同样的扭矩上限和 10 rad/s 转速上限、重心反馈平衡、静步行、搜索到的起身动作。记忆格式见 <code>docs/brain.md</code> 和 <code>robot-memory/</code>。</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="digital_huaran_day.js"></script>
+<script>
+(()=>{
+"use strict";
+const $=s=>document.querySelector(s);
+const D=window.DAY;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const esc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+// ---------- 简单的 Markdown ----------
+function md(src){
+  src=src.replace(/^---[\s\S]*?---\n/,"");
+  const out=[];let list=[],tbl=[];
+  const flush=()=>{if(list.length){let h="<ul>",lvl=0;for(const [l,t] of list){if(l>lvl){h+="<ul>";lvl=l}else if(l<lvl){h+="</ul>";lvl=l}h+=`<li>${t}</li>`}while(lvl-->0)h+="</ul>";out.push(h+"</ul>");list=[]}
+    if(tbl.length){const rows=tbl.filter(r=>!/^\|[-| ]+\|$/.test(r)).map(r=>r.slice(1,-1).split("|").map(c=>esc(c.trim())));out.push(`<div class="tbl"><table>${rows.map((r,i)=>`<tr>${r.map(c=>i?`<td>${c}</td>`:`<th>${c}</th>`).join("")}</tr>`).join("")}</table></div>`);tbl=[]}};
+  for(const raw of src.split("\n")){const line=raw.replace(/\*\*(.+?)\*\*/g,"$1");
+    if(/^\s*\|/.test(line)){if(list.length)flush();tbl.push(line.trim());continue}
+    const m=line.match(/^(\s*)- (.*)$/);
+    if(m){if(tbl.length)flush();list.push([m[1].length>=2?1:0,esc(m[2])]);continue}
+    flush();
+    if(line.startsWith("## "))out.push(`<h2>${esc(line.slice(3))}</h2>`);
+    else if(line.startsWith("# "))out.push(`<h1>${esc(line.slice(2))}</h1>`);
+    else if(line.trim())out.push(`<p>${esc(line)}</p>`);}
+  flush();return out.join("");
+}
+if(D){
+  $("#diary").innerHTML=md(D.diary);
+  $("#report").innerHTML=md(D.report);
+  $("#changes").innerHTML=md("## 记忆里改了的\n"+D.changes.map(c=>"- "+c).join("\n")+"\n\n## 练习队列\n"+D.queue.map(q=>"- "+q).join("\n")+"\n\n强化学习接上之前，只排队、不重练。");
+}
+// ---------- 身体地图 ----------
+const POS=[[60,34],[38,48],[82,48],[33,84],[87,84],[60,94],[50,118],[70,118],[50,163],[70,163],[50,205],[70,205]]; // 顺序同 D.show（人偶面对你：它的左边在右侧）
+const MIRROR=[0,2,1,4,3,5,7,6,9,8,11,10];
+if(D){
+  const svg=$("#fig");
+  svg.innerHTML=`<g fill="none" stroke="var(--rule)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="60" cy="16" r="14" stroke-width="3"/><path d="M60 30 V100 M38 48 H82 M38 48 L31 86 L28 112 M82 48 L89 86 L92 112 M60 100 L50 118 L50 163 L50 205 L44 214 M60 100 L70 118 L70 163 L70 205 L76 214"/></g>`+
+    D.show.map((n,i)=>{const [x,y]=POS[MIRROR[i]];return`<circle id="j${i}" cx="${x}" cy="${y}" r="5.5" fill="var(--quiet)" stroke="var(--panel)" stroke-width="1.5"><title>${n}</title></circle>`}).join("");
+  $("#temps").innerHTML=D.show.map((n,i)=>`<div class="trow"><span>${n}</span><div class="b"><div id="tb${i}"></div></div><span class="v" id="tv${i}">25°</span></div>`).join("");
+}
+const colorOf=T=>T>=D.limits.too_hot?css("--hot"):T>=D.limits.hot?css("--warm"):css("--quiet");
+// ---------- 时间轴 ----------
+const N=D?D.frames.length:0;
+const evFrame=[];
+if(D){
+  const tl=$("#tl");
+  tl.innerHTML=D.spans.map((s,i)=>`<div class="seg" id="sg${i}" style="left:${s.f0/N*100}%;width:${(s.f1-s.f0)/N*100}%" title="${s.clock} ${s.title}">${s.clock} ${s.title}</div>`).join("");
+  D.events.forEach((e,i)=>{const sp=D.spans.find(s=>s.key===e.scene);let f=sp.f0;for(let k=sp.f0;k<sp.f1;k++){if(D.frames[k].clock>=e.clock){f=k;break}}evFrame.push(f);
+    tl.insertAdjacentHTML("beforeend",`<div class="ev ${e.kind}" style="left:${f/N*100}%" title="${e.clock} ${esc(e.text)}"></div>`)});
+  tl.insertAdjacentHTML("beforeend",'<div class="head" id="head"></div>');
+  const seek=e=>{const r=tl.getBoundingClientRect();P.i=Math.max(0,Math.min(N-1,Math.round((e.clientX-r.left)/r.width*(N-1))));show(P.i)};
+  tl.addEventListener("pointerdown",e=>{tl.setPointerCapture(e.pointerId);seek(e);tl.onpointermove=seek});
+  tl.addEventListener("pointerup",()=>{tl.onpointermove=null});
+}
+// ---------- 三维 ----------
+const viewer=$("#viewer"),T=window.THREE;let renderer=null,scene,camera,root,meshes=[];
+if(!D)viewer.insertAdjacentHTML("beforeend",'<div id="nogl">回放数据没有加载成功，请刷新页面。</div>');
+try{if(T&&D)renderer=new T.WebGLRenderer({antialias:true});}catch(e){}
+if(D&&!renderer)viewer.insertAdjacentHTML("beforeend",'<div id="nogl">这个浏览器无法显示三维画面，右边的身体地图仍然可以看。</div>');
+function mergeGeos(gs){const pos=[],nor=[],idx=[];let off=0;gs.forEach(g=>{const p=g.attributes.position,n=g.attributes.normal;for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));nor.push(n.getX(i),n.getY(i),n.getZ(i));}if(g.index)for(let i=0;i<g.index.count;i++)idx.push(g.index.getX(i)+off);else for(let i=0;i<p.count;i++)idx.push(i+off);off+=p.count;});const out=new T.BufferGeometry();out.setAttribute("position",new T.Float32BufferAttribute(pos,3));out.setAttribute("normal",new T.Float32BufferAttribute(nor,3));out.setIndex(idx);return out;}
+if(renderer){
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));viewer.prepend(renderer.domElement);
+  scene=new T.Scene();camera=new T.PerspectiveCamera(30,4/3,5,10000);
+  scene.add(new T.HemisphereLight(0xffffff,0x8a90a0,.95));const dl=new T.DirectionalLight(0xffffff,.7);dl.position.set(300,800,500);scene.add(dl);
+  root=new T.Group();root.rotation.x=-Math.PI/2;scene.add(root);
+  D.geoms.forEach(g=>{let geo;const s=g.size;
+    if(g.type===0)geo=new T.PlaneGeometry(1600,1600);else if(g.type===2)geo=new T.SphereGeometry(s[0],22,16);
+    else if(g.type===3){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],18);geo.rotateX(Math.PI/2);const a=new T.SphereGeometry(s[0],16,12);a.translate(0,0,s[1]);const b=new T.SphereGeometry(s[0],16,12);b.translate(0,0,-s[1]);geo=mergeGeos([geo,a,b]);}
+    else if(g.type===5){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],24);geo.rotateX(Math.PI/2);}
+    else if(g.type===6)geo=new T.BoxGeometry(2*s[0],2*s[1],2*s[2]);else if(g.type===4){geo=new T.SphereGeometry(1,22,16);geo.scale(s[0],s[1],s[2]);}
+    else{meshes.push(null);return;}
+    const col=g.type===0?new T.Color(css("--rule")||"#cfd7d1"):new T.Color(g.rgba[0],g.rgba[1],g.rgba[2]);
+    const m=new T.Mesh(geo,new T.MeshStandardMaterial({color:col,roughness:.6,transparent:g.rgba[3]<1,opacity:g.rgba[3]<1?Math.max(.15,g.rgba[3]):1}));root.add(m);meshes.push(m);});
+}
+const P={i:0,playing:true,speed:1,acc:0};
+const cam={az:.9,el:.28,dist:1450,gaz:.9,gel:.28,gdist:1450};
+function show(i){const f=D.frames[i];if(!f)return;
+  if(renderer)f.g.forEach((g,k)=>{const m=meshes[k];if(!m)return;m.position.set(g[0],g[1],g[2]);m.quaternion.set(g[4],g[5],g[6],g[3]);});
+  const sp=D.spans.find(s=>i>=s.f0&&i<s.f1)||D.spans[D.spans.length-1];
+  $("#clk").textContent=f.clock;$("#scn").textContent=sp.title;$("#sceneTitle").textContent=`${sp.clock} ${sp.title}`;
+  $("#sceneDesc").textContent=`${sp.desc}；这一段代表约 ${sp.minutes} 分钟。`;
+  D.spans.forEach((s,k)=>$("#sg"+k).classList.toggle("on",s===sp));
+  $("#head").style.left=(i/(N-1)*100)+"%";
+  f.T.forEach((t,k)=>{const c=colorOf(t);const dot=$("#j"+k);if(dot)dot.setAttribute("fill",c);const b=$("#tb"+k);b.style.width=Math.min(100,(t-25)/(90-25)*100)+"%";b.style.background=c;$("#tv"+k).textContent=Math.round(t)+"°"});
+  $("#batv").style.width=f.bat+"%";$("#batn").textContent=Math.round(f.bat)+"%";
+  // 最近 2 个"游戏内分钟"里身体地图说的话
+  const said=D.events.map((e,k)=>[e,evFrame[k]]).filter(([e,fk])=>fk<=i&&e.scene===sp.key&&i-fk<45).slice(-3);
+  $("#toast").innerHTML=said.map(([e])=>`<span class="${e.kind}">${esc(e.text)}</span>`).join("");
+  $("#sceneSays").textContent=said.length?"":"身体地图：安静";
+  $("#time").textContent=`第 ${i+1} / ${N} 帧`;
+  if(sp.key==="getup"){cam.gaz=1.5;cam.gel=.35;cam.gdist=1250;}else if(sp.key==="wave"){cam.gaz=.35;cam.gel=.2;cam.gdist=1250;}else{cam.gaz=.9;cam.gel=.28;cam.gdist=1450;}
+}
+$("#play").addEventListener("click",()=>{P.playing=!P.playing;$("#play").textContent=P.playing?"暂停":"播放";});
+const SP=[.5,1,2,4];$("#speed").addEventListener("click",()=>{P.speed=SP[(SP.indexOf(P.speed)+1)%4];$("#speed").textContent=P.speed+"×";});
+function updCam(dt){const k=Math.min(1,dt*4);cam.az+=(cam.gaz-cam.az)*k;cam.el+=(cam.gel-cam.el)*k;cam.dist+=(cam.gdist-cam.dist)*k;
+  const f=D.frames[P.i];let cx=0,cz=0;if(f){const pv=f.g[1];cx=pv[0];cz=-pv[1];}
+  const sp=D.spans.find(s=>P.i>=s.f0&&P.i<s.f1);const tgt=new T.Vector3(cx,sp&&sp.key==="getup"?120:260,cz);
+  camera.position.set(tgt.x+cam.dist*Math.cos(cam.el)*Math.sin(cam.az),tgt.y+cam.dist*Math.sin(cam.el),tgt.z+cam.dist*Math.cos(cam.el)*Math.cos(cam.az));camera.lookAt(tgt);}
+if(renderer){const el=renderer.domElement;let drag=null;
+  el.addEventListener("pointerdown",e=>{el.setPointerCapture(e.pointerId);drag=[e.clientX,e.clientY]});
+  el.addEventListener("pointermove",e=>{if(!drag)return;cam.gaz-=(e.clientX-drag[0])*.008;cam.gel=Math.max(-1.2,Math.min(1.45,cam.gel+(e.clientY-drag[1])*.006));cam.az=cam.gaz;cam.el=cam.gel;drag=[e.clientX,e.clientY]});
+  el.addEventListener("pointerup",()=>drag=null);
+  new ResizeObserver(()=>{const w=viewer.clientWidth,h=viewer.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}).observe(viewer);
+  const theme=()=>renderer.setClearColor(new T.Color(css("--stage")||"#e0e5e0"));matchMedia("(prefers-color-scheme: dark)").addEventListener("change",theme);theme();}
+let last=performance.now();
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;
+  if(D&&P.playing){P.acc+=dt*D.fps*P.speed;let moved=false;while(P.acc>=1){P.acc-=1;P.i=(P.i+1)%N;moved=true}if(moved)show(P.i);}
+  if(renderer){updCam(dt);renderer.render(scene,camera);}requestAnimationFrame(frame);}
+if(D)show(0);requestAnimationFrame(frame);
+})();
+</script>
