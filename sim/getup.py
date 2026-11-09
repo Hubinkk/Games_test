@@ -127,7 +127,7 @@ KNEEL_RANGES = dict(
     wp4=(-0.3, 0.6), sp4=(-1.0, 0.6),
     t5=(1.2, 3.0),
 )
-if METHOD in ("kneel", "kneel2"):
+if METHOD in ("kneel", "kneel2", "kneel3"):
     RANGES.clear()
     RANGES.update(KNEEL_RANGES)
 
@@ -179,6 +179,33 @@ def kneel2_keyframes(x):
     return ks
 
 
+KNEEL3_EXTRA = dict(ts=(0.6, 2.0), sroll=(-0.4, 0.4), swp=(-0.3, 0.4), slhp=(-0.4, 0.4),
+                    tw=(0.6, 2.0), wrhp=(-2.2, -0.6), wrkn=(0.8, 2.5), wran=(-1.0, 0.6), wroll=(-0.4, 0.4))
+
+
+def kneel3_keyframes(x):
+    """kneel2 + 跨腿前先把重心移到左膝（髋侧摆），右腿抬起跨到前面后，再把重心往前移，最后站起。"""
+    ks = kneel2_keyframes(x)
+    stand = ks.pop()                       # 最后的站立帧
+    half = ks.pop()                        # 原来的单膝跪地帧
+    kneel = ks[-1][1]
+    t = ks[-1][0]
+    p = dict(kneel)                        # 重心移到左膝
+    p["l_hip_roll"] = p["r_hip_roll"] = x["sroll"]
+    p["waist_pitch"] = x["swp"]
+    p["l_hip_pitch"] = kneel["l_hip_pitch"] + x["slhp"]
+    t += x["ts"]; ks.append((t, p))
+    q = dict(p)                            # 右腿抬起、跨到前面
+    q["r_hip_pitch"], q["r_knee"], q["r_ankle_pitch"] = x["wrhp"], x["wrkn"], x["wran"]
+    q["r_hip_roll"] = x["wroll"]
+    t += x["tw"]; ks.append((t, q))
+    h = dict(half[1])                      # 脚落地，重心往前移（原来的单膝跪地帧）
+    h["l_hip_roll"] = h["r_hip_roll"] = 0.0
+    t += x["t4"]; ks.append((t, h))
+    t += x["t5"]; ks.append((t, stand[1]))
+    return ks
+
+
 def kneel_keyframes(x):
     def pose(sp, el, lhp, lkn, lan, rhp, rkn, ran, wp):
         p = lying()
@@ -202,7 +229,7 @@ def kneel_keyframes(x):
 def run(x, record=None):
     sim = get_sim()
     m, d = sim.m, sim.d
-    ks = kneel2_keyframes(x) if METHOD == "kneel2" else kneel_keyframes(x) if METHOD == "kneel" else keyframes(x)
+    ks = kneel3_keyframes(x) if METHOD == "kneel3" else kneel2_keyframes(x) if METHOD == "kneel2" else kneel_keyframes(x) if METHOD == "kneel" else keyframes(x)
 
     def target(t):
         for i in range(1, len(ks)):
@@ -229,7 +256,7 @@ def run(x, record=None):
     for k in range(int(t_end / dt)):
         t = k * dt
         tgt = target(t)
-        if METHOD in ("arms", "kneel", "kneel2"):
+        if METHOD in ("arms", "kneel", "kneel2", "kneel3"):
             # 脖子放松：撑起身体时，头自然垂着，脖子电机几乎不出力（花然的头大而重，抬着头也很费力）。
             # 放松结束时只恢复一次，之后交给关节自己的过热保护（L0），不再每一步覆盖。
             if t < t_rise:
@@ -276,7 +303,12 @@ if __name__ == "__main__":
     n0 = int(sys.argv[1]) if len(sys.argv) > 1 else 48
     rng = np.random.default_rng(1)
     with Pool(4) as pool:
-        if METHOD in ("kneel", "kneel2"):   # 参数多，从手工设计的起点附近找
+        if METHOD == "kneel3":   # 从 kneel2 的最好结果出发，加上移重心和跨腿的参数
+            base = json.load(open(os.path.join(HERE, "getup_best_kneel2.json"), encoding="utf-8"))["x"]
+            base.update(ts=1.0, sroll=0.0, swp=0.0, slhp=0.0, tw=1.0, wrhp=-1.5, wrkn=2.0, wran=-0.2, wroll=0.0)
+            RANGES.update(KNEEL3_EXTRA)
+            res = pool.map(evaluate, [dict(base)] + [sample(rng, base, 1.0) for _ in range(n0 - 1)])
+        elif METHOD in ("kneel", "kneel2"):   # 参数多，从手工设计的起点附近找
             res = pool.map(evaluate, [dict(KNEEL_GUESS)] + [sample(rng, KNEEL_GUESS, 1.0) for _ in range(n0 - 1)])
         else:
             res = pool.map(evaluate, [sample(rng) for _ in range(n0)])
