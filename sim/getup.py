@@ -114,8 +114,8 @@ def keyframes(x):
 # 1 撑地（脖子放松）→ 2 收腿成手膝着地 → 3 跪直上身 → 4 右脚跨到前面（单膝跪地）→ 5 站起
 KNEEL_GUESS = dict(
     t1=1.2, sp1=-0.6, el1=-1.4,
-    t2=1.6, sp2=-1.2, el2=-0.2, hp2=-1.9, kn2=2.3, an2=0.3, wp2=0.0,
-    t3=1.6, sp3=-0.4, el3=-0.2, hp3=-0.5, kn3=2.0, an3=0.4, wp3=-0.2,
+    t2=1.6, sp2=-1.3, el2=-0.5, hp2=-1.9, kn2=2.3, an2=0.3, wp2=0.0,
+    t3=1.6, sp3=-0.8, el3=-0.3, hp3=-0.5, kn3=2.0, an3=0.4, wp3=-0.2,
     t4=1.6, rhp4=-1.6, rkn4=1.9, ran4=-0.4, lhp4=-0.2, lkn4=1.8, lan4=0.5, wp4=0.2, sp4=0.0,
     t5=2.0,
 )
@@ -127,9 +127,56 @@ KNEEL_RANGES = dict(
     wp4=(-0.3, 0.6), sp4=(-1.0, 0.6),
     t5=(1.2, 3.0),
 )
-if METHOD == "kneel":
+if METHOD in ("kneel", "kneel2"):
     RANGES.clear()
     RANGES.update(KNEEL_RANGES)
+
+
+PUSHUP = None
+
+
+def pushup_arms():
+    """pushup.py 搜到的三段胳膊动作：张开 → 手带到肩旁 → 撑起（2026-11-11）。"""
+    global PUSHUP
+    if PUSHUP is None:
+        p = os.path.join(HERE, "pushup_best.json")
+        PUSHUP = json.load(open(p, encoding="utf-8"))["x"] if os.path.exists(p) else None
+    return PUSHUP
+
+
+def set_arms(p, sp, roll, yaw, el):
+    p["r_shoulder_pitch"], p["l_shoulder_pitch"] = sp, sp
+    p["r_shoulder_roll"], p["l_shoulder_roll"] = roll, -roll
+    p["r_shoulder_yaw"], p["l_shoulder_yaw"] = yaw, -yaw
+    p["r_elbow"], p["l_elbow"] = el, el
+
+
+def kneel2_keyframes(x):
+    """先做俯卧撑（手放到肩下），再收腿、跪直、单膝跪地、站起。"""
+    px = pushup_arms()
+    J = ("sp", "roll", "yaw", "el")
+    arm = [tuple(px[f"{j}{i}"] for j in J) for i in range(3)]
+
+    def pose(a, lhp, lkn, lan, rhp, rkn, ran, wp):
+        p = lying()
+        set_arms(p, *a)
+        p["l_hip_pitch"], p["l_knee"], p["l_ankle_pitch"] = lhp, lkn, lan
+        p["r_hip_pitch"], p["r_knee"], p["r_ankle_pitch"] = rhp, rkn, ran
+        p["waist_pitch"] = wp
+        p["neck_pitch"] = -0.5
+        return p
+    flat = (0.0, 0.05, 0.0, 0.0, 0.05, 0.0, 0.0)
+    ks = [(0.0, lying()), (1.0, lying()), (1.3, lying())]
+    t = 1.3
+    for i, dt_ in enumerate((1.0, 1.0, 1.3)):          # 俯卧撑三段（和 pushup.py 相同的时间）
+        t += dt_
+        ks.append((t, pose(arm[i], *flat)))
+    top = arm[2]
+    t += x["t2"]; ks.append((t, pose((x["sp2"], top[1], top[2], x["el2"]), x["hp2"], x["kn2"], x["an2"], x["hp2"], x["kn2"], x["an2"], x["wp2"])))
+    t += x["t3"]; ks.append((t, pose((x["sp3"], top[1] * 0.5, top[2] * 0.5, x["el3"]), x["hp3"], x["kn3"], x["an3"], x["hp3"], x["kn3"], x["an3"], x["wp3"])))
+    t += x["t4"]; ks.append((t, pose((x["sp4"], 0.0, 0.0, -0.2), x["lhp4"], x["lkn4"], x["lan4"], x["rhp4"], x["rkn4"], x["ran4"], x["wp4"])))
+    t += x["t5"]; ks.append((t, stand_pose()))
+    return ks
 
 
 def kneel_keyframes(x):
@@ -155,7 +202,7 @@ def kneel_keyframes(x):
 def run(x, record=None):
     sim = get_sim()
     m, d = sim.m, sim.d
-    ks = kneel_keyframes(x) if METHOD == "kneel" else keyframes(x)
+    ks = kneel2_keyframes(x) if METHOD == "kneel2" else kneel_keyframes(x) if METHOD == "kneel" else keyframes(x)
 
     def target(t):
         for i in range(1, len(ks)):
@@ -182,7 +229,7 @@ def run(x, record=None):
     for k in range(int(t_end / dt)):
         t = k * dt
         tgt = target(t)
-        if METHOD in ("arms", "kneel"):
+        if METHOD in ("arms", "kneel", "kneel2"):
             # 脖子放松：撑起身体时，头自然垂着，脖子电机几乎不出力（花然的头大而重，抬着头也很费力）。
             # 放松结束时只恢复一次，之后交给关节自己的过热保护（L0），不再每一步覆盖。
             if t < t_rise:
@@ -229,7 +276,7 @@ if __name__ == "__main__":
     n0 = int(sys.argv[1]) if len(sys.argv) > 1 else 48
     rng = np.random.default_rng(1)
     with Pool(4) as pool:
-        if METHOD == "kneel":   # 参数多，从手工设计的起点附近找
+        if METHOD in ("kneel", "kneel2"):   # 参数多，从手工设计的起点附近找
             res = pool.map(evaluate, [dict(KNEEL_GUESS)] + [sample(rng, KNEEL_GUESS, 1.0) for _ in range(n0 - 1)])
         else:
             res = pool.map(evaluate, [sample(rng) for _ in range(n0)])
