@@ -1,0 +1,87 @@
+{
+ "rom": [
+  {
+   "act": "举手过头",
+   "joint": "l_shoulder_roll",
+   "need": 170,
+   "have": 160,
+   "ok": false,
+   "note": "手臂从身体侧面举到头顶"
+  },
+  {
+   "act": "左右转头",
+   "joint": "neck_yaw",
+   "need": 80,
+   "have": 57,
+   "ok": false,
+   "note": "人约 ±80°"
+  },
+  {
+   "act": "低头",
+   "joint": "neck_pitch",
+   "need": 50,
+   "have": 34,
+   "ok": false,
+   "note": "看自己的手和脚边"
+  },
+  {
+   "act": "抬头",
+   "joint": "neck_pitch",
+   "need": 45,
+   "have": 29,
+   "ok": false,
+   "note": "仰头看高处"
+  },
+  {
+   "act": "弯腰",
+   "joint": "waist_pitch",
+   "need": 70,
+   "have": 34,
+   "ok": false,
+   "note": "弯腰捡东西、鞠躬（人约 90°）"
+  },
+  {
+   "act": "扭腰",
+   "joint": "waist_yaw",
+   "need": 40,
+   "have": 46,
+   "ok": true,
+   "note": "回头、转身"
+  },
+  {
+   "act": "深蹲 / 跪坐",
+   "joint": "l_knee",
+   "need": 145,
+   "have": 143,
+   "ok": true,
+   "note": "跪坐、蹲到底"
+  },
+  {
+   "act": "抬腿",
+   "joint": "l_hip_pitch",
+   "need": 120,
+   "have": 126,
+   "ok": true,
+   "note": "抱膝、爬起来时收腿"
+  },
+  {
+   "act": "勾脚",
+   "joint": "l_ankle_pitch",
+   "need": 30,
+   "have": 57,
+   "ok": true,
+   "note": "深蹲时脚跟不离地"
+  },
+  {
+   "act": "屈肘",
+   "joint": "l_elbow",
+   "need": 140,
+   "have": 138,
+   "ok": false,
+   "note": "手碰到肩膀"
+  }
+ ],
+ "head": {
+  "t90": 0.1005,
+  "deg": 46,
+  "fell": 
