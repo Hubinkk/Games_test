@@ -1,0 +1,334 @@
+<title>花然的脖子</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* 上方：左右两个花然（旧 2 关节 / 新 4 关节）做同一个表情；下面是每个表情的结果、趴着抬头的发热、脖子结构图 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --hard:#b9800f; --no:#cf3b3d;
+  --skin:#f4dccf; --hair:#6b5a8e; --iris:#4a7fd0; --lid:#e9c9b8; --body:#c9cfe0;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --body:#5d6680; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --body:#5d6680; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.6;margin:0}
+.wrap{max-width:1160px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:36px}
+header{display:grid;gap:8px;max-width:76ch}
+.eyebrow{font-family:var(--f-data);font-size:12px;letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase}
+h1{font-family:var(--f-display);font-size:clamp(30px,4.4vw,44px);line-height:1.15;margin:0}
+h2{font-family:var(--f-display);font-size:22px;margin:0}
+p{margin:0}
+.lede{color:var(--ink-2);font-size:15.5px}
+.lede b{color:var(--ink)}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:760px){.stage{grid-template-columns:minmax(0,1fr)}}
+.view{background:var(--stage);border-radius:12px;overflow:hidden;position:relative}
+.view canvas{display:block;width:100%;height:auto;aspect-ratio:1/0.82}
+.view .cap{position:absolute;left:12px;top:10px;font-size:13px;color:var(--ink);background:color-mix(in srgb,var(--stage) 80%,transparent);padding:2px 8px;border-radius:5px}
+.view .cap small{color:var(--ink-2);font-family:var(--f-data);font-size:11.5px;margin-left:6px}
+.verdict{position:absolute;left:12px;bottom:10px;right:12px;font-size:13.5px;padding:6px 10px;border-radius:7px;background:var(--panel);border-left:4px solid var(--ok)}
+.verdict.bad{border-left-color:var(--no)}
+.verdict.mid{border-left-color:var(--hard)}
+.controls{display:grid;gap:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lbl{font-size:12px;color:var(--ink-2);letter-spacing:.04em;min-width:4em}
+.seg button,.btn{font:inherit;font-size:13.5px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:7px;padding:5px 11px;cursor:pointer}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button[aria-pressed="true"]{border-color:var(--calm);color:var(--calm);box-shadow:inset 0 0 0 1px var(--calm);font-weight:600}
+button:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.desc{background:var(--panel);border:1px solid var(--rule);border-radius:9px;padding:10px 14px;font-size:14px;color:var(--ink-2)}
+.desc b{color:var(--ink)}
+.bar{height:4px;background:var(--rule);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--calm)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tw{overflow-x:auto}
+th,td{border-bottom:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:top}
+th{color:var(--ink-2);font-weight:500;font-size:12.5px}
+tr.sel td{background:color-mix(in srgb,var(--calm) 10%,transparent)}
+.y{color:var(--ok);font-weight:600}.n{color:var(--no);font-weight:600}.m{color:var(--hard);font-weight:600}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+section{display:grid;gap:12px}
+section > p{max-width:76ch;color:var(--ink-2);font-size:14.5px}
+section > p b{color:var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;display:grid;gap:4px;font-size:13.5px;color:var(--ink-2)}
+.card b{color:var(--ink);font-size:14.5px}
+.card .big{font-family:var(--f-data);font-size:26px;color:var(--ink)}
+.card.bad{border-left:4px solid var(--no)}.card.ok{border-left:4px solid var(--ok)}.card.mid{border-left:4px solid var(--hard)}
+.anat svg{width:100%;max-width:680px;height:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+.foot{font-size:12.5px;color:var(--ink-2);max-width:80ch}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">55 cm 人偶 · 身体 · 脖子</div>
+    <h1>花然的脖子：2 个关节还是 4 个</h1>
+    <p class="lede">左边是现在的脖子（左右转、点头），右边是新方案：<b>下颈俯仰、左右转、上颈俯仰、歪头</b>，四个电机都放在胸腔里，用线传到脖子。两边做同一个表情，看哪些做得出来。眼睛和眼睑两边一样（±12° 云台），只有脖子不同。</p>
+  </header>
+
+  <section class="controls" aria-label="选择表情">
+    <div class="row"><span class="lbl">表情</span><div class="seg" id="exprSeg"></div></div>
+    <div class="row"><span class="lbl">看的角度</span><div class="seg" id="viewSeg"></div>
+      <button class="btn" id="replay" type="button">再来一次</button></div>
+    <div class="desc" id="desc"></div>
+    <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+  </section>
+
+  <section class="stage" aria-label="两种脖子做同一个表情">
+    <div class="view"><canvas id="cOld" width="720" height="590" aria-label="旧脖子（2 个关节）"></canvas>
+      <span class="cap">旧脖子<small>2 个关节</small></span><div class="verdict" id="vOld"></div></div>
+    <div class="view"><canvas id="cNew" width="720" height="590" aria-label="新脖子（4 个关节）"></canvas>
+      <span class="cap">新脖子<small>4 个关节，电机在胸腔</small></span><div class="verdict" id="vNew"></div></div>
+  </section>
+
+  <section aria-labelledby="h-all">
+    <h2 id="h-all">每个表情：和"想做的样子"差多少</h2>
+    <p>"想做的样子"是按 4 个关节排好的动作。仿真里两种脖子都用真实的扭矩上限（0.3 N·m）和转速上限（10 rad/s）去追，在每个姿势停住时量头的朝向和位置差了多少。<b>差 5° 以内、5 mm 以内，看起来就是同一个动作。</b>画面里淡灰色的网格球是头的起始位置。</p>
+    <div class="tw"><table id="tbl"><thead><tr><th>表情</th><th>旧脖子</th><th>新脖子</th><th>新脖子最用力的一下</th><th>一直做这个动作，最热的关节</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section aria-labelledby="h-prone">
+    <h2 id="h-prone">趴在地上抬头看前面</h2>
+    <p>表情动作都很轻，脖子几乎不发热（25～30 °C）。真正吃力的是<b>趴着抬头</b>：头整个横过来，重量全压在脖子上。起身时就会遇到。我还试了一个想法：在胸腔里加弹簧，抵消头的重量的八成。</p>
+    <div class="cards" id="prone"></div>
+    <p><b>弹簧不能用。</b>弹簧是按"身体站直"时调好的，一趴下，重力方向变了，弹簧反而往错的方向推，脖子电机要和弹簧对抗，温度到了 135 °C。站着做表情时，脖子本来就不热，弹簧也帮不上什么忙。所以新方案<b>不加弹簧</b>。</p>
+  </section>
+
+  <section aria-labelledby="h-anat" class="anat">
+    <h2 id="h-anat">新脖子的结构</h2>
+    <p>四个 12 g 的小电机（和现在脖子里的一样）挪进胸腔，再留一个空位给以后。每个电机拉一对线，线在套管里穿过脖子，像自行车的刹车线。头和脖子因此轻了约 24 g，头里只剩眼睛、眼睑、摄像头和计算单元。</p>
+    <svg viewBox="0 0 640 380" role="img" aria-label="侧面示意：胸腔里的电机通过套管里的线带动脖子的四个关节">
+      <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--ink-2)"/></marker></defs>
+      <!-- 胸腔 -->
+      <rect x="150" y="215" width="200" height="150" rx="16" fill="none" stroke="var(--rule)" stroke-width="2"/>
+      <text x="160" y="358" font-size="13" fill="var(--ink-2)">胸腔</text>
+      <g stroke="var(--hard)" stroke-width="2" fill="none">
+        <rect x="170" y="240" width="34" height="24" rx="4"/><rect x="214" y="240" width="34" height="24" rx="4"/>
+        <rect x="258" y="240" width="34" height="24" rx="4"/><rect x="302" y="240" width="34" height="24" rx="4"/>
+      </g>
+      <rect x="236" y="276" width="34" height="24" rx="4" fill="none" stroke="var(--ink-2)" stroke-dasharray="4 3" stroke-width="1.5"/>
+      <text x="278" y="293" font-size="12" fill="var(--ink-2)">空位（留给以后）</text>
+      <!-- 线 -->
+      <g stroke="var(--hard)" stroke-width="1.5" fill="none" stroke-dasharray="3 3">
+        <path d="M187,240 C187,215 240,212 246,200"/>
+        <path d="M231,240 C231,200 250,170 250,160"/>
+        <path d="M275,240 C275,190 256,150 254,128"/>
+        <path d="M319,240 C319,180 262,140 258,124"/>
+      </g>
+      <!-- 脖子 -->
+      <line x1="250" y1="200" x2="250" y2="140" stroke="var(--ink)" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="250" cy="200" r="9" fill="var(--panel)" stroke="var(--calm)" stroke-width="3"/>
+      <circle cx="250" cy="160" r="7" fill="var(--panel)" stroke="var(--calm)" stroke-width="3"/>
+      <circle cx="256" cy="126" r="9" fill="var(--panel)" stroke="var(--calm)" stroke-width="3"/>
+      <!-- 头 -->
+      <circle cx="262" cy="70" r="58" fill="none" stroke="var(--rule)" stroke-width="2"/>
+      <circle cx="306" cy="64" r="9" fill="none" stroke="var(--iris)" stroke-width="2.5"/>
+      <g font-size="13" fill="var(--ink)">
+        <text x="20" y="206">① 下颈俯仰</text><line x1="96" y1="202" x2="238" y2="200" stroke="var(--ink-2)"/>
+        <text x="20" y="166">② 左右转（±80°）</text><line x1="130" y1="162" x2="242" y2="160" stroke="var(--ink-2)"/>
+        <text x="360" y="150">③ 上颈俯仰 + ④ 歪头</text><line x1="358" y1="146" x2="267" y2="128" stroke="var(--ink-2)"/>
+        <text x="372" y="60">眼睛 ±12°（已有）</text><line x1="370" y1="57" x2="318" y2="62" stroke="var(--ink-2)"/>
+        <text x="372" y="250">4 个脖子电机</text><line x1="370" y1="247" x2="338" y2="252" stroke="var(--ink-2)"/>
+        <text x="372" y="210">套管里的线</text><line x1="370" y1="206" x2="300" y2="200" stroke="var(--ink-2)"/>
+      </g>
+    </svg>
+  </section>
+
+  <section aria-labelledby="h-small">
+    <h2 id="h-small">小动作不只靠脖子</h2>
+    <p>偷看、躲开视线这类动作，在仿真里新脖子都做得出来（停下来时误差不到 0.5°，动的途中最多差 3°）。但真正让它们"像"的，是好几个部位一起配合：</p>
+    <div class="cards">
+      <div class="card"><b>眼睛先动，头再跟上</b>人看东西时，眼睛先到，头晚 0.1～0.2 秒才跟上。所有表情都按这个顺序排。</div>
+      <div class="card"><b>眼睑</b>半闭、慢眨、快眨，比脖子更能表达情绪。已经在眼睛方案里。</div>
+      <div class="card"><b>肩和呼吸</b>缩脖子时肩会耸起来，发呆时胸口会起伏。肩已经有电机，呼吸可以用腰的俯仰做得很小。</div>
+      <div class="card"><b>小动作要"准"</b>1°～2° 的小动作，仿真误差只有 0.05°；实物上，线会伸长、齿轮有空隙，误差会大得多。要选间隙小的减速器，线要预先拉紧。</div>
+    </div>
+  </section>
+
+  <p class="foot">数字来源：仿真结果（<code>sim/neck.py</code>，MuJoCo 3.17）。电机扭矩上限、转速上限沿用整体模型；发热用的是数字花然一天里的小关节热模型（估算，R = 15 K/W）。眼睛和眼睑只在网页上按关键帧画，不在物理模型里。旧脖子做不出的部分，按"能做的那几个关节尽量接近"来摆。</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="neck_frames.js"></script>
+<script>
+const D = window.NECK;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const S = { expr: 0, view: "front", t: 0, playing: true, last: null };
+const VIEWS = { front: ["正面（你站在它面前）", [0.34, 0.14, 0.0]], side: ["侧面", [0.06, 0.15, 0.34]], three: ["斜前方", [0.27, 0.17, 0.2]] };
+
+// 眼睑：眼白椭圆的上面一部分（lid = 0 睁开，1 合上），和眼睛一样大，不会露到眼睛外面
+function lidGeom(lid) {
+  const a = 0.0085 * 0.85 + 0.0004, b = 0.0085 * 1.15 + 0.0004, cut = b - 2 * b * lid, sh = new THREE.Shape();
+  if (lid <= 0.001) { sh.moveTo(-0.0001, b); sh.lineTo(0.0001, b); sh.lineTo(0, b - 0.0001); return new THREE.ShapeGeometry(sh); }
+  const t0 = Math.asin(Math.max(-1, Math.min(1, cut / b))), N = 24;
+  for (let i = 0; i <= N; i++) { const t = t0 + (Math.PI - 2 * t0) * i / N; const x = a * Math.cos(t), y = b * Math.sin(t); i ? sh.lineTo(x, y) : sh.moveTo(x, y); }
+  sh.lineTo(a * Math.cos(t0), cut);
+  return new THREE.ShapeGeometry(sh);
+}
+function makeScene(canvas, kind) {
+  const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  const sc = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(30, canvas.width / canvas.height, 0.01, 5);
+  sc.add(new THREE.HemisphereLight(0xffffff, 0x8890a0, 0.7));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.55); dl.position.set(0.5, 0.8, 0.3); sc.add(dl);
+  const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; sc.add(root);  // MuJoCo 坐标：x 前，y 左，z 上
+  const M = {
+    skin: new THREE.MeshLambertMaterial(), hair: new THREE.MeshLambertMaterial(), body: new THREE.MeshLambertMaterial(),
+    white: new THREE.MeshBasicMaterial({ color: 0xffffff }), iris: new THREE.MeshBasicMaterial(), pupil: new THREE.MeshBasicMaterial({ color: 0x14161c }),
+    lid: new THREE.MeshBasicMaterial(), neck: new THREE.MeshLambertMaterial(), joint: new THREE.MeshLambertMaterial(),
+  };
+  // 胸和肩
+  const chest = new THREE.Mesh(new THREE.BoxGeometry(0.056, 0.08, 0.07), M.body); chest.position.set(0, 0, 0.035); root.add(chest);
+  for (const s of [1, -1]) { const sh = new THREE.Mesh(new THREE.SphereGeometry(0.016, 20, 14), M.body); sh.position.set(0, s * 0.052, 0.058); root.add(sh); }
+  const cyl = (len, rad, mat) => { const g = new THREE.CylinderGeometry(rad, rad, len, 18); g.rotateX(Math.PI / 2); g.translate(0, 0, len / 2); return new THREE.Mesh(g, mat); };
+  const jball = (rad) => new THREE.Mesh(new THREE.SphereGeometry(rad, 16, 12), M.joint);
+  const J = {};
+  let headParent;
+  if (kind === "old") {
+    J.yaw = new THREE.Group(); J.yaw.position.set(0, 0, 0.07); root.add(J.yaw);
+    J.yaw.add(cyl(0.022, 0.011, M.neck));
+    J.hp = new THREE.Group(); J.hp.position.set(0, 0, 0.022); J.yaw.add(J.hp); J.hp.add(jball(0.012));
+    headParent = J.hp;
+  } else {
+    J.lp = new THREE.Group(); J.lp.position.set(0, 0, 0.07); root.add(J.lp); J.lp.add(jball(0.012));
+    J.lp.add(cyl(0.018, 0.010, M.neck));
+    J.yaw = new THREE.Group(); J.yaw.position.set(0, 0, 0.018); J.lp.add(J.yaw); J.yaw.add(cyl(0.006, 0.009, M.neck));
+    J.hp = new THREE.Group(); J.hp.position.set(0, 0, 0.006); J.yaw.add(J.hp);
+    J.roll = new THREE.Group(); J.hp.add(J.roll); J.roll.add(jball(0.011));
+    headParent = J.roll;
+  }
+  // 头
+  const head = new THREE.Group(); head.position.set(0, 0, 0.044); headParent.add(head);
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(0.046, 40, 30), M.skin); head.add(ball);
+  const hairG = new THREE.SphereGeometry(1, 40, 30, 0, Math.PI * 2, 0, Math.PI * 0.62);
+  const hair = new THREE.Mesh(hairG, M.hair); hair.rotation.x = Math.PI / 2; hair.scale.set(0.051, 0.05, 0.052); hair.position.set(-0.008, 0, 0.006);
+  hair.rotation.set(0, -0.25, 0); hair.rotateX(Math.PI / 2); head.add(hair);
+  const back = new THREE.Mesh(new THREE.SphereGeometry(1, 30, 20), M.hair); back.scale.set(0.038, 0.05, 0.06); back.position.set(-0.024, 0, -0.012); head.add(back);
+  for (const [y, z, sx] of [[0, 0.03, 1], [0.022, 0.026, 0.9], [-0.022, 0.026, 0.9]]) {
+    const b = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), M.hair); b.scale.set(0.012, 0.016 * sx, 0.018); b.position.set(0.036, y, z); head.add(b);
+  }
+  // 眼睛：圆屏 + 虹膜 + 眼睑（屏幕画的眼睛跟着云台一起转）
+  const eyes = [];
+  for (const s of [1, -1]) {
+    const pivot = new THREE.Group(); pivot.position.set(0.03, s * 0.017, -0.006); head.add(pivot);
+    const face = new THREE.Group(); face.position.set(0.0135, 0, 0); face.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(1, 0, 0))); pivot.add(face);
+    const w = new THREE.Mesh(new THREE.CircleGeometry(0.0085, 32), M.white); w.scale.set(0.85, 1.15, 1); face.add(w);
+    const ir = new THREE.Mesh(new THREE.CircleGeometry(0.0065, 32), M.iris); ir.scale.set(0.85, 1.15, 1); ir.position.z = 0.0003; face.add(ir);
+    const pu = new THREE.Mesh(new THREE.CircleGeometry(0.0025, 20), M.pupil); pu.position.z = 0.0006; face.add(pu);
+    const lid = new THREE.Mesh(lidGeom(0), M.lid); lid.position.z = 0.0012; face.add(lid);
+    eyes.push({ pivot, lid, v: 0 });
+  }
+  // 起始姿势的头：淡淡的轮廓，用来看头往哪里移动了
+  const ghost = new THREE.Mesh(new THREE.SphereGeometry(0.046, 24, 16), new THREE.MeshBasicMaterial({ color: 0x888888, wireframe: true, transparent: true, opacity: 0.18 }));
+  ghost.position.set(0, 0, 0.07 + (kind === "old" ? 0.022 : 0.024) + 0.044); root.add(ghost);
+  function colors() {
+    M.skin.color.set(css("--skin")); M.hair.color.set(css("--hair")); M.body.color.set(css("--body"));
+    M.iris.color.set(css("--iris")); M.lid.color.set(css("--lid")); M.neck.color.set(css("--skin")); M.joint.color.set(css("--calm"));
+  }
+  colors();
+  function pose(f) {
+    if (kind === "old") { J.yaw.rotation.z = f[0]; J.hp.rotation.y = f[1]; }
+    else { J.lp.rotation.y = f[0]; J.yaw.rotation.z = f[1]; J.hp.rotation.y = f[2]; J.roll.rotation.x = f[3]; }
+    const n = kind === "old" ? 2 : 4, ex = f[n] * Math.PI / 180, ey = f[n + 1] * Math.PI / 180, lid = f[n + 2];
+    const lq = Math.round(lid * 40) / 40;
+    for (const e of eyes) {
+      e.pivot.rotation.set(0, 0, 0); e.pivot.rotateZ(ex); e.pivot.rotateY(-ey);
+      if (e.v !== lq) { e.lid.geometry.dispose(); e.lid.geometry = lidGeom(lq); e.v = lq; }
+    }
+  }
+  function draw() {
+    const v = VIEWS[S.view][1];
+    cam.position.set(v[0] * 1.3, v[1] + 0.01, v[2] * 1.3); cam.lookAt(0.0, 0.118, 0); cam.updateProjectionMatrix();
+    r.render(sc, cam);
+  }
+  function resize() {
+    const w = canvas.clientWidth; if (!w) return;
+    const h = Math.round(w * 0.82); r.setSize(w, h, false); cam.aspect = w / h;
+  }
+  return { pose, draw, colors, resize };
+}
+
+let A, B;
+try { A = makeScene(document.getElementById("cOld"), "old"); B = makeScene(document.getElementById("cNew"), "new"); }
+catch (e) { document.querySelectorAll(".view").forEach(v => v.insertAdjacentHTML("beforeend", '<p style="padding:40px 16px">这个浏览器不能显示三维画面。下面的表格仍然有全部结果。</p>')); }
+
+function seg(el, items, cur, cb) {
+  el.innerHTML = "";
+  items.forEach(([k, label]) => {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.setAttribute("aria-pressed", String(k === cur));
+    b.onclick = () => { [...el.children].forEach(c => c.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); cb(k); };
+    el.appendChild(b);
+  });
+}
+const fmt = s => `差 ${s.hold_err_deg.toFixed(1)}°、${s.hold_err_mm.toFixed(1)} mm`;
+const grade = s => (s.hold_err_deg > 8 || s.hold_err_mm > 8) ? "bad" : (s.hold_err_deg > 5 || s.hold_err_mm > 5) ? "mid" : "ok";
+const WORD = { ok: "做得出", mid: "大致做得出", bad: "做不出" };
+const WHY = {
+  tilt: { old: "没有歪头的关节" }, peer: { old: "头不能往前伸，只能低头" }, flinch: { old: "缩不回脖子，只能抬下巴" },
+  peek: { old: "不能一边转开一边歪头" }, avert: { old: "躲开时少了歪头，显得硬" }, sound: { old: "最多转 57°，转不到 75°", new: "转的途中头比目标晚约 0.1 秒（差 9°），停下来时到位" },
+  listen: {}, idle: {},
+};
+function verdicts() {
+  const e = D.expr[S.expr];
+  for (const [id, k] of [["vOld", "old"], ["vNew", "new"]]) {
+    const s = e.stats[k], g = grade(s), el = document.getElementById(id);
+    el.className = "verdict" + (g === "bad" ? " bad" : g === "mid" ? " mid" : "");
+    const why = (WHY[e.key] || {})[k];
+    el.innerHTML = `<b>${WORD[g]}</b> · ${fmt(s)}${why ? "：" + why : ""}`;
+  }
+  document.getElementById("desc").innerHTML = `<b>${e.title}</b>　${e.desc}`;
+  document.querySelectorAll("#tbl tbody tr").forEach((tr, i) => tr.classList.toggle("sel", i === S.expr));
+}
+function table() {
+  const tb = document.querySelector("#tbl tbody");
+  tb.innerHTML = D.expr.map((e, i) => {
+    const o = e.stats.old, n = e.stats.new, go = grade(o), gn = grade(n);
+    const cls = g => g === "ok" ? "y" : g === "mid" ? "m" : "n";
+    return `<tr data-i="${i}"><td>${e.title}</td><td><span class="${cls(go)}">${WORD[go]}</span> <span class="num">${fmt(o)}</span></td>
+      <td><span class="${cls(gn)}">${WORD[gn]}</span> <span class="num">${fmt(n)}</span></td>
+      <td class="num">${n.peak_tau.toFixed(2)} N·m（上限 0.3）</td><td class="num">约 ${Math.round(n.T_ss)} °C</td></tr>`;
+  }).join("");
+  tb.querySelectorAll("tr").forEach(tr => tr.onclick = () => pick(+tr.dataset.i));
+}
+function prone() {
+  const p = D.prone, el = document.getElementById("prone");
+  const items = [["old", "旧脖子", "bad", "头最多抬到 29°，还是看着地面"], ["new", "新脖子（不加弹簧）", "ok", "头抬到 69°，再加眼睛往上看 12°，能看到前面"], ["spring", "新脖子 + 弹簧", "bad", "弹簧在趴着时往错的方向推"]];
+  el.innerHTML = items.map(([k, t, g, note]) => `<div class="card ${g}"><b>${t}</b><span class="big">${Math.round(p[k].T_hold)} °C</span>
+    <span>一直保持时的温度（估算）</span><span>抬头 ${Math.round(p[k].look_deg)}°（90° = 看向正前方）· ${note}</span></div>`).join("");
+}
+function pick(i) {
+  S.expr = i; S.t = 0; S.playing = true;
+  seg(document.getElementById("exprSeg"), D.expr.map((e, j) => [j, e.title]), i, pick);
+  verdicts();
+}
+seg(document.getElementById("viewSeg"), Object.entries(VIEWS).map(([k, v]) => [k, v[0]]), S.view, k => { S.view = k; });
+document.getElementById("replay").onclick = () => { S.t = 0; S.playing = true; };
+table(); prone(); pick(0);
+
+function frameAt(arr, t) { const i = Math.min(arr.length - 1, Math.floor(t * D.meta.fps)); return arr[i]; }
+function resize() { A && A.resize(); B && B.resize(); }
+window.addEventListener("resize", resize); resize();
+const mq = matchMedia("(prefers-color-scheme: dark)");
+mq.addEventListener && mq.addEventListener("change", () => { A && A.colors(); B && B.colors(); });
+new MutationObserver(() => { A && A.colors(); B && B.colors(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function loop(ts) {
+  const dt = S.last == null ? 0 : Math.min(0.1, (ts - S.last) / 1000); S.last = ts;
+  const e = D.expr[S.expr];
+  if (S.playing) { S.t += dt; if (S.t > e.T + 1.0) S.t = 0; }
+  const t = Math.min(S.t, e.T);
+  document.getElementById("prog").style.width = (100 * t / e.T).toFixed(1) + "%";
+  if (A && B) { A.pose(frameAt(e.old, reduce ? e.T * 0.6 : t)); B.pose(frameAt(e.new, reduce ? e.T * 0.6 : t)); A.draw(); B.draw(); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>

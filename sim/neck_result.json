@@ -1,0 +1,378 @@
+{
+ "expr": [
+  {
+   "key": "listen",
+   "title": "看着你，听你说话",
+   "desc": "边听边轻轻点头。小动作：幅度只有 3°～5°。",
+   "T": 4.2,
+   "stats": {
+    "old": {
+     "pose_err_deg": 3.0,
+     "pose_err_mm": 2.0,
+     "hold_err_deg": 3.0,
+     "hold_err_mm": 2.0,
+     "track_rms": 0.18,
+     "peak_tau": 0.019,
+     "peak_w": 0.4,
+     "T_ss": 25.1,
+     "hot": "head_pitch"
+    },
+    "new": {
+     "pose_err_deg": 0.6,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.2,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.18,
+     "peak_tau": 0.018,
+     "peak_w": 0.4,
+     "T_ss": 25.1,
+     "hot": "head_pitch"
+    },
+    "spring": {
+     "pose_err_deg": 0.6,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.2,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.18,
+     "peak_tau": 0.011,
+     "peak_w": 0.4,
+     "T_ss": 25.0,
+     "hot": "head_pitch"
+    }
+   }
+  },
+  {
+   "key": "tilt",
+   "title": "歪头",
+   "desc": "疑惑、好奇。二次元角色最有代表性的动作；旧脖子没有这个关节。",
+   "T": 4.2,
+   "stats": {
+    "old": {
+     "pose_err_deg": 22.0,
+     "pose_err_mm": 2.0,
+     "hold_err_deg": 22.0,
+     "hold_err_mm": 2.0,
+     "track_rms": 0.08,
+     "peak_tau": 0.01,
+     "peak_w": 0.2,
+     "T_ss": 25.1,
+     "hot": "head_pitch"
+    },
+    "new": {
+     "pose_err_deg": 1.4,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.3,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.44,
+     "peak_tau": 0.052,
+     "peak_w": 1.0,
+     "T_ss": 27.7,
+     "hot": "roll"
+    },
+    "spring": {
+     "pose_err_deg": 1.4,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.3,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.44,
+     "peak_tau": 0.018,
+     "peak_w": 1.0,
+     "T_ss": 25.2,
+     "hot": "roll"
+    }
+   }
+  },
+  {
+   "key": "peer",
+   "title": "探头（凑近看）",
+   "desc": "下颈往前、上颈往回：脸保持朝前，整个头往前伸。",
+   "T": 4.6,
+   "stats": {
+    "old": {
+     "pose_err_deg": 0.1,
+     "pose_err_mm": 12.1,
+     "hold_err_deg": 0.1,
+     "hold_err_mm": 12.1,
+     "track_rms": 0.03,
+     "peak_tau": 0.005,
+     "peak_w": 0.1,
+     "T_ss": 25.0,
+     "hot": "head_pitch"
+    },
+    "new": {
+     "pose_err_deg": 0.1,
+     "pose_err_mm": 0.5,
+     "hold_err_deg": 0.1,
+     "hold_err_mm": 0.1,
+     "track_rms": 0.53,
+     "peak_tau": 0.042,
+     "peak_w": 1.0,
+     "T_ss": 26.5,
+     "hot": "low_pitch"
+    },
+    "spring": {
+     "pose_err_deg": 0.1,
+     "pose_err_mm": 0.5,
+     "hold_err_deg": 0.1,
+     "hold_err_mm": 0.1,
+     "track_rms": 0.53,
+     "peak_tau": 0.017,
+     "peak_w": 1.0,
+     "T_ss": 25.1,
+     "hot": "low_pitch"
+    }
+   }
+  },
+  {
+   "key": "flinch",
+   "title": "缩脖子（吓一跳）",
+   "desc": "下颈往后、下巴收回，很快；眼睛一下睁大再眨。",
+   "T": 3.4,
+   "stats": {
+    "old": {
+     "pose_err_deg": 3.1,
+     "pose_err_mm": 9.8,
+     "hold_err_deg": 0.1,
+     "hold_err_mm": 9.8,
+     "track_rms": 0.42,
+     "peak_tau": 0.098,
+     "peak_w": 2.2,
+     "T_ss": 25.9,
+     "hot": "head_pitch"
+    },
+    "new": {
+     "pose_err_deg": 4.7,
+     "pose_err_mm": 3.2,
+     "hold_err_deg": 0.6,
+     "hold_err_mm": 0.1,
+     "track_rms": 1.04,
+     "peak_tau": 0.232,
+     "peak_w": 5.2,
+     "T_ss": 30.2,
+     "hot": "low_pitch"
+    },
+    "spring": {
+     "pose_err_deg": 4.7,
+     "pose_err_mm": 3.2,
+     "hold_err_deg": 0.6,
+     "hold_err_mm": 0.1,
+     "track_rms": 1.04,
+     "peak_tau": 0.206,
+     "peak_w": 5.2,
+     "T_ss": 27.5,
+     "hot": "low_pitch"
+    }
+   }
+  },
+  {
+   "key": "peek",
+   "title": "偷看",
+   "desc": "头转开、低一点，只用眼睛偷偷看你；被发现时眼睛先跳开，头再转得更远。",
+   "T": 6.4,
+   "stats": {
+    "old": {
+     "pose_err_deg": 17.3,
+     "pose_err_mm": 2.0,
+     "hold_err_deg": 17.3,
+     "hold_err_mm": 2.0,
+     "track_rms": 0.87,
+     "peak_tau": 0.076,
+     "peak_w": 2.4,
+     "T_ss": 26.4,
+     "hot": "head_pitch"
+    },
+    "new": {
+     "pose_err_deg": 3.2,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.2,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.95,
+     "peak_tau": 0.037,
+     "peak_w": 2.4,
+     "T_ss": 26.3,
+     "hot": "head_pitch"
+    },
+    "spring": {
+     "pose_err_deg": 3.2,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.2,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.95,
+     "peak_tau": 0.026,
+     "peak_w": 2.4,
+     "T_ss": 25.2,
+     "hot": "yaw"
+    }
+   }
+  },
+  {
+   "key": "avert",
+   "title": "躲开视线",
+   "desc": "眼睛先往下偏开，头再慢慢跟着低下、转开。人害羞时就是这个顺序。",
+   "T": 5.9,
+   "stats": {
+    "old": {
+     "pose_err_deg": 9.4,
+     "pose_err_mm": 3.8,
+     "hold_err_deg": 9.4,
+     "hold_err_mm": 3.8,
+     "track_rms": 0.34,
+     "peak_tau": 0.06,
+     "peak_w": 0.7,
+     "T_ss": 28.8,
+     "hot": "head_pitch"
+    },
+    "new": {
+     "pose_err_deg": 1.3,
+     "pose_err_mm": 0.1,
+     "hold_err_deg": 0.3,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.34,
+     "peak_tau": 0.068,
+     "peak_w": 0.7,
+     "T_ss": 30.1,
+     "hot": "low_pitch"
+    },
+    "spring": {
+     "pose_err_deg": 1.3,
+     "pose_err_mm": 0.1,
+     "hold_err_deg": 0.3,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.34,
+     "peak_tau": 0.016,
+     "peak_w": 0.7,
+     "T_ss": 25.2,
+     "hot": "low_pitch"
+    }
+   }
+  },
+  {
+   "key": "sound",
+   "title": "听到声音，转过去看",
+   "desc": "眼睛先到，头跟上，转 75°。旧脖子最多转 57°。",
+   "T": 4.0,
+   "stats": {
+    "old": {
+     "pose_err_deg": 19.4,
+     "pose_err_mm": 2.0,
+     "hold_err_deg": 19.4,
+     "hold_err_mm": 2.0,
+     "track_rms": 1.74,
+     "peak_tau": 0.193,
+     "peak_w": 7.1,
+     "T_ss": 26.6,
+     "hot": "yaw"
+    },
+    "new": {
+     "pose_err_deg": 9.1,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.4,
+     "hold_err_mm": 0.0,
+     "track_rms": 1.91,
+     "peak_tau": 0.119,
+     "peak_w": 7.1,
+     "T_ss": 26.1,
+     "hot": "yaw"
+    },
+    "spring": {
+     "pose_err_deg": 9.1,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.4,
+     "hold_err_mm": 0.0,
+     "track_rms": 1.91,
+     "peak_tau": 0.119,
+     "peak_w": 7.1,
+     "T_ss": 26.1,
+     "hot": "yaw"
+    }
+   }
+  },
+  {
+   "key": "idle",
+   "title": "发呆时的小动作",
+   "desc": "呼吸带着头轻轻起伏、眼睛偶尔扫一下、慢慢眨眼。幅度 1°～2°。",
+   "T": 6.4,
+   "stats": {
+    "old": {
+     "pose_err_deg": 1.5,
+     "pose_err_mm": 2.1,
+     "hold_err_deg": 1.5,
+     "hold_err_mm": 2.1,
+     "track_rms": 0.04,
+     "peak_tau": 0.003,
+     "peak_w": 0.1,
+     "T_ss": 25.0,
+     "hot": "head_pitch"
+    },
+    "new": {
+     "pose_err_deg": 0.1,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.1,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.05,
+     "peak_tau": 0.005,
+     "peak_w": 0.1,
+     "T_ss": 25.0,
+     "hot": "roll"
+    },
+    "spring": {
+     "pose_err_deg": 0.1,
+     "pose_err_mm": 0.0,
+     "hold_err_deg": 0.1,
+     "hold_err_mm": 0.0,
+     "track_rms": 0.05,
+     "peak_tau": 0.004,
+     "peak_w": 0.1,
+     "T_ss": 25.0,
+     "hot": "low_pitch"
+    }
+   }
+  }
+ ],
+ "prone": {
+  "old": {
+   "peak_tau": [
+    0.0,
+    0.114
+   ],
+   "joints": [
+    "yaw",
+    "head_pitch"
+   ],
+   "T_hold": 52.8,
+   "look_deg": 28.6
+  },
+  "new": {
+   "peak_tau": [
+    0.107,
+    0.0,
+    0.045,
+    0.0
+   ],
+   "joints": [
+    "low_pitch",
+    "yaw",
+    "head_pitch",
+    "roll"
+   ],
+   "T_hold": 49.5,
+   "look_deg": 68.6
+  },
+  "spring": {
+   "peak_tau": [
+    0.226,
+    0.0,
+    0.138,
+    0.0
+   ],
+   "joints": [
+    "low_pitch",
+    "yaw",
+    "head_pitch",
+    "roll"
+   ],
+   "T_hold": 135.1,
+   "look_deg": 68.6
+  }
+ }
+}
