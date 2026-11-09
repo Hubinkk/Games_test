@@ -49,6 +49,7 @@ NEXT = (datetime.date.fromisoformat(DAY) + datetime.timedelta(days=1)).isoformat
 INBOX = os.path.join(MEM, "inbox")
 GETUP_TAG = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--getup=")), "")   # "arms"：育苗人教的起身方法
 UNDER = None
+BODY = None
 FPS = 15
 
 # ---------------- 身体：温度与电量 ----------------
@@ -253,7 +254,7 @@ def read_inbox():
     done = json.load(open(done_p, encoding="utf-8")) if os.path.exists(done_p) else {}
     msgs = []
     for f in sorted(os.listdir(INBOX)):
-        if f.endswith(".json") and f != "已读.json" and f != "回执.json":
+        if f.endswith(".json") and f not in ("已读.json", "回执.json") and not f.startswith("理解-"):
             for m in json.load(open(os.path.join(INBOX, f), encoding="utf-8")):
                 if m["id"] not in done:
                     msgs.append(m)
@@ -488,10 +489,13 @@ def getup_try_line(results):
     g = results.get("getup", {})
     if GETUP_TAG != "arms":
         return ""
+    neck = BODY.scene_peak.get("getup", {}).get("neck_pitch", 25.0)
+    neck_s = ("脖子没再发热（最高 {:.0f} °C）。".format(neck) if neck < HOT else
+              "撑地的时候脖子是放松的；可是最后要站起来时，得把垂着的头抬回来，脖子又热了（{:.0f} °C）：我的头很大、很重。".format(neck))
     if g.get("ok"):
-        return "今天摔倒以后，我照你说的，先用手掌撑地、胳膊发力，头不顶地——我自己站起来了！"
-    return (f"今天摔倒以后，我照你说的，头抬起来不顶地，手掌撑地、胳膊发力。脖子不累了。"
-            f"不过还是没站起来，最多撑到骨盆离地 {g.get('peak_cm', 0):.0f} 厘米。可能真的要看看我的手臂和结构了。")
+        return "今天摔倒以后，我照你说的，先用手掌撑地、胳膊发力，脖子放松——我自己站起来了！" + neck_s
+    return (f"今天摔倒以后，我照你说的，脖子放松、头自然垂着，手掌撑地、胳膊发力。{neck_s}"
+            f"不过还是没站起来，最多撑到骨盆离地 {g.get('peak_cm', 0):.0f} 厘米：手臂能把上身撑起来，但重心挪不到脚上。")
 
 
 def still_ask(msgs):
@@ -549,6 +553,8 @@ def main():
     agility.add_speed_limit(sim)
     bal = Balance(sim)
     body = Body(sim)
+    global BODY
+    BODY = body
     rec = Rec(sim, body)
     gfile = "getup_best_arms.json" if GETUP_TAG == "arms" else "getup_best.json"
     gx = json.load(open(os.path.join(HERE, gfile), encoding="utf-8"))["x"]

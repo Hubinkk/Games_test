@@ -99,7 +99,7 @@ def keyframes(x):
             p[f"{s}_hip_pitch"], p[f"{s}_knee"], p[f"{s}_ankle_pitch"] = hp, kn, an
         p["waist_pitch"] = wp
         if METHOD == "arms":
-            p["neck_pitch"] = -0.5          # 头抬起来，不顶地
+            p["neck_pitch"] = -0.5          # 头的目标是抬起；撑起身体时脖子放松（见 run）
         return p
     t = 1.0
     ks = [(0.0, lying()), (t, lying())]
@@ -135,9 +135,18 @@ def run(x, record=None):
     t_rise = ks[-2][0]
     t_end = ks[-1][0] + 1.5
     hist, best_prog, balancing = [], 0.0, False
+    neck_i = m.actuator("neck_pitch").id
+    neck_base = m.actuator_forcerange[neck_i].copy()
     for k in range(int(t_end / dt)):
         t = k * dt
         tgt = target(t)
+        if METHOD == "arms":
+            # 脖子放松：撑起身体时，头自然垂着，脖子电机几乎不出力（花然的头大而重，抬着头也很费力）。
+            # 放松结束时只恢复一次，之后交给关节自己的过热保护（L0），不再每一步覆盖。
+            if t < t_rise:
+                m.actuator_forcerange[neck_i] = neck_base * 0.05
+            elif k and (k - 1) * dt < t_rise:
+                m.actuator_forcerange[neck_i] = neck_base
         # 站起阶段：身体接近直立后接上平衡控制（和其他测试同一个控制器）
         if t > t_rise and sim.tilt_deg() < 35:
             balancing = True
@@ -151,6 +160,7 @@ def run(x, record=None):
         best_prog = max(best_prog, min(z, 0.26) / 0.26 + math.cos(math.radians(min(tilt, 180))))
         if k % int(0.25 / dt) == 0:
             hist.append((round(t, 2), round(z * 100, 1), round(tilt, 0)))
+    m.actuator_forcerange[neck_i] = neck_base
     z, tilt = float(d.qpos[2]), sim.tilt_deg()
     ok = z > 0.20 and tilt < 20
     final = min(z, 0.26) / 0.26 + math.cos(math.radians(min(tilt, 180)))

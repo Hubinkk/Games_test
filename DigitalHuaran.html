@@ -95,9 +95,9 @@ code{font-family:var(--f-data);font-size:.92em}
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">数字花然 · 第一天 · 仿真</div>
+    <div class="eyebrow" id="eyebrow">数字花然 · 仿真</div>
     <h1>数字花然的一天</h1>
-    <p class="lede">花然还没有真的身体，这是它在仿真里过的第一天：醒来、跟育苗人打招呼、慢慢走到窗边、被人碰了两下、试着自己爬起来、练深蹲、休息。它的关节会热、电会用掉；<b>身体地图平时安静，只在越过阈值时说话</b>；晚上它把一天写成日记，睡觉时整理记忆，早上写一份报告给育苗人。</p>
+    <p class="lede">花然还没有真的身体，这是它在仿真里过的一天：醒来、跟育苗人打招呼、慢慢走到窗边、被人碰了两下、试着自己爬起来、练深蹲、休息。它的关节会热、电会用掉；<b>身体地图平时安静，只在越过阈值时说话</b>；晚上它把一天写成日记，睡觉时整理记忆，早上写一份报告给育苗人。</p>
   </header>
 
   <section aria-labelledby="h-day">
@@ -174,6 +174,7 @@ function md(src){
   flush();return out.join("");
 }
 if(D){
+  $("#eyebrow").textContent=`数字花然 · ${D.day} · 仿真`;
   $("#diary").innerHTML=md(D.diary);
   $("#report").innerHTML=md(D.report);
   $("#changes").innerHTML=md("## 记忆里改了的\n"+D.changes.map(c=>"- "+c).join("\n")+"\n\n## 练习队列\n"+D.queue.map(q=>"- "+q).join("\n")+"\n\n强化学习接上之前，只排队、不重练。");
@@ -266,7 +267,7 @@ const $=s=>document.querySelector(s);
 const D=window.DAY; if(!D)return;
 // 早上报告里"想问你的"
 const qs=[];let inQ=false;
-for(const line of D.report.split("\n")){if(line.startsWith("## ")){inQ=line.includes("想问你的");continue}if(inQ&&line.startsWith("- "))qs.push(line.slice(2).trim())}
+for(const line of D.report.split("\n")){if(line.startsWith("## ")){inQ=line.includes("想问你的");continue}if(inQ&&line.startsWith("- ")&&!line.slice(2).trim().startsWith("（"))qs.push(line.slice(2).trim())}
 const qBox=$("#questions");
 qs.forEach((q,i)=>{const d=document.createElement("div");d.className="q";const p=document.createElement("p");p.textContent="花然问："+q;
   const t=document.createElement("textarea");t.id="rq"+i;t.disabled=true;t.setAttribute("aria-label","回答："+q);t.placeholder="你的回答";d.append(p,t);qBox.append(d)});
