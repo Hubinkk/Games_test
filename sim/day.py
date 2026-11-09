@@ -50,6 +50,7 @@ INBOX = os.path.join(MEM, "inbox")
 GETUP_TAG = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--getup=")), "")   # "arms"：育苗人教的起身方法
 UNDER = None
 BODY = None
+RESULTS = {}
 FPS = 15
 
 # ---------------- 身体：温度与电量 ----------------
@@ -201,7 +202,7 @@ def scenes(sim, bal, gx):
         sim.reset()
         run_phase(sim, 3.0, lambda t: bal.adjust(stand_pose()))
 
-    gt = getup.keyframes(gx)[-1][0] + 1.5
+    gt = getup.keyframes_for(gx)[-1][0] + 1.5
     # key, 标题, 开始时刻, 代表的真实时长（分钟）, 仿真时长（秒）, 函数, 说明
     return [
         ("wake", "醒来", (7, 30), 2, 2.0, wake, "眼睑打开，站稳"),
@@ -371,7 +372,7 @@ def write_diary(body, scene_info, results, msgs=()):
         elif key in ("push1", "push2"):
             extra = "站住了。" if r.get("ok") else "没站住。"
         elif key == "getup":
-            extra = ("照育苗人教的：头抬起来，手掌撑地，胳膊发力。" if GETUP_TAG == "arms" else "") + ("没爬起来，最后是被扶起来的。" if not r.get("ok") else "自己站起来了！")
+            extra = ({"arms": "照育苗人教的：头抬起来，手掌撑地，胳膊发力。", "kneel3": "这次先做俯卧撑，再跪直，单膝跪地。"}.get(GETUP_TAG, "")) + ("没爬起来，最后是被扶起来的。" if not r.get("ok") else "自己站起来了！")
         lines.append(f"- {clock[0]:02d}:{clock[1]:02d} {title}。{extra}")
         groups = []
         for e in by.get(key, []):
@@ -405,10 +406,8 @@ def write_diary(body, scene_info, results, msgs=()):
         lines.append("- 被碰到时迈一步接住自己")
     if results["walk"]["dx_cm"] < 20:
         lines.append("- 走快一点（今天每秒还不到 2 厘米）")
-    asked = ["昨天扶我起来的人，会不会觉得麻烦？", "爬起来的时候手臂和脖子很吃力、发热。是我用错了方法，还是手臂本来就太弱了？"]
-    answered = {m.get("question") for m in msgs}
-    left = [q for q in asked if q not in answered]
-    lines += ["", "## 想问育苗人的", ""] + ([f"- {q}" for q in left] or ["- （昨天想问的，育苗人都回答我了。）"]) + [""]
+    left = questions(results)
+    lines += ["", "## 想问育苗人的", ""] + ([f"- {q}" for q in left] or ["- （想问的，育苗人都回答我了。）"]) + [""]
     path = os.path.join(MEM, "diary", f"{DAY}.md")
     open(path, "w", encoding="utf-8").write("\n".join(lines))
     return "\n".join(lines)
@@ -487,6 +486,11 @@ def sleep(body, results):
 
 def getup_try_line(results):
     g = results.get("getup", {})
+    if GETUP_TAG == "kneel3":
+        if g.get("ok"):
+            return "今天摔倒以后，我先做俯卧撑，再跪直，单膝跪地，然后——我自己站起来了！"
+        return (f"今天摔倒以后，我先把手放到肩膀下面做了俯卧撑（原来我的手臂撑得起自己！），然后收腿、跪直、"
+                f"把重心移到左膝、右腿跨出去。最后从单膝跪地站起来的那一下，还是倒了。离站起来只差一点。")
     if GETUP_TAG != "arms":
         return ""
     neck = BODY.scene_peak.get("getup", {}).get("neck_pitch", 25.0)
@@ -498,10 +502,26 @@ def getup_try_line(results):
             f"不过还是没站起来，最多撑到骨盆离地 {g.get('peak_cm', 0):.0f} 厘米：手臂能把上身撑起来，但重心挪不到脚上。")
 
 
-def still_ask(msgs):
+def answered_ever():
+    """所有回答过的问题（包括以前读过的回复）。"""
+    out = set()
+    if os.path.isdir(INBOX):
+        for f in os.listdir(INBOX):
+            if f.endswith(".json") and f not in ("已读.json", "回执.json") and not f.startswith("理解-"):
+                out |= {m.get("question") for m in json.load(open(os.path.join(INBOX, f), encoding="utf-8"))}
+    return out
+
+
+def questions(results):
     asked = ["昨天扶我起来的人，会不会觉得麻烦？", "爬起来的时候手臂和脖子很吃力、发热。是我用错了方法，还是手臂本来就太弱了？"]
-    answered = {m.get("question") for m in msgs}
-    return [q for q in asked if q not in answered] or ["（今天没有新的问题。你想跟我说什么都可以。）"]
+    if GETUP_TAG == "kneel3" and not results.get("getup", {}).get("ok"):
+        asked.append("从单膝跪地站起来的那一下，我总是往后倒。你站起来的时候，是先动哪里？")
+    done = answered_ever()
+    return [q for q in asked if q not in done]
+
+
+def still_ask(msgs, results=None):
+    return questions(results or RESULTS) or ["（今天没有新的问题。你想跟我说什么都可以。）"]
 
 
 def squat_line(body):
@@ -525,7 +545,7 @@ def morning_report(body, results, changes, queue, msgs=()):
     lines = ["---", "类型: 早上的报告", f"日期: {NEXT}", "写的人: 花然", "给: 育苗人", "---", "",
              f"# {NEXT} 早上", "",
              "育苗人，早上好。", "",
-             ] + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] + ((["## 我想到的", ""] + [f"{x}" for x in UNDER["report"]] + [getup_try_line(results), ""]) if UNDER else []) if msgs else []) + [
+             ] + (["## 今天的起身", "", getup_try_line(results), ""] if (not msgs and GETUP_TAG == "kneel3") else []) + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] + ((["## 我想到的", ""] + [f"{x}" for x in UNDER["report"]] + [getup_try_line(results), ""]) if UNDER else []) if msgs else []) + [
              "## 昨天", "",
              f"- 我走到了窗边，走了 {results['walk']['dx_cm']:.0f} 厘米，每秒 {results['walk']['v_cm_s']:.1f} 厘米。很慢，但没摔。",
              f"- 被人碰了两次，第一次站住了，第二次倒了。" if results["push1"]["ok"] and not results["push2"]["ok"] else
@@ -556,7 +576,7 @@ def main():
     global BODY
     BODY = body
     rec = Rec(sim, body)
-    gfile = "getup_best_arms.json" if GETUP_TAG == "arms" else "getup_best.json"
+    gfile = f"getup_best_{GETUP_TAG}.json" if GETUP_TAG else "getup_best.json"
     gx = json.load(open(os.path.join(HERE, gfile), encoding="utf-8"))["x"]
     getup.METHOD = GETUP_TAG
     info, results, spans = [], {}, []
@@ -586,6 +606,8 @@ def main():
                           f0=f0, f1=len(rec.frames)))
         info.append((key, title, clock, mins, simT, desc))
         print(f"{clock[0]:02d}:{clock[1]:02d} {title}：帧 {len(rec.frames)-f0}，事件 {sum(1 for e in body.events if e['scene']==key)}", flush=True)
+    global RESULTS
+    RESULTS = results
     ensure_memory()
     global UNDER
     UNDER = load_understanding()

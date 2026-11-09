@@ -226,10 +226,15 @@ def kneel_keyframes(x):
     return ks
 
 
+def keyframes_for(x):
+    return (kneel3_keyframes(x) if METHOD == "kneel3" else kneel2_keyframes(x) if METHOD == "kneel2"
+            else kneel_keyframes(x) if METHOD == "kneel" else keyframes(x))
+
+
 def run(x, record=None):
     sim = get_sim()
     m, d = sim.m, sim.d
-    ks = kneel3_keyframes(x) if METHOD == "kneel3" else kneel2_keyframes(x) if METHOD == "kneel2" else kneel_keyframes(x) if METHOD == "kneel" else keyframes(x)
+    ks = keyframes_for(x)
 
     def target(t):
         for i in range(1, len(ks)):
