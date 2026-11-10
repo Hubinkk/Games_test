@@ -1,0 +1,56 @@
+{
+ "0 mm": {
+  "skin_g": 0,
+  "area_m2": 0.243,
+  "total_kg": 3.34,
+  "squat_fell": false,
+  "knee_peak_Nm": 1.56,
+  "single_fell": false,
+  "walk_fell": false,
+  "walk_cm": 20.9,
+  "stand_up": true,
+  "stand_up_peak": {
+   "waist_pitch": 1.0,
+   "neck_pitch": 1.0,
+   "neck_low": 1.0,
+   "l_shoulder_pitch": 1.0,
+   "l_elbow": 1.0
+  }
+ },
+ "1 mm": {
+  "skin_g": 267,
+  "area_m2": 0.243,
+  "total_kg": 3.61,
+  "squat_fell": false,
+  "knee_peak_Nm": 1.68,
+  "single_fell": false,
+  "walk_fell": false,
+  "walk_cm": 19.4,
+  "stand_up": true,
+  "stand_up_peak": {
+   "waist_pitch": 1.0,
+   "neck_pitch": 1.0,
+   "neck_low": 1.0,
+   "l_shoulder_pitch": 1.0,
+   "l_elbow": 1.0
+  }
+ },
+ "2 mm": {
+  "skin_g": 535,
+  "area_m2": 0.243,
+  "total_kg": 3.88,
+  "squat_fell": false,
+  "knee_peak_Nm": 1.82,
+  "single_fell": false,
+  "walk_fell": false,
+  "walk_cm": 19.2,
+  "stand_up": true,
+  "stand_up_peak": {
+   "waist_pitch": 1.0,
+   "neck_pitch": 1.0,
+   "neck_low": 1.0,
+   "l_shoulder_pitch": 1.0,
+   "l_elbow": 1.0
+  }
+ }
+}

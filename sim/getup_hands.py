@@ -130,8 +130,8 @@ def simulate(ks, hold=1.5, verbose=True, record=None, t_free=None, start="prone"
         if record is not None:
             record(t)
         for n, v in sim.torques().items():
-            if n[:2] not in ("L_", "R_"):
-                peak[n] = max(peak.get(n, 0.0), abs(v) / max(sim.limit.get(n, 1e9), 1e-9))
+            if n[:2] not in ("L_", "R_") and sim.limit.get(n, 0.0) > 1e-6 and not n.endswith(("_quad", "_ham")):
+                peak[n] = max(peak.get(n, 0.0), abs(v) / sim.limit[n])
         if k % int(0.25 / dt) == 0:
             hist.append((round(t, 2), round(float(d.qpos[2]) * 100, 1), round(sim.tilt_deg(), 0)))
         if verbose and ki < len(ks) and t >= ks[ki][0] - dt / 2:
