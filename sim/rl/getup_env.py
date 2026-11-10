@@ -119,6 +119,7 @@ class GetUp(Env):
         t2 = t + 1
         info = dict(info)
         info.update(t=t2, target=target, last_act=action, rng=rng, fric=fric)
-        metrics = dict(height=z, up=up, success=success * late, track=track)
+        metrics = dict(state.metrics)          # 训练库的包装器会往里加自己的项，不能整个换掉
+        metrics.update(height=z, up=up, success=success * late, track=track)
         return state.replace(pipeline_state=d, obs=self._obs(d, action, t2), reward=reward, done=bad.astype(jnp.float32),
                              metrics=metrics, info=info)
