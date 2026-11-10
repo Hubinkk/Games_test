@@ -55,6 +55,7 @@ class Trim:
         self.now = _Draft(sim.m)
         self.ref = _Draft(mujoco.MjModel.from_xml_path(ref_path))
         self.delta, self.ankle, self.t_last = 0.0, 0.0, -1.0
+        self.enabled = True       # 起身这类"在现在的身体上设计的动作"自己关掉它：参考身体做不出那些姿势，比较没有意义
         self.history = []
         self.orig = sim.set_targets
         sim.set_targets = self.set_targets
@@ -71,7 +72,7 @@ class Trim:
     def set_targets(self, pose):
         t = self.sim.d.time
         if t - self.t_last >= EVERY or t < self.t_last:
-            if self.sim.tilt_deg() < UPRIGHT:
+            if self.enabled and self.sim.tilt_deg() < UPRIGHT:
                 self.ankle, self.delta = self.solve({k: v for k, v in pose.items() if not k.startswith("hand_")})
             else:
                 self.ankle, self.delta = 0.0, 0.0

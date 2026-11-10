@@ -112,8 +112,11 @@ def simulate(ks, hold=1.5, verbose=True, record=None, t_free=None, start="prone"
     peak = {}
     balancing, restored, ki = False, False, 1
     hist = []
+    trim = getattr(sim, "trim", None)
     for k in range(int(t_end / dt)):
         t = k * dt
+        if trim is not None:          # 自动配平只在最后一段（走向站姿）打开
+            trim.enabled = t >= ks[-2][0]
         tgt = target(t)
         if not restored and t >= t_free:
             m.actuator_forcerange[neck_i] = neck_base
@@ -153,6 +156,8 @@ def simulate(ks, hold=1.5, verbose=True, record=None, t_free=None, start="prone"
                   f"重心 x {com[0]*100:6.1f} 骨盆 x {d.qpos[0]*100:5.1f} 左膝 x {kx[0][0]*100:5.1f} z {kx[0][2]*100:4.1f} 右膝 x {kx[1][0]*100:5.1f} z {kx[1][2]*100:4.1f}  左脚 x {fx[0][0]*100:6.1f} z {fx[0][2]*100:4.1f}  右脚 x {fx[1][0]*100:6.1f} z {fx[1][2]*100:4.1f}  "
                   f"手 x {hx[0][0]*100:6.1f} z {hx[0][2]*100:4.1f}  受力 手 {load['手']:4.1f} 脚 {load['脚']:4.1f} 其它 {load['其它']:4.1f} {sorted(load.get('碰地的', []))}", flush=True)
             ki += 1
+    if trim is not None:
+        trim.enabled = True
     m.actuator_forcerange[neck_i] = neck_base
     z, tilt = float(d.qpos[2]), sim.tilt_deg()
     ok = z > 0.20 and tilt < 20
@@ -161,3 +166,47 @@ def simulate(ks, hold=1.5, verbose=True, record=None, t_free=None, start="prone"
         print(f"结束：骨盆高 {z*100:.1f} cm，倾斜 {tilt:.0f}°，{'站起来了' if ok else '没站起来'}；最吃力的关节（占上限）：" +
               "，".join(f"{n} {v*100:.0f}%" for n, v in top))
     return dict(ok=bool(ok), z_cm=z * 100, tilt=tilt, hist=hist, peak=dict(top))
+
+
+# ---------------- 第三版身体上已经验证的后半段：蹲着手撑地 → 松手 → 站起 ----------------
+# 姿势来自 flex_study 的扫描（第三版身体）：髋 132°、膝 143°、踝勾 34°、腰 57°，手掌在脚掌中心前 4 cm
+SQUAT = dict(hp=-2.3, kn=2.5, an=-0.6, wp=1.0, sp=-1.2, el=-0.4)
+
+
+def squat_pose(sp=None, el=None, hp=None, kn=None, an=None, wp=None):
+    c = dict(SQUAT)
+    for k, v in dict(sp=sp, el=el, hp=hp, kn=kn, an=an, wp=wp).items():
+        if v is not None:
+            c[k] = v
+    p = P((c["sp"], -0.25, 0.0, c["el"]), (c["hp"], c["kn"], c["an"]), wp=c["wp"], neck=-0.3)
+    p["neck_low"] = -0.3
+    return p
+
+
+def squat_to_stand(verbose=True, record=None):
+    """从"蹲着、手掌撑地"开始：手把重量交给腿，然后靠大腿站起来。育苗人：手臂撑起身体之后，把重心交给别的部分。"""
+    import flex_study as F
+    sim = get_sim()
+    m = sim.m
+    B = F.Body(mujoco.MjModel.from_xml_path(fb.OUT))
+
+    def init(sim):
+        B.flat(SQUAT["hp"], SQUAT["kn"], SQUAT["an"], SQUAT["wp"], 0.0, SQUAT["sp"], SQUAT["el"])
+        d = sim.d
+        d.qpos[:] = B.d.qpos
+        fg = m.geom("l_foot").id
+        d.qpos[2] -= B.d.geom_xpos[fg][2] - m.geom_size[fg][2] - 0.0005
+        d.qvel[:] = 0
+    S0 = squat_pose()
+    mid = stand_pose(1.6)
+    mid["waist_pitch"] = 0.3
+    ks = [(0.0, S0, "蹲着手撑地"), (0.8, S0, "蹲着手撑地"),
+          (1.8, squat_pose(sp=-0.6, el=-0.3, hp=-2.1, kn=2.3, an=-0.75, wp=0.7), "松手，重心交给腿"),
+          (3.0, mid, "半蹲"), (5.0, stand_pose(), "站起")]
+    return simulate(ks, hold=1.5, init=init, relax_neck=False, t_free=0.8, verbose=verbose, record=record)
+
+
+if __name__ == "__main__":
+    r = squat_to_stand(verbose="--quiet" not in sys.argv)
+    json.dump(dict(segment="蹲着手撑地 → 站起", ok=r["ok"], z_cm=round(r["z_cm"], 1), tilt=round(r["tilt"], 1), hist=r["hist"], squat=SQUAT),
+              open(os.path.join(HERE, "getup_hands_result.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
