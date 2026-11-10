@@ -503,7 +503,7 @@ def getup_try_line(results):
     g = results.get("getup", {})
     if GETUP_TAG == "hands":
         if g.get("ok"):
-            return ("今天摔倒以后，我先弓起腰把腿收到身体下面，手举到头两侧撑起来，然后两只手轮流往脚这边挪。"
+            return (("今天摔倒以后，" if not results.get("push2", {}).get("ok") else "今天我自己趴到地上练起身。") + "我先弓起腰把腿收到身体下面，手举到头两侧撑起来，然后两只手轮流往脚这边挪。"
                     "等重心到了脚上，我松开手，靠腿站了起来。**我自己站起来了。**")
         return ("今天摔倒以后，我照新的顺序做：弓腰收腿、手撑起来、两只手轮流往回挪。"
                 f"这次没有站起来，最高撑到骨盆离地 {g.get('peak_cm', 0):.0f} 厘米。")
@@ -573,7 +573,7 @@ def morning_report(body, results, changes, queue, msgs=()):
              f"- 我走到了窗边，走了 {results['walk']['dx_cm']:.0f} 厘米，每秒 {results['walk']['v_cm_s']:.1f} 厘米。很慢，但没摔。",
              f"- 被人碰了两次，第一次站住了，第二次倒了。" if results["push1"]["ok"] and not results["push2"]["ok"] else
              f"- 被人碰了两次，站住了 {sum(1 for k in ('push1','push2') if results[k]['ok'])} 次。",
-             "- 摔倒以后我试着自己爬起来，" + (f"撑到了骨盆离地 {results['getup']['peak_cm']:.0f} 厘米，还是没站起来，后来被扶起来了。" if not results["getup"]["ok"] else "成功了。"),
+             ("- 摔倒以后我试着自己爬起来，" if not results["push2"]["ok"] else "- 我趴到地上练习自己爬起来，") + (f"撑到了骨盆离地 {results['getup']['peak_cm']:.0f} 厘米，还是没站起来，后来被扶起来了。" if not results["getup"]["ok"] else "成功了。"),
              squat_line(body),
              getup_heat_line(body),
              f"- 傍晚还剩 {body.battery()*100:.0f}% 的电。", "",
