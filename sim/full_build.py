@@ -55,6 +55,36 @@ NECK_ACT_NEW = NECK_ACT_OLD + """
     <position name="neck_roll" joint="neck_roll" kp="2" kv="0.05" forcerange="-0.3 0.3"/>"""
 
 
+V2 = os.path.join(HERE, "figure55_full_v2.xml")     # 第二版身体的快照：结构对比的脚本（flex_study 等）从它出发
+
+# ---------- 第三版身体（2026-11-10，docs/hip-waist-v1.md）----------
+# 髋能弯到 140°；腰分两段（一个电机带两段，各一半）；髋轴前移 1.5 cm；骨盆前面削 2 cm、后面加 2 cm；
+# 手臂加长 1.5 cm（育苗人同意）
+V3 = [
+    ('<joint name="l_hip_pitch" axis="0 1 0" range="-2.2 0.7" class="big"/>', '<joint name="l_hip_pitch" axis="0 1 0" range="-2.45 0.7" class="big"/>', 1),
+    ('<joint name="r_hip_pitch" axis="0 1 0" range="-2.2 0.7" class="big"/>', '<joint name="r_hip_pitch" axis="0 1 0" range="-2.45 0.7" class="big"/>', 1),
+    ('<joint name="waist_pitch" axis="0 1 0" range="-0.3 0.6" class="big"/>', '<joint name="waist_pitch" axis="0 1 0" range="-0.15 0.5" class="big"/>', 1),
+    ('<body name="chest" pos="0 0 0.05">', '<body name="chest" pos="0 0 0.05">\n          <joint name="waist_pitch2" axis="0 1 0" range="-0.15 0.5" class="big"/>', 1),
+    ('<body name="l_hip_yaw_link" pos="0 0.032 -0.015">', '<body name="l_hip_yaw_link" pos="0.015 0.032 -0.015">', 1),
+    ('<body name="r_hip_yaw_link" pos="0 -0.032 -0.015">', '<body name="r_hip_yaw_link" pos="0.015 -0.032 -0.015">', 1),
+    ('<geom name="pelvis" type="box" size="0.022 0.042 0.022" mass="0.50"', '<geom name="pelvis" type="box" pos="-0.02 0 0" size="0.022 0.042 0.022" mass="0.50"', 1),
+    ('<geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.072"/>', '<geom type="capsule" fromto="0 0 0 0 0 -0.09" size="0.009" mass="0.076"/>', 2),
+    ('<body name="L_hand" pos="0 0 -0.081"', '<body name="L_hand" pos="0 0 -0.096"', 1),
+    ('<body name="R_hand" pos="0 0 -0.081"', '<body name="R_hand" pos="0 0 -0.096"', 1),
+    # 脚从 6 cm 加长到 7.5 cm（往后加，脚尖不动）：髋轴前移后，站着时重心到了脚跟边缘
+    ('<geom name="l_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006"', '<geom name="l_foot" type="box" pos="0.0045 0 -0.034" size="0.0375 0.022 0.006"', 1),
+    ('<geom name="r_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006"', '<geom name="r_foot" type="box" pos="0.0045 0 -0.034" size="0.0375 0.022 0.006"', 1),
+    ('  <equality>\n', '  <equality>\n    <joint joint1="waist_pitch2" joint2="waist_pitch" polycoef="0 1 0 0 0"/>\n', 1),
+]
+
+
+def v3(s):
+    for a, b, n in V3:
+        assert s.count(a) == n, a
+        s = s.replace(a, b)
+    return s
+
+
 def v2(s):
     for a, b, n in V2_MASS:
         assert s.count(a) == n, a
@@ -147,7 +177,9 @@ def build():
     s = s.replace("  <tendon>\n", "  <contact>" + excl + "</contact>\n  <equality>\n" + eq + "  </equality>\n  <tendon>\n" + ten, 1)
     s = s.replace("  </actuator>", act + "  </actuator>", 1)
     open(REF, "w", encoding="utf-8").write(s)
-    open(OUT, "w", encoding="utf-8").write(v2(s))
+    s2 = v2(s)
+    open(V2, "w", encoding="utf-8").write(s2)
+    open(OUT, "w", encoding="utf-8").write(v3(s2))
 
 
 if __name__ == "__main__":

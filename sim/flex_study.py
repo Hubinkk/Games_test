@@ -29,7 +29,7 @@ COM_OK = 0.025        # 重心离脚掌中心 2.5 cm 以内（脚掌前后各 3 
 
 def build(two_seg=False, hip_dx=0.0, cut=0.0, back=0.0, abd_r=0.03, arm=0.0, chest_x=0.028):
     """two_seg 腰分两段；hip_dx 髋轴前移；cut 骨盆前面削掉；back 骨盆后面（屁股）加厚；abd_r 腰的半径"""
-    s = open(fb.OUT, encoding="utf-8").read()
+    s = open(fb.V2, encoding="utf-8").read()
     if two_seg:
         a = '<body name="chest" pos="0 0 0.05">'
         assert s.count(a) == 1

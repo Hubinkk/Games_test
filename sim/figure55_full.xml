@@ -49,15 +49,16 @@
     <body name="pelvis" pos="0 0 0.285">
       <freejoint name="root"/>
       <!-- 骨盆：电池约 0.4 kg + 脊髓控制器 + 结构 -->
-      <geom name="pelvis" type="box" size="0.022 0.042 0.022" mass="0.50" rgba="0.36 0.62 0.58 1"/>
+      <geom name="pelvis" type="box" pos="-0.02 0 0" size="0.022 0.042 0.022" mass="0.50" rgba="0.36 0.62 0.58 1"/>
       <site name="imu" pos="0 0 0" size="0.005"/>
 
       <body name="abdomen" pos="0 0 0.035">
         <joint name="waist_yaw" axis="0 0 1" range="-0.8 0.8" class="big"/>
-        <joint name="waist_pitch" axis="0 1 0" range="-0.3 0.6" class="big"/>
+        <joint name="waist_pitch" axis="0 1 0" range="-0.15 0.5" class="big"/>
         <geom type="capsule" fromto="0 0 0 0 0 0.045" size="0.03" mass="0.26"/>
 
         <body name="chest" pos="0 0 0.05">
+          <joint name="waist_pitch2" axis="0 1 0" range="-0.15 0.5" class="big"/>
           <!-- 胸腔：大脑、散热风扇、肩部驱动器 -->
           <geom name="chest" type="box" pos="0 0 0.035" size="0.028 0.04 0.035" mass="0.57"/>
           <!-- 背包：30 Wh 电池，做成角色的背包 -->
@@ -88,8 +89,8 @@
             <geom type="capsule" fromto="0 0 0 0 0 -0.085" size="0.011" mass="0.10"/>
             <body name="l_forearm" pos="0 0 -0.085">
               <joint name="l_elbow" axis="0 1 0" range="-2.4 0" class="small"/>
-              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.072"/>
-              <body name="L_hand" pos="0 0 -0.081" xyaxes="0 0 -1 -1 0 0" childclass="hand">
+              <geom type="capsule" fromto="0 0 0 0 0 -0.09" size="0.009" mass="0.076"/>
+              <body name="L_hand" pos="0 0 -0.096" xyaxes="0 0 -1 -1 0 0" childclass="hand">
 <body name="L_palm">
         <joint name="L_wrist_pitch" axis="0 1 0" range="-0.9 0.9"/>
         <joint name="L_wrist_yaw" axis="0 0 1" range="-0.5 0.5"/>
@@ -179,8 +180,8 @@
             <geom type="capsule" fromto="0 0 0 0 0 -0.085" size="0.011" mass="0.10"/>
             <body name="r_forearm" pos="0 0 -0.085">
               <joint name="r_elbow" axis="0 1 0" range="-2.4 0" class="small"/>
-              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.072"/>
-              <body name="R_hand" pos="0 0 -0.081" xyaxes="0 0 -1 1 0 0" childclass="hand">
+              <geom type="capsule" fromto="0 0 0 0 0 -0.09" size="0.009" mass="0.076"/>
+              <body name="R_hand" pos="0 0 -0.096" xyaxes="0 0 -1 1 0 0" childclass="hand">
 <body name="R_palm">
         <joint name="R_wrist_pitch" axis="0 1 0" range="-0.9 0.9"/>
         <joint name="R_wrist_yaw" axis="0 0 1" range="-0.5 0.5"/>
@@ -265,7 +266,7 @@
       </body>
 
       <!-- 左腿：髋 3 轴 + 膝 + 踝 2 轴 -->
-      <body name="l_hip_yaw_link" pos="0 0.032 -0.015">
+      <body name="l_hip_yaw_link" pos="0.015 0.032 -0.015">
         <joint name="l_hip_yaw" axis="0 0 1" range="-0.6 0.6" class="big"/>
         <geom type="sphere" size="0.012" mass="0.04"/>
         <body name="l_hip_roll_link">
@@ -273,7 +274,7 @@
           <geom class="vis" type="sphere" size="0.013"/>
           <geom type="sphere" size="0.008" mass="0.03"/>
           <body name="l_thigh">
-            <joint name="l_hip_pitch" axis="0 1 0" range="-2.2 0.7" class="big"/>
+            <joint name="l_hip_pitch" axis="0 1 0" range="-2.45 0.7" class="big"/>
             <geom name="l_thigh" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.02" mass="0.17"/>
             <!-- 膝电机放在大腿根部（近端布置） -->
             <geom type="sphere" pos="0 0 -0.02" size="0.019" mass="0.09" rgba="0.82 0.6 0.15 1"/>
@@ -292,7 +293,7 @@
                 <geom type="sphere" size="0.007" mass="0.01"/>
                 <body name="l_foot">
                   <joint name="l_ankle_roll" axis="1 0 0" range="-0.4 0.4" class="big"/>
-                  <geom name="l_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
+                  <geom name="l_foot" type="box" pos="0.0045 0 -0.034" size="0.0375 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
                 </body>
               </body>
             </body>
@@ -301,7 +302,7 @@
       </body>
 
       <!-- 右腿 -->
-      <body name="r_hip_yaw_link" pos="0 -0.032 -0.015">
+      <body name="r_hip_yaw_link" pos="0.015 -0.032 -0.015">
         <joint name="r_hip_yaw" axis="0 0 1" range="-0.6 0.6" class="big"/>
         <geom type="sphere" size="0.012" mass="0.04"/>
         <body name="r_hip_roll_link">
@@ -309,7 +310,7 @@
           <geom class="vis" type="sphere" size="0.013"/>
           <geom type="sphere" size="0.008" mass="0.03"/>
           <body name="r_thigh">
-            <joint name="r_hip_pitch" axis="0 1 0" range="-2.2 0.7" class="big"/>
+            <joint name="r_hip_pitch" axis="0 1 0" range="-2.45 0.7" class="big"/>
             <geom name="r_thigh" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.02" mass="0.17"/>
             <geom type="sphere" pos="0 0 -0.02" size="0.019" mass="0.09" rgba="0.82 0.6 0.15 1"/>
             <site name="r_spool_f" pos="0.012 0 -0.02" size="0.003"/>
@@ -327,7 +328,7 @@
                 <geom type="sphere" size="0.007" mass="0.01"/>
                 <body name="r_foot">
                   <joint name="r_ankle_roll" axis="1 0 0" range="-0.4 0.4" class="big"/>
-                  <geom name="r_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
+                  <geom name="r_foot" type="box" pos="0.0045 0 -0.034" size="0.0375 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
                 </body>
               </body>
             </body>
@@ -340,6 +341,7 @@
   <!-- 位置伺服：kp/kv 为 PD 增益，forcerange 为扭矩上限（N·m） -->
   <contact><exclude body1="L_palm" body2="L_index1"/><exclude body1="L_palm" body2="L_middle1"/><exclude body1="L_palm" body2="L_ring1"/><exclude body1="L_palm" body2="L_little1"/><exclude body1="L_palm" body2="L_thumb1"/><exclude body1="R_palm" body2="R_index1"/><exclude body1="R_palm" body2="R_middle1"/><exclude body1="R_palm" body2="R_ring1"/><exclude body1="R_palm" body2="R_little1"/><exclude body1="R_palm" body2="R_thumb1"/></contact>
   <equality>
+    <joint joint1="waist_pitch2" joint2="waist_pitch" polycoef="0 1 0 0 0"/>
     <joint joint1="L_index_dip" joint2="L_index_pip" polycoef="0 0.75 0 0 0"/>
     <joint joint1="L_middle_dip" joint2="L_middle_pip" polycoef="0 0.75 0 0 0"/>
     <joint joint1="L_ring_dip" joint2="L_ring_pip" polycoef="0 0.75 0 0 0"/>

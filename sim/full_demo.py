@@ -67,7 +67,9 @@ class FullSim(tk.TendonSim):
     def __init__(self, view=False):
         self.hand_q = {k: relaxed(k) for k in "LR"}
         self.recorder = None
+        self.jq = {}
         super().__init__(view)
+        self.jq = {self.m.joint(j).name: j for j in range(self.m.njnt)}
         m = self.m
         self.hand_dofs = [m.jnt_dofadr[j] for j in range(m.njnt) if m.joint(j).name[:2] in ("L_", "R_")]
         self.hand_act = {k: [i for n, i in self.act.items() if n.startswith(k + "_")] for k in "LR"}
@@ -99,6 +101,8 @@ class FullSim(tk.TendonSim):
 
     def set_targets(self, pose):
         pose = dict(pose)
+        if "waist_pitch" in pose and "waist_pitch2" in self.jq:   # 腰分两段：姿势里写的是总的弯曲角，两段各一半
+            pose["waist_pitch"] = pose["waist_pitch"] * 0.5
         hands = {k: pose.pop(f"hand_{k}", None) for k in "LR"}
         super().set_targets(pose)
         if not hasattr(self, "hand_act"):

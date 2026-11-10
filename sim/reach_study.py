@@ -22,7 +22,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def model(arm_extra=0.0, deep=False):
-    s = open(fb.OUT, encoding="utf-8").read()
+    s = open(fb.V2, encoding="utf-8").read()
     if arm_extra:
         a = '<geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.072"/>'
         assert s.count(a) == 2

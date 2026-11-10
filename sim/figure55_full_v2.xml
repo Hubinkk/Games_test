@@ -1,0 +1,460 @@
+<!--
+  55 cm 二次元人偶机器人 · MuJoCo 物理模型 v0.1
+  - 单位：米、千克、牛·米、弧度
+  - 朝向：+x 向前，+y 向左，+z 向上
+  - 质量预算约 2.95 kg，对应 FigureAnatomy.html 的设计
+  - 扭矩上限（forcerange）取自 docs/knee-joint-v1.md 的估算：
+    膝、髋俯仰峰值约 2.8 N·m
+  - 踝关节在设计上由跟腱拉杆驱动，这里先简化为直接驱动
+  - 所有机器人几何体之间不互相碰撞，只和地面碰撞
+-->
+<mujoco model="figure55">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.0005" integrator="implicitfast" cone="elliptic"/>
+
+  <default>
+    <joint damping="0.03" armature="0.003" frictionloss="0.01"/>
+    <geom contype="2" conaffinity="1" friction="1.0 0.02 0.001" rgba="0.91 0.9 0.95 1"/>
+    <default class="vis">
+      <geom contype="0" conaffinity="0" density="0" group="1"/>
+      <default class="hand">
+      <joint damping="0.0004" armature="2e-7" frictionloss="0"/>
+      <geom contype="4" conaffinity="5" density="1100" friction="1.0 0.01 0.001" solref="0.004 1" solimp="0.95 0.99 0.0005" rgba="0.95 0.85 0.79 1"/>
+      <site size="0.0005"/>
+    </default>
+    <equality solref="0.001 1"/>
+  </default>
+    <!-- 大关节：准直驱电机，减速比约 15:1，反射惯量较大 -->
+    <default class="big">
+      <joint armature="0.0045"/>
+    </default>
+    <default class="small">
+      <joint armature="0.001" damping="0.01"/>
+    </default>
+  </default>
+
+  <visual>
+    <headlight ambient="0.45 0.45 0.45" diffuse="0.5 0.5 0.5"/>
+  </visual>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="256" height="256" rgb1="0.86 0.88 0.9" rgb2="0.78 0.8 0.84"/>
+    <material name="grid" texture="grid" texrepeat="8 8"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0.5 0.5 1.5" dir="-0.3 -0.3 -1" directional="true"/>
+    <geom name="floor" type="plane" size="2 2 0.05" material="grid" contype="1" conaffinity="1"/>
+
+    <body name="pelvis" pos="0 0 0.285">
+      <freejoint name="root"/>
+      <!-- 骨盆：电池约 0.4 kg + 脊髓控制器 + 结构 -->
+      <geom name="pelvis" type="box" size="0.022 0.042 0.022" mass="0.50" rgba="0.36 0.62 0.58 1"/>
+      <site name="imu" pos="0 0 0" size="0.005"/>
+
+      <body name="abdomen" pos="0 0 0.035">
+        <joint name="waist_yaw" axis="0 0 1" range="-0.8 0.8" class="big"/>
+        <joint name="waist_pitch" axis="0 1 0" range="-0.3 0.6" class="big"/>
+        <geom type="capsule" fromto="0 0 0 0 0 0.045" size="0.03" mass="0.26"/>
+
+        <body name="chest" pos="0 0 0.05">
+          <!-- 胸腔：大脑、散热风扇、肩部驱动器 -->
+          <geom name="chest" type="box" pos="0 0 0.035" size="0.028 0.04 0.035" mass="0.57"/>
+          <!-- 背包：30 Wh 电池，做成角色的背包 -->
+          <geom name="backpack" type="box" pos="-0.051 0 0.032" size="0.022 0.030 0.026" mass="0.31" rgba="0.62 0.52 0.78 1"/>
+
+          <body name="neck" pos="0 0 0.07">
+            <joint name="neck_low" axis="0 1 0" range="-0.5 0.6" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 0.018" size="0.010" mass="0.012"/>
+            <body name="neck_up" pos="0 0 0.018">
+            <joint name="neck_yaw" axis="0 0 1" range="-1.4 1.4" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 0.006" size="0.009" mass="0.006"/>
+            <body name="head" pos="0 0 0.006">
+              <joint name="neck_pitch" axis="0 1 0" range="-0.7 0.6" class="small"/>
+              <joint name="neck_roll" axis="1 0 0" range="-0.45 0.45" class="small"/>
+              <geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.32" rgba="0.95 0.85 0.79 1"/>
+              <geom class="vis" type="ellipsoid" pos="-0.008 0 0.05" size="0.05 0.051 0.048" rgba="0.72 0.7 0.85 1"/>
+              <geom class="vis" type="ellipsoid" pos="0.041 0.016 0.037" size="0.004 0.008 0.01" rgba="0.45 0.38 0.8 1"/>
+              <geom class="vis" type="ellipsoid" pos="0.041 -0.016 0.037" size="0.004 0.008 0.01" rgba="0.45 0.38 0.8 1"/>
+            </body>
+            </body>
+          </body>
+
+          <!-- 左臂 -->
+          <body name="l_upper_arm" pos="0 0.056 0.041">
+            <joint name="l_shoulder_pitch" axis="0 1 0" range="-3.0 1.0" class="small"/>
+            <joint name="l_shoulder_roll" axis="1 0 0" range="-0.3 2.8" class="small"/>
+            <joint name="l_shoulder_yaw" axis="0 0 1" range="-1.5 1.5" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 -0.085" size="0.011" mass="0.10"/>
+            <body name="l_forearm" pos="0 0 -0.085">
+              <joint name="l_elbow" axis="0 1 0" range="-2.4 0" class="small"/>
+              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.072"/>
+              <body name="L_hand" pos="0 0 -0.081" xyaxes="0 0 -1 -1 0 0" childclass="hand">
+<body name="L_palm">
+        <joint name="L_wrist_pitch" axis="0 1 0" range="-0.9 0.9"/>
+        <joint name="L_wrist_yaw" axis="0 0 1" range="-0.5 0.5"/>
+        <geom name="L_palm" type="box" pos="0.0055 0 0" size="0.0115 0.011 0.0035" rgba="0.95 0.85 0.79 1"/>
+        <geom name="L_wrist" type="sphere" pos="-0.012 0 0" size="0.0065" rgba="0.95 0.85 0.79 1" contype="0" conaffinity="0"/>
+
+        <body name="L_index1" pos="0.019 -0.0075 0">
+          <joint name="L_index_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="L_index_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="L_index_g1" type="capsule" fromto="0 0 0 0.007 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+          <body name="L_index2" pos="0.007 0 0">
+            <joint name="L_index_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="L_index_g2" type="capsule" fromto="0 0 0 0.005 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+            <body name="L_index3" pos="0.005 0 0">
+              <joint name="L_index_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="L_index_g3" type="capsule" fromto="0 0 0 0.004 0 0" size="0.0019" rgba="0.95 0.85 0.79 1"/>
+              <site name="L_index_tip" pos="0.004 0 0"/>
+            </body>
+          </body>
+        </body>
+        <body name="L_middle1" pos="0.019 -0.0025 0">
+          <joint name="L_middle_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="L_middle_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="L_middle_g1" type="capsule" fromto="0 0 0 0.0075 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+          <body name="L_middle2" pos="0.0075 0 0">
+            <joint name="L_middle_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="L_middle_g2" type="capsule" fromto="0 0 0 0.0055 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+            <body name="L_middle3" pos="0.0055 0 0">
+              <joint name="L_middle_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="L_middle_g3" type="capsule" fromto="0 0 0 0.0042 0 0" size="0.0019" rgba="0.95 0.85 0.79 1"/>
+              <site name="L_middle_tip" pos="0.0042 0 0"/>
+            </body>
+          </body>
+        </body>
+        <body name="L_ring1" pos="0.019 0.0025 0">
+          <joint name="L_ring_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="L_ring_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="L_ring_g1" type="capsule" fromto="0 0 0 0.007 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+          <body name="L_ring2" pos="0.007 0 0">
+            <joint name="L_ring_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="L_ring_g2" type="capsule" fromto="0 0 0 0.005 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+            <body name="L_ring3" pos="0.005 0 0">
+              <joint name="L_ring_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="L_ring_g3" type="capsule" fromto="0 0 0 0.004 0 0" size="0.0019" rgba="0.95 0.85 0.79 1"/>
+              <site name="L_ring_tip" pos="0.004 0 0"/>
+            </body>
+          </body>
+        </body>
+        <body name="L_little1" pos="0.019 0.0075 0">
+          <joint name="L_little_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="L_little_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="L_little_g1" type="capsule" fromto="0 0 0 0.0056 0 0" size="0.0018" rgba="0.95 0.85 0.79 1"/>
+          <body name="L_little2" pos="0.0056 0 0">
+            <joint name="L_little_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="L_little_g2" type="capsule" fromto="0 0 0 0.0042 0 0" size="0.0018" rgba="0.95 0.85 0.79 1"/>
+            <body name="L_little3" pos="0.0042 0 0">
+              <joint name="L_little_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="L_little_g3" type="capsule" fromto="0 0 0 0.0035 0 0" size="0.00171" rgba="0.95 0.85 0.79 1"/>
+              <site name="L_little_tip" pos="0.0035 0 0"/>
+            </body>
+          </body>
+        </body>
+        <body name="L_thumb1" pos="0.001 -0.0105 -0.0025" euler="0 0 -0.6">
+          <joint name="L_thumb_opp" axis="1 0 0" range="-0.2 1.6" stiffness="0.002"/>
+          <joint name="L_thumb_cmc" axis="0 1 0" range="-0.4 1.0" stiffness="0.002"/>
+          <geom name="L_thumb_g1" type="capsule" fromto="0 0 0 0.009 0 0" size="0.0021" rgba="0.95 0.85 0.79 1"/>
+          <body name="L_thumb2" pos="0.009 0 0">
+            <joint name="L_thumb_mcp" axis="0 1 0" range="0 1.2" stiffness="0.0015"/>
+            <geom name="L_thumb_g2" type="capsule" fromto="0 0 0 0.0065 0 0" size="0.0021" rgba="0.95 0.85 0.79 1"/>
+            <body name="L_thumb3" pos="0.0065 0 0">
+              <joint name="L_thumb_ip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="L_thumb_g3" type="capsule" fromto="0 0 0 0.005 0 0" size="0.001995" rgba="0.95 0.85 0.79 1"/>
+              <site name="L_thumb_tip" pos="0.005 0 0"/>
+            </body>
+          </body>
+        </body>
+      </body>
+</body>
+            </body>
+          </body>
+
+          <!-- 右臂 -->
+          <body name="r_upper_arm" pos="0 -0.056 0.041">
+            <joint name="r_shoulder_pitch" axis="0 1 0" range="-3.0 1.0" class="small"/>
+            <joint name="r_shoulder_roll" axis="1 0 0" range="-2.8 0.3" class="small"/>
+            <joint name="r_shoulder_yaw" axis="0 0 1" range="-1.5 1.5" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 -0.085" size="0.011" mass="0.10"/>
+            <body name="r_forearm" pos="0 0 -0.085">
+              <joint name="r_elbow" axis="0 1 0" range="-2.4 0" class="small"/>
+              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.072"/>
+              <body name="R_hand" pos="0 0 -0.081" xyaxes="0 0 -1 1 0 0" childclass="hand">
+<body name="R_palm">
+        <joint name="R_wrist_pitch" axis="0 1 0" range="-0.9 0.9"/>
+        <joint name="R_wrist_yaw" axis="0 0 1" range="-0.5 0.5"/>
+        <geom name="R_palm" type="box" pos="0.0055 0 0" size="0.0115 0.011 0.0035" rgba="0.95 0.85 0.79 1"/>
+        <geom name="R_wrist" type="sphere" pos="-0.012 0 0" size="0.0065" rgba="0.95 0.85 0.79 1" contype="0" conaffinity="0"/>
+
+        <body name="R_index1" pos="0.019 0.0075 0">
+          <joint name="R_index_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="R_index_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="R_index_g1" type="capsule" fromto="0 0 0 0.007 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+          <body name="R_index2" pos="0.007 0 0">
+            <joint name="R_index_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="R_index_g2" type="capsule" fromto="0 0 0 0.005 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+            <body name="R_index3" pos="0.005 0 0">
+              <joint name="R_index_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="R_index_g3" type="capsule" fromto="0 0 0 0.004 0 0" size="0.0019" rgba="0.95 0.85 0.79 1"/>
+              <site name="R_index_tip" pos="0.004 0 0"/>
+            </body>
+          </body>
+        </body>
+        <body name="R_middle1" pos="0.019 0.0025 0">
+          <joint name="R_middle_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="R_middle_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="R_middle_g1" type="capsule" fromto="0 0 0 0.0075 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+          <body name="R_middle2" pos="0.0075 0 0">
+            <joint name="R_middle_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="R_middle_g2" type="capsule" fromto="0 0 0 0.0055 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+            <body name="R_middle3" pos="0.0055 0 0">
+              <joint name="R_middle_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="R_middle_g3" type="capsule" fromto="0 0 0 0.0042 0 0" size="0.0019" rgba="0.95 0.85 0.79 1"/>
+              <site name="R_middle_tip" pos="0.0042 0 0"/>
+            </body>
+          </body>
+        </body>
+        <body name="R_ring1" pos="0.019 -0.0025 0">
+          <joint name="R_ring_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="R_ring_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="R_ring_g1" type="capsule" fromto="0 0 0 0.007 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+          <body name="R_ring2" pos="0.007 0 0">
+            <joint name="R_ring_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="R_ring_g2" type="capsule" fromto="0 0 0 0.005 0 0" size="0.002" rgba="0.95 0.85 0.79 1"/>
+            <body name="R_ring3" pos="0.005 0 0">
+              <joint name="R_ring_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="R_ring_g3" type="capsule" fromto="0 0 0 0.004 0 0" size="0.0019" rgba="0.95 0.85 0.79 1"/>
+              <site name="R_ring_tip" pos="0.004 0 0"/>
+            </body>
+          </body>
+        </body>
+        <body name="R_little1" pos="0.019 -0.0075 0">
+          <joint name="R_little_abd" axis="0 0 1" range="-0.35 0.35" stiffness="0.002"/>
+          <joint name="R_little_mcp" axis="0 1 0" range="-0.25 1.6" stiffness="0.002"/>
+          <geom name="R_little_g1" type="capsule" fromto="0 0 0 0.0056 0 0" size="0.0018" rgba="0.95 0.85 0.79 1"/>
+          <body name="R_little2" pos="0.0056 0 0">
+            <joint name="R_little_pip" axis="0 1 0" range="0 1.8" stiffness="0.0016"/>
+            <geom name="R_little_g2" type="capsule" fromto="0 0 0 0.0042 0 0" size="0.0018" rgba="0.95 0.85 0.79 1"/>
+            <body name="R_little3" pos="0.0042 0 0">
+              <joint name="R_little_dip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="R_little_g3" type="capsule" fromto="0 0 0 0.0035 0 0" size="0.00171" rgba="0.95 0.85 0.79 1"/>
+              <site name="R_little_tip" pos="0.0035 0 0"/>
+            </body>
+          </body>
+        </body>
+        <body name="R_thumb1" pos="0.001 0.0105 -0.0025" euler="0 0 0.6">
+          <joint name="R_thumb_opp" axis="1 0 0" range="-1.6 0.2" stiffness="0.002"/>
+          <joint name="R_thumb_cmc" axis="0 1 0" range="-0.4 1.0" stiffness="0.002"/>
+          <geom name="R_thumb_g1" type="capsule" fromto="0 0 0 0.009 0 0" size="0.0021" rgba="0.95 0.85 0.79 1"/>
+          <body name="R_thumb2" pos="0.009 0 0">
+            <joint name="R_thumb_mcp" axis="0 1 0" range="0 1.2" stiffness="0.0015"/>
+            <geom name="R_thumb_g2" type="capsule" fromto="0 0 0 0.0065 0 0" size="0.0021" rgba="0.95 0.85 0.79 1"/>
+            <body name="R_thumb3" pos="0.0065 0 0">
+              <joint name="R_thumb_ip" axis="0 1 0" range="0 1.4" stiffness="0.0012"/>
+              <geom name="R_thumb_g3" type="capsule" fromto="0 0 0 0.005 0 0" size="0.001995" rgba="0.95 0.85 0.79 1"/>
+              <site name="R_thumb_tip" pos="0.005 0 0"/>
+            </body>
+          </body>
+        </body>
+      </body>
+</body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- 左腿：髋 3 轴 + 膝 + 踝 2 轴 -->
+      <body name="l_hip_yaw_link" pos="0 0.032 -0.015">
+        <joint name="l_hip_yaw" axis="0 0 1" range="-0.6 0.6" class="big"/>
+        <geom type="sphere" size="0.012" mass="0.04"/>
+        <body name="l_hip_roll_link">
+          <joint name="l_hip_roll" axis="1 0 0" range="-0.4 0.6" class="big"/>
+          <geom class="vis" type="sphere" size="0.013"/>
+          <geom type="sphere" size="0.008" mass="0.03"/>
+          <body name="l_thigh">
+            <joint name="l_hip_pitch" axis="0 1 0" range="-2.2 0.7" class="big"/>
+            <geom name="l_thigh" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.02" mass="0.17"/>
+            <!-- 膝电机放在大腿根部（近端布置） -->
+            <geom type="sphere" pos="0 0 -0.02" size="0.019" mass="0.09" rgba="0.82 0.6 0.15 1"/>
+            <site name="l_spool_f" pos="0.012 0 -0.02" size="0.003"/>
+            <site name="l_spool_b" pos="-0.012 0 -0.02" size="0.003"/>
+            <site name="l_side_f" pos="0.03 0 -0.115" size="0.002"/>
+            <site name="l_side_b" pos="-0.03 0 -0.115" size="0.002"/>
+            <body name="l_shin" pos="0 0 -0.115">
+              <joint name="l_knee" axis="0 1 0" range="0 2.5" class="big"/>
+              <geom name="l_pulley" type="cylinder" size="0.01 0.008" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+              <site name="l_ins_f" pos="0.011 0 -0.03" size="0.003"/>
+              <site name="l_ins_b" pos="-0.011 0 -0.03" size="0.003"/>
+              <geom name="l_shin" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.013" mass="0.11"/>
+              <body name="l_ankle_link" pos="0 0 -0.115">
+                <joint name="l_ankle_pitch" axis="0 1 0" range="-1.0 1.0" class="big"/>
+                <geom type="sphere" size="0.007" mass="0.01"/>
+                <body name="l_foot">
+                  <joint name="l_ankle_roll" axis="1 0 0" range="-0.4 0.4" class="big"/>
+                  <geom name="l_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- 右腿 -->
+      <body name="r_hip_yaw_link" pos="0 -0.032 -0.015">
+        <joint name="r_hip_yaw" axis="0 0 1" range="-0.6 0.6" class="big"/>
+        <geom type="sphere" size="0.012" mass="0.04"/>
+        <body name="r_hip_roll_link">
+          <joint name="r_hip_roll" axis="1 0 0" range="-0.6 0.4" class="big"/>
+          <geom class="vis" type="sphere" size="0.013"/>
+          <geom type="sphere" size="0.008" mass="0.03"/>
+          <body name="r_thigh">
+            <joint name="r_hip_pitch" axis="0 1 0" range="-2.2 0.7" class="big"/>
+            <geom name="r_thigh" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.02" mass="0.17"/>
+            <geom type="sphere" pos="0 0 -0.02" size="0.019" mass="0.09" rgba="0.82 0.6 0.15 1"/>
+            <site name="r_spool_f" pos="0.012 0 -0.02" size="0.003"/>
+            <site name="r_spool_b" pos="-0.012 0 -0.02" size="0.003"/>
+            <site name="r_side_f" pos="0.03 0 -0.115" size="0.002"/>
+            <site name="r_side_b" pos="-0.03 0 -0.115" size="0.002"/>
+            <body name="r_shin" pos="0 0 -0.115">
+              <joint name="r_knee" axis="0 1 0" range="0 2.5" class="big"/>
+              <geom name="r_pulley" type="cylinder" size="0.01 0.008" euler="1.5708 0 0" contype="0" conaffinity="0" density="0" rgba="0.82 0.6 0.15 1"/>
+              <site name="r_ins_f" pos="0.011 0 -0.03" size="0.003"/>
+              <site name="r_ins_b" pos="-0.011 0 -0.03" size="0.003"/>
+              <geom name="r_shin" type="capsule" fromto="0 0 0 0 0 -0.115" size="0.013" mass="0.11"/>
+              <body name="r_ankle_link" pos="0 0 -0.115">
+                <joint name="r_ankle_pitch" axis="0 1 0" range="-1.0 1.0" class="big"/>
+                <geom type="sphere" size="0.007" mass="0.01"/>
+                <body name="r_foot">
+                  <joint name="r_ankle_roll" axis="1 0 0" range="-0.4 0.4" class="big"/>
+                  <geom name="r_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006" mass="0.05" rgba="0.36 0.38 0.5 1"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- 位置伺服：kp/kv 为 PD 增益，forcerange 为扭矩上限（N·m） -->
+  <contact><exclude body1="L_palm" body2="L_index1"/><exclude body1="L_palm" body2="L_middle1"/><exclude body1="L_palm" body2="L_ring1"/><exclude body1="L_palm" body2="L_little1"/><exclude body1="L_palm" body2="L_thumb1"/><exclude body1="R_palm" body2="R_index1"/><exclude body1="R_palm" body2="R_middle1"/><exclude body1="R_palm" body2="R_ring1"/><exclude body1="R_palm" body2="R_little1"/><exclude body1="R_palm" body2="R_thumb1"/></contact>
+  <equality>
+    <joint joint1="L_index_dip" joint2="L_index_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="L_middle_dip" joint2="L_middle_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="L_ring_dip" joint2="L_ring_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="L_little_dip" joint2="L_little_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="L_index_pip" joint2="L_index_mcp" polycoef="0 1.0 0 0 0"/>
+    <joint joint1="L_middle_pip" joint2="L_middle_mcp" polycoef="0 1.0 0 0 0"/>
+    <joint joint1="L_thumb_ip" joint2="L_thumb_mcp" polycoef="0 1.0 0 0 0"/>
+    <joint joint1="L_ring_abd" joint2="L_little_abd" polycoef="0 0.4 0 0 0"/>
+    <joint joint1="L_thumb_cmc" polycoef="0 0 0 0 0"/>
+    <joint joint1="L_wrist_pitch" polycoef="0 0 0 0 0"/>
+    <joint joint1="R_index_dip" joint2="R_index_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="R_middle_dip" joint2="R_middle_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="R_ring_dip" joint2="R_ring_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="R_little_dip" joint2="R_little_pip" polycoef="0 0.75 0 0 0"/>
+    <joint joint1="R_index_pip" joint2="R_index_mcp" polycoef="0 1.0 0 0 0"/>
+    <joint joint1="R_middle_pip" joint2="R_middle_mcp" polycoef="0 1.0 0 0 0"/>
+    <joint joint1="R_thumb_ip" joint2="R_thumb_mcp" polycoef="0 1.0 0 0 0"/>
+    <joint joint1="R_ring_abd" joint2="R_little_abd" polycoef="0 0.4 0 0 0"/>
+    <joint joint1="R_thumb_cmc" polycoef="0 0 0 0 0"/>
+    <joint joint1="R_wrist_pitch" polycoef="0 0 0 0 0"/>
+  </equality>
+  <tendon>
+    <fixed name="L_index_a"><joint joint="L_index_mcp" coef="0.0022"/><joint joint="L_index_abd" coef="0.0015"/></fixed>
+    <fixed name="L_index_b"><joint joint="L_index_mcp" coef="0.0022"/><joint joint="L_index_abd" coef="-0.0015"/></fixed>
+    <fixed name="L_middle_a"><joint joint="L_middle_mcp" coef="0.0022"/><joint joint="L_middle_abd" coef="0.0015"/></fixed>
+    <fixed name="L_middle_b"><joint joint="L_middle_mcp" coef="0.0022"/><joint joint="L_middle_abd" coef="-0.0015"/></fixed>
+    <fixed name="L_ring_flex"><joint joint="L_ring_mcp" coef="0.0022"/><joint joint="L_ring_pip" coef="0.0018"/></fixed>
+    <fixed name="L_little_flex"><joint joint="L_little_mcp" coef="0.0022"/><joint joint="L_little_pip" coef="0.0018"/></fixed>
+    <fixed name="L_spread"><joint joint="L_little_abd" coef="0.0015"/></fixed>
+    <fixed name="L_thumb_opp"><joint joint="L_thumb_opp" coef="0.002"/></fixed>
+    <fixed name="L_thumb_flex"><joint joint="L_thumb_mcp" coef="0.002"/></fixed>
+    <fixed name="L_wrist_yaw"><joint joint="L_wrist_yaw" coef="0.004"/></fixed>
+    <fixed name="L_wrist_pitch"><joint joint="L_wrist_pitch" coef="0.004"/></fixed>
+    <fixed name="R_index_a"><joint joint="R_index_mcp" coef="0.0022"/><joint joint="R_index_abd" coef="0.0015"/></fixed>
+    <fixed name="R_index_b"><joint joint="R_index_mcp" coef="0.0022"/><joint joint="R_index_abd" coef="-0.0015"/></fixed>
+    <fixed name="R_middle_a"><joint joint="R_middle_mcp" coef="0.0022"/><joint joint="R_middle_abd" coef="0.0015"/></fixed>
+    <fixed name="R_middle_b"><joint joint="R_middle_mcp" coef="0.0022"/><joint joint="R_middle_abd" coef="-0.0015"/></fixed>
+    <fixed name="R_ring_flex"><joint joint="R_ring_mcp" coef="0.0022"/><joint joint="R_ring_pip" coef="0.0018"/></fixed>
+    <fixed name="R_little_flex"><joint joint="R_little_mcp" coef="0.0022"/><joint joint="R_little_pip" coef="0.0018"/></fixed>
+    <fixed name="R_spread"><joint joint="R_little_abd" coef="0.0015"/></fixed>
+    <fixed name="R_thumb_opp"><joint joint="R_thumb_opp" coef="0.002"/></fixed>
+    <fixed name="R_thumb_flex"><joint joint="R_thumb_mcp" coef="0.002"/></fixed>
+    <fixed name="R_wrist_yaw"><joint joint="R_wrist_yaw" coef="0.004"/></fixed>
+    <fixed name="R_wrist_pitch"><joint joint="R_wrist_pitch" coef="0.004"/></fixed>
+    <spatial name="l_quad" width="0.0015" rgba="0.2 0.5 0.9 1">
+      <site site="l_spool_f"/><geom geom="l_pulley" sidesite="l_side_f"/><site site="l_ins_f"/>
+    </spatial>
+    <spatial name="l_ham" width="0.0015" rgba="0.2 0.5 0.9 1">
+      <site site="l_spool_b"/><geom geom="l_pulley" sidesite="l_side_b"/><site site="l_ins_b"/>
+    </spatial>
+    <spatial name="r_quad" width="0.0015" rgba="0.2 0.5 0.9 1">
+      <site site="r_spool_f"/><geom geom="r_pulley" sidesite="r_side_f"/><site site="r_ins_f"/>
+    </spatial>
+    <spatial name="r_ham" width="0.0015" rgba="0.2 0.5 0.9 1">
+      <site site="r_spool_b"/><geom geom="r_pulley" sidesite="r_side_b"/><site site="r_ins_b"/>
+    </spatial>
+  </tendon>
+
+  <actuator>
+    <position name="waist_yaw" joint="waist_yaw" kp="8" kv="0.3" forcerange="-1.5 1.5"/>
+    <position name="waist_pitch" joint="waist_pitch" kp="15" kv="0.4" forcerange="-2.0 2.0"/>
+    <position name="neck_yaw" joint="neck_yaw" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
+    <position name="neck_pitch" joint="neck_pitch" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
+    <position name="neck_low" joint="neck_low" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
+    <position name="neck_roll" joint="neck_roll" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
+
+    <position name="l_shoulder_pitch" joint="l_shoulder_pitch" kp="4" kv="0.1" forcerange="-1.0 1.0"/>
+    <position name="l_shoulder_roll" joint="l_shoulder_roll" kp="4" kv="0.1" forcerange="-1.0 1.0"/>
+    <position name="l_shoulder_yaw" joint="l_shoulder_yaw" kp="3" kv="0.08" forcerange="-0.6 0.6"/>
+    <position name="l_elbow" joint="l_elbow" kp="3" kv="0.08" forcerange="-0.6 0.6"/>
+    <position name="r_shoulder_pitch" joint="r_shoulder_pitch" kp="4" kv="0.1" forcerange="-1.0 1.0"/>
+    <position name="r_shoulder_roll" joint="r_shoulder_roll" kp="4" kv="0.1" forcerange="-1.0 1.0"/>
+    <position name="r_shoulder_yaw" joint="r_shoulder_yaw" kp="3" kv="0.08" forcerange="-0.6 0.6"/>
+    <position name="r_elbow" joint="r_elbow" kp="3" kv="0.08" forcerange="-0.6 0.6"/>
+
+    <position name="l_hip_yaw" joint="l_hip_yaw" kp="6" kv="0.15" forcerange="-1.0 1.0"/>
+    <position name="l_hip_roll" joint="l_hip_roll" kp="15" kv="0.4" forcerange="-2.0 2.0"/>
+    <position name="l_hip_pitch" joint="l_hip_pitch" kp="20" kv="0.5" forcerange="-2.8 2.8"/>
+    <motor name="l_quad" tendon="l_quad" ctrlrange="-400.0 0"/>
+    <motor name="l_ham" tendon="l_ham" ctrlrange="-400.0 0"/>
+    <position name="l_ankle_pitch" joint="l_ankle_pitch" kp="25" kv="0.6" forcerange="-1.5 1.5"/>
+    <position name="l_ankle_roll" joint="l_ankle_roll" kp="20" kv="0.5" forcerange="-1.5 1.5"/>
+    <position name="r_hip_yaw" joint="r_hip_yaw" kp="6" kv="0.15" forcerange="-1.0 1.0"/>
+    <position name="r_hip_roll" joint="r_hip_roll" kp="15" kv="0.4" forcerange="-2.0 2.0"/>
+    <position name="r_hip_pitch" joint="r_hip_pitch" kp="20" kv="0.5" forcerange="-2.8 2.8"/>
+    <motor name="r_quad" tendon="r_quad" ctrlrange="-400.0 0"/>
+    <motor name="r_ham" tendon="r_ham" ctrlrange="-400.0 0"/>
+    <position name="r_ankle_pitch" joint="r_ankle_pitch" kp="25" kv="0.6" forcerange="-1.5 1.5"/>
+    <position name="r_ankle_roll" joint="r_ankle_roll" kp="20" kv="0.5" forcerange="-1.5 1.5"/>
+    <position name="L_index_a" tendon="L_index_a" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="L_index_b" tendon="L_index_b" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="L_middle_a" tendon="L_middle_a" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="L_middle_b" tendon="L_middle_b" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="L_ring_flex" tendon="L_ring_flex" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="L_little_flex" tendon="L_little_flex" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="L_spread" tendon="L_spread" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="L_thumb_opp" tendon="L_thumb_opp" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="L_thumb_flex" tendon="L_thumb_flex" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="L_wrist_yaw" tendon="L_wrist_yaw" kp="6000" kv="12" forcerange="-30.0 30.0"/>
+    <position name="L_wrist_pitch" tendon="L_wrist_pitch" kp="6000" kv="12" forcerange="-30.0 30.0"/>
+    <position name="R_index_a" tendon="R_index_a" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="R_index_b" tendon="R_index_b" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="R_middle_a" tendon="R_middle_a" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="R_middle_b" tendon="R_middle_b" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="R_ring_flex" tendon="R_ring_flex" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="R_little_flex" tendon="R_little_flex" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="R_spread" tendon="R_spread" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="R_thumb_opp" tendon="R_thumb_opp" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="R_thumb_flex" tendon="R_thumb_flex" kp="6000" kv="8" forcerange="-15.0 15.0"/>
+    <position name="R_wrist_yaw" tendon="R_wrist_yaw" kp="6000" kv="12" forcerange="-30.0 30.0"/>
+    <position name="R_wrist_pitch" tendon="R_wrist_pitch" kp="6000" kv="12" forcerange="-30.0 30.0"/>
+  </actuator>
+
+  <sensor>
+    <framequat name="imu_quat" objtype="site" objname="imu"/>
+    <subtreecom name="com" body="pelvis"/>
+  </sensor>
+</mujoco>
