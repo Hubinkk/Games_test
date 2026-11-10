@@ -1,0 +1,14 @@
+{
+ "total_kg": 3.44,
+ "squat_fell": false,
+ "knee_peak_Nm": 1.41,
+ "single_fell": false,
+ "walk_fell": true,
+ "walk_cm": 10.0,
+ "push_fwd_N": 5,
+ "push_back_N": 3,
+ "lean_deg": [
+  1.3,
+  2.4
+ ]
+}
