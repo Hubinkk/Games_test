@@ -5,9 +5,11 @@
     python trim.py         # 用几种"头和背包重量"测试：不配平 vs 自动配平，写 trim_result.json
 
 做法（不用强化学习，不用传感器，只用它自己的身体数据 = 每一段的重量和长度）：
-  1. 对"马上要摆的姿势"，在脑子里（一份草稿模型）算出全身重心在脚掌中心前后多少
-  2. 算出腰往前弯 1 弧度，重心会前移多少
-  3. 腰的目标角加上一个修正量，让重心回到设计位置（每 20 ms 重算一次）
+  1. 它有两份身体数据：设计动作时的身体（参考），和现在的身体（加了电池、换了零件之后）
+  2. 对"马上要摆的姿势"，在脑子里分别算两个身体的重心：现在的重心比参考偏了多少
+  3. 算出腰往前弯 1 弧度，重心会前移多少；腰加一个修正量，把偏掉的那部分补回来（每 20 ms 重算一次）
+  （第一版让每个姿势都回到同一个重心位置，结果腰修正到 ±13°，连原来能做的深蹲都摔了：
+    深蹲、迈步本来就有各自的重心位置，要补的只是身体变化带来的偏移。）
 以后身体数据不准时（穿了衣服、拿着东西），再用脚底压力把这份数据校准，方法不变。
 
 测试的重量分布：
@@ -42,6 +44,8 @@ class Trim:
         self.sim, self.target = sim, target_x
         self.m = sim.m
         self.d = mujoco.MjData(self.m)          # 草稿：只用来"想"，不影响真的身体
+        self.mref = mujoco.MjModel.from_xml_path(fb.OUT)   # 参考身体：设计动作时的重量分布
+        self.dref = mujoco.MjData(self.mref)
         self.q0 = self.m.qpos0.copy()
         self.adr = {self.m.joint(j).name: self.m.jnt_qposadr[j] for j in range(self.m.njnt) if self.m.jnt_type[j] == 3}
         self.feet = [self.m.geom(f"{s}_foot").id for s in ("l", "r")]
@@ -51,16 +55,17 @@ class Trim:
         sim.set_targets = self.set_targets
         self.history = []
 
-    def com_x(self, pose, waist_extra=0.0):
-        d = self.d
+    def com_x(self, pose, waist_extra=0.0, ref=False):
+        d = self.dref if ref else self.d
+        m = self.mref if ref else self.m
         d.qpos[:] = self.q0
         for k, v in pose.items():
             a = self.adr.get(k)
             if a is not None:
                 d.qpos[a] = v
         d.qpos[self.adr["waist_pitch"]] += waist_extra
-        mujoco.mj_kinematics(self.m, d)
-        mujoco.mj_comPos(self.m, d)
+        mujoco.mj_kinematics(m, d)
+        mujoco.mj_comPos(m, d)
         com = d.subtree_com[self.pelvis]
         sup = np.mean([d.geom_xpos[g] for g in self.feet], axis=0)
         # 骨盆在草稿里是直立的；脚不一定正好放平，所以用"相对脚掌中心"的水平距离
@@ -71,7 +76,7 @@ class Trim:
         k = (self.com_x(pose, 0.05) - x0) / 0.05          # 腰前弯 1 弧度，重心前移多少米
         if abs(k) < 1e-4:
             return 0.0
-        return float(np.clip((self.target - x0) / k, -MAX_TRIM, MAX_TRIM))
+        return float(np.clip((self.com_x(pose, ref=True) - x0) / k, -MAX_TRIM, MAX_TRIM))
 
     def set_targets(self, pose):
         t = self.sim.d.time
