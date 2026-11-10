@@ -39,6 +39,7 @@ def one_day(f):
     gx = json.load(open(os.path.join(HERE, f"getup_best_{tag}.json" if tag else "getup_best.json"), encoding="utf-8"))["x"]
     getup.METHOD = tag
     res = {}
+    rec = day.Rec(sim, body)
     for key, title, clock, mins, simT, fn, desc in day.scenes(sim, bal, gx):
         body.scene = dict(key=key, clock=clock)
         body.scale = mins * 60.0 / simT
@@ -47,7 +48,9 @@ def one_day(f):
         body.effort_t = {n: 0.0 for n in body.joints}
         if key == "walk":
             sim.reset()
+        sim.recorder = rec          # 体温是在"每一步"里更新的（和 day.py 一样）
         out = fn()
+        sim.recorder = None
         if key == "walk":
             res["walk_cm"] = round(float(sim.d.qpos[0]) * 100, 1)
         elif key in ("push1", "push2"):
