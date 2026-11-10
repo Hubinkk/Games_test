@@ -1,0 +1,143 @@
+<title>髋和腰的弯曲结构</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* 布局：上方两张并排的侧面图（现在的身体 / 新设计，同一个"蹲着手掌着地"的动作），下面是四处改动、证据表、没验证的 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --hard:#b9800f; --no:#cf3b3d;
+  --skin:#f4dccf; --hair:#6b5a8e; --body:#c9cfe0; --leg:#aab3cf;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --skin:#cbb3a6; --hair:#8573ad; --body:#4d566e; --leg:#6a7696; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --skin:#cbb3a6; --hair:#8573ad; --body:#4d566e; --leg:#6a7696; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.65;margin:0;font-size:15px}
+.wrap{max-width:1080px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:38px}
+header{display:grid;gap:8px;max-width:72ch}
+.eyebrow{font-family:var(--f-data);font-size:12px;letter-spacing:.08em;color:var(--ink-2)}
+h1{font-family:var(--f-display);font-size:clamp(28px,4.2vw,42px);line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:22px;margin:0;text-wrap:balance}
+h3{font-size:15.5px;margin:0}
+p{margin:0}
+.lede{color:var(--ink-2);font-size:16px}.lede b{color:var(--ink)}
+section{display:grid;gap:14px;min-width:0}
+section>p{max-width:72ch;color:var(--ink-2)}section>p b{color:var(--ink)}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.fig{background:var(--stage);border-radius:12px;display:grid;gap:0;overflow:hidden}
+.fig svg{display:block;width:100%;height:auto}
+.fig .cap{padding:10px 14px 12px;background:var(--panel);font-size:14px;color:var(--ink-2);border-top:1px solid var(--rule)}
+.fig .cap b{color:var(--ink)}
+.y{color:var(--ok);font-weight:700}.n{color:var(--no);font-weight:700}.m{color:var(--hard);font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:13px 15px;display:grid;gap:5px;align-content:start;font-size:14px;color:var(--ink-2)}
+.card b{color:var(--ink);font-size:15px}
+.card .chg{font-family:var(--f-data);font-size:12.5px;color:var(--calm)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+th{color:var(--ink-2);font-weight:500;font-size:12.5px}
+td.num{font-family:var(--f-data);font-variant-numeric:tabular-nums;text-align:right}
+th.num{text-align:right}
+tr.pick td{background:color-mix(in srgb,var(--ok) 12%,transparent)}
+ul.plain{margin:0;padding-left:1.2em;display:grid;gap:6px;color:var(--ink-2);max-width:72ch}
+ul.plain b{color:var(--ink)}
+.foot{font-size:12.5px;color:var(--ink-2);max-width:80ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">55 cm 人偶 · 身体 · 髋和腰</div>
+    <h1>髋和腰的弯曲结构</h1>
+    <p class="lede">"手不离地"的起身需要一个姿势：蹲着，手掌撑地，重心在脚上。现在的身体做不出这个姿势。<b>只把角度范围加大没有用，大腿会插进骨盆约 2 cm。</b>要同时改四处结构：髋的范围、腰分两段、髋轴前移、骨盆前面让位。</p>
+  </header>
+
+  <section aria-labelledby="h-fig">
+    <h2 id="h-fig">同一个动作：蹲到底，手掌着地</h2>
+    <div class="pair">
+      <div class="fig"><svg id="f0" viewBox="0 0 440 400" role="img" aria-label="现在的身体蹲到底、手掌着地的侧面图：重心落在脚尖前面"></svg>
+        <div class="cap"><b>现在的身体</b>　髋 126°、腰 34° 都弯到了头。手掌刚够到地，<span class="n">重心在脚掌中心前 <span id="c0"></span> cm</span>，已经出了脚尖。手一松就往前倒。</div></div>
+      <div class="fig"><svg id="f1" viewBox="0 0 440 400" role="img" aria-label="新设计蹲到底、手掌着地的侧面图：重心落在脚掌内"></svg>
+        <div class="cap"><b>新设计</b>　髋 138°、腰两段共 57°、膝盖外开 17°。<span class="y">重心在脚掌中心前 <span id="c1"></span> cm</span>，在脚掌里面。大腿和骨盆、胸口之间还有 <span id="g1"></span> mm。</div></div>
+    </div>
+    <p>图是按模型的身体数据画的侧面投影。竖线是重心，脚下的粗线是脚掌（前后各 3 cm）。圆点是髋轴。</p>
+  </section>
+
+  <section aria-labelledby="h-four">
+    <h2 id="h-four">四处改动</h2>
+    <div class="cards">
+      <div class="card"><b>① 髋弯得更深</b><span class="chg">126° → 140°</span>蹲到底时上身才能压到大腿上。最少要 138°，取 140° 留一点余量。</div>
+      <div class="card"><b>② 腰分成两段</b><span class="chg">一个关节 34° → 两段各 29°，共 57°</span>身体能拱起来。一个电机在下段，用拉线带着上段转同样的角度。弯到底时下段要 0.82 N·m，电机上限 2.0。</div>
+      <div class="card"><b>③ 髋轴前移</b><span class="chg">前移 1–1.5 cm</span>现在髋轴在骨盆正下方，大腿抬过 100° 就顶到骨盆。移到骨盆前缘后，大腿从骨盆前面过。</div>
+      <div class="card"><b>④ 骨盆前面让位</b><span class="chg">前面削 2 cm，后面加 2 cm</span>给大腿让出腹股沟。髋电机搬到后面的臀部里，用一级齿轮带到轴上。容积不变。</div>
+    </div>
+    <p>再配合一个动作习惯：<b>深蹲时膝盖朝外打开约 17°</b>，现有的髋旋转范围够用。外形上多了腹股沟和臀部，腰能弯出弧线，这些都更像人。</p>
+  </section>
+
+  <section aria-labelledby="h-proof">
+    <h2 id="h-proof">证据：每种设计有多少个能用的姿势</h2>
+    <p>把蹲姿扫一遍，数出同时满足四条的：手掌着地、脚掌放平、重心在脚掌内、大腿和小腿不插进骨盆 / 肚子 / 胸口（允许压进软皮 3 mm）。只算几何和重量，不是动力学。</p>
+    <div class="tw"><table id="tbl"><thead><tr><th>设计</th><th class="num">手掌着地</th><th class="num">重心也在脚上</th><th class="num">还不撞自己</th></tr></thead><tbody></tbody></table></div>
+    <ul class="plain">
+      <li><b>更正：</b>上次我说"加大髋和腰的范围就有 196 个姿势"，那次没有检查身体会不会撞到自己。只加大范围，一个能用的都没有。</li>
+      <li>四处一起改才有 15–16 个。这是<b>刚好够</b>，不是很宽裕。</li>
+      <li>余量最便宜的来源是手臂：加长 1.5 cm，可用姿势变成 108 个。这一项不在这次的设计里，等动力学试过以后再决定。</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-cost">
+    <h2 id="h-cost">代价和还没验证的</h2>
+    <ul class="plain">
+      <li><b>站着时重心往后跑了 1.35 cm</b>（髋轴前移、骨盆里的东西后移造成的），到了脚跟的边缘。补法：站姿时腿从脚踝起整体前倾约 2.5°；自动配平要学会动脚踝。</li>
+      <li><b>动力学没做。</b>以上都是摆姿势算出来的。从这个蹲姿松手站起来，以及从趴着怎么到这个蹲姿，都还没在仿真里做。</li>
+      <li>腰两段联动的拉线会伸长；软外皮反复折叠的寿命；髋电机不在轴上以后多一级传动的间隙和声音。这些仿真测不出来。</li>
+    </ul>
+  </section>
+
+  <p class="foot">数字来源：<code>sim/flex_study.py</code>、<code>sim/flex_fig.py</code>（MuJoCo 3.17 的运动学和质量数据；估算）。文字版和每一处的做法在 <code>docs/hip-waist-v1.md</code>。</p>
+</div>
+
+<script src="hipwaist_fig.js"></script>
+<script>
+const D = window.FLEX;
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, at, parent) { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); parent.appendChild(e); return e; }
+const COL = b => /thigh|shin|foot/.test(b) ? "var(--leg)" : /arm|palm/.test(b) ? "var(--skin)" : /head|neck/.test(b) ? "var(--skin)" : "var(--body)";
+function draw(svg, fig, good) {
+  const S = 12.5, X0 = 112, Y0 = 350;                 // 1 cm = 13 px；脚掌中心在 X0，地面在 Y0
+  const X = x => X0 + x * S, Y = z => Y0 - z * S;
+  el("line", { x1: 10, y1: Y0, x2: 430, y2: Y0, stroke: "var(--rule)", "stroke-width": 2 }, svg);
+  const order = b => /arm|palm/.test(b) ? 3 : /thigh|shin|foot/.test(b) ? 2 : 1;
+  for (const s of [...fig.shapes].sort((a, b) => order(a.b) - order(b.b))) {
+    const c = COL(s.b);
+    if (s.k === "c") el("circle", { cx: X(s.c[0]), cy: Y(s.c[1]), r: s.r * S, fill: c, stroke: "var(--ink-2)", "stroke-width": 1 }, svg);
+    else if (s.k === "l") { el("line", { x1: X(s.a[0]), y1: Y(s.a[1]), x2: X(s.e[0]), y2: Y(s.e[1]), stroke: "var(--ink-2)", "stroke-width": s.r * 2 * S + 2, "stroke-linecap": "round" }, svg);
+      el("line", { x1: X(s.a[0]), y1: Y(s.a[1]), x2: X(s.e[0]), y2: Y(s.e[1]), stroke: c, "stroke-width": s.r * 2 * S, "stroke-linecap": "round" }, svg); }
+    else el("polygon", { points: s.pts.map(p => X(p[0]) + "," + Y(p[1])).join(" "), fill: s.name === "backpack" ? "var(--hair)" : c, stroke: "var(--ink-2)", "stroke-width": 1, "stroke-linejoin": "round" }, svg);
+  }
+  const shin = fig.shapes.find(s => s.b === "l_shin" && s.k === "l"), foot = fig.shapes.find(s => s.b === "l_foot");
+  if (shin && foot) { const lo = shin.a[1] < shin.e[1] ? shin.a : shin.e, fc = foot.pts.reduce((a, p) => [a[0] + p[0] / 4, a[1] + p[1] / 4], [0, 0]);
+    el("line", { x1: X(lo[0]), y1: Y(lo[1]), x2: X(fc[0] - 1.2), y2: Y(fc[1]), stroke: "var(--leg)", "stroke-width": 0.9 * 2 * S, "stroke-linecap": "round" }, svg); }
+  el("line", { x1: X(-3), y1: Y0 + 7, x2: X(3), y2: Y0 + 7, stroke: "var(--ink)", "stroke-width": 5, "stroke-linecap": "round" }, svg);
+  el("circle", { cx: X(fig.hip[0]), cy: Y(fig.hip[1]), r: 5, fill: "var(--panel)", stroke: "var(--calm)", "stroke-width": 3 }, svg);
+  const col = good ? "var(--ok)" : "var(--no)";
+  el("line", { x1: X(fig.com), y1: 30, x2: X(fig.com), y2: Y0 + 16, stroke: col, "stroke-width": 2.5, "stroke-dasharray": "7 5" }, svg);
+  const t = el("text", { x: X(fig.com) + 8, y: 44, fill: col, "font-size": 14, "font-family": "Noto Sans SC, sans-serif", "font-weight": 700 }, svg); t.textContent = "重心";
+  const t2 = el("text", { x: X(0), y: Y0 + 30, fill: "var(--ink-2)", "font-size": 12.5, "font-family": "Noto Sans SC, sans-serif", "text-anchor": "middle" }, svg); t2.textContent = "脚掌";
+}
+draw(document.getElementById("f0"), D.fig.now_squat, false);
+draw(document.getElementById("f1"), D.fig.new_squat, true);
+document.getElementById("c0").textContent = D.fig.now_squat.com.toFixed(1);
+document.getElementById("c1").textContent = D.fig.new_squat.com.toFixed(1);
+document.getElementById("g1").textContent = D.fig.new_squat.gap_mm.toFixed(1);
+const ROWS = [["now", ""], ["hip", "大腿插进骨盆 23 mm"], ["waist", "18 mm"], ["both", "18 mm"], ["two", "22 mm"], ["two_cut", "差 3.6 mm，卡在胸口"], ["two_fwd1", "12 mm"],
+  ["two_fwd1_cut", ""], ["full_fwd15", "留出 1.1 mm 的间隙"], ["full_chest", ""], ["full_arm", "间隙 10.7 mm"], ["full_138_57", ""], ["full_149_46", ""], ["full_138_46", ""]];
+document.querySelector("#tbl tbody").innerHTML = ROWS.map(([k, note]) => { const r = D.table[k];
+  return `<tr class="${k === "full_fwd15" ? "pick" : ""}"><td>${r.title}</td><td class="num">${r.touch}</td><td class="num">${r.balanced}</td><td class="num"><span class="${r.ok ? "y" : "n"}">${r.ok}</span>${note ? `<br><span style="font-family:var(--f-body);color:var(--ink-2);font-size:12.5px">${note}</span>` : ""}</td></tr>`; }).join("");
+</script>

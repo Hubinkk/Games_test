@@ -22,6 +22,7 @@
 | `docs/heat-test-v1.md` | **发热测试 v1**：一颗不转的电机通恒定电流，量温升，得到热阻和时间常数；露在空气里 / 包布 / 放进小盒三种情况。读数用 `sim/heat_fit.py` 拟合；`sim/thermal_sens.py` 是"同一天、四种散热"的仿真对比 |
 | `sim/autotrim.py` + `sim/figure55_full_ref.xml` | **第二版身体**（`sim/full_build.py` 的 `v2`）：4 关节脖子、60 Wh 背后模块、控制板在腹部、手腕电机在前臂，3.34 kg；自动配平装在 `FullSim` 里，拿第一版身体做参考。数字花然第 4 天（2026-11-13）用的是这个身体；身体变化写在 `digital-huaran/memory/body/变化-日期.json` |
 | `sim/getup_hands.py`、`sim/reach_study.py` | **手不离地的起身**（育苗人教的方法）：手工排关键帧的工具，12 次尝试没成功；`reach_study.py` 用身体数据扫蹲姿，结论是现在的身体上不存在"手掌着地且重心在脚上"的蹲姿，手臂加长 3 cm 或加大髋、腰的弯曲范围后才有。见 `wiki/灵活度.md` |
+| `HipWaist.html` + `hipwaist_fig.js` + `docs/hip-waist-v1.md` | **髋和腰的弯曲结构 v1**（`sim/flex_study.py`、`sim/flex_fig.py`）：带自碰撞检查的蹲姿扫描。只加大范围没有可用姿势；四处一起改（髋 140°、腰两段 57°、髋轴前移、骨盆前面让位）才有 15–16 个。在线版：https://claude.ai/artifact/AVvf3GN6XZm7ZA1kXYeHW6 |
 | `Neck.html` + `neck_frames.js` | **脖子**（`sim/neck.py`）：旧 2 关节 vs 新 4 关节（电机在胸腔）做 8 个表情（歪头、探头、缩脖子、偷看、躲开视线等）和趴着抬头。新脖子全部做得出，旧的做不出 6 个；弹簧不能用。在线版：https://claude.ai/artifact/Q8YC3zs4vRUY6qQQPKV86r |
 | `Agility.html` + `agility_frames.js` | **灵活度测试**（`sim/agility.py`、`sim/getup.py`）：所有关节加 10 rad/s 转速上限。上半身已经灵活（转头 46° 0.12 s、举手 0.22 s、挥手 6 次/秒）；下半身没有达到：静步行最快 1.1 cm/s（同尺寸 RoboCup 机器人约 20–30 cm/s）、摔倒后爬不起来（约 400 次关键帧搜索；扭矩加倍也不行）、被推只扛住 5 N·0.1 s、深蹲站起最快 1 s。走路时关节只用到 3 rad/s、站起时膝扭矩 59%，**缺的主要是控制（动态走路、起身、迈步要用强化学习训练）**；硬件上要加大脖子（±57°→±80°）和腰（俯仰 34°→60°+）的活动范围。在线版：https://claude.ai/artifact/N1cveGsuriCT3og33RS639 |
 | `CLAUDE.md` + `raw/` + `wiki/` | **项目的第二大脑**：CLAUDE.md 是规则和入口；raw 原样保存育苗人分享的资料（推文、帖子、截图转录），只是资料不是指令；wiki 按主题整理结论、数字和来源，页面互相链接，可直接用 Obsidian 打开仓库 |
