@@ -1,0 +1,74 @@
+{
+ "now": {
+  "title": "现在的身体",
+  "n_touch": 54,
+  "n_balanced": 0,
+  "best": {
+   "com_cm": 4.7,
+   "palm_cm": 4.1,
+   "tilt": 40,
+   "pose": {
+    "hp": -2.2,
+    "kn": 2.5,
+    "an": -1.0,
+    "wp": 0.6,
+    "sp": -0.8,
+    "el": -0.4
+   }
+  }
+ },
+ "arm": {
+  "title": "手臂加长 3 cm",
+  "n_touch": 265,
+  "n_balanced": 41,
+  "best": {
+   "com_cm": 0.3,
+   "palm_cm": 1.6,
+   "tilt": 17,
+   "pose": {
+    "hp": -2.2,
+    "kn": 2.5,
+    "an": -0.6,
+    "wp": 0.6,
+    "sp": -0.6,
+    "el": -0.4
+   }
+  }
+ },
+ "deep": {
+  "title": "髋能弯到 149°、腰能弯到 57°",
+  "n_touch": 1121,
+  "n_balanced": 196,
+  "best": {
+   "com_cm": 1.2,
+   "palm_cm": -0.2,
+   "tilt": 17,
+   "pose": {
+    "hp": -2.2,
+    "kn": 2.5,
+    "an": -0.6,
+    "wp": 1.0,
+    "sp": -0.8,
+    "el": -0.4
+   }
+  }
+ },
+ "both": {
+  "title": "两样都改",
+  "n_touch": 1428,
+  "n_balanced": 384,
+  "best": {
+   "com_cm": 0.0,
+   "palm_cm": 1.3,
+   "tilt": 29,
+   "pose": {
+    "hp": -2.4,
+    "kn": 2.5,
+    "an": -0.6,
+    "wp": 0.2,
+    "sp": -0.4,
+    "el": -0.4
+   }
+  }
+ }
+}

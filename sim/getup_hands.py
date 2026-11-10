@@ -1,0 +1,163 @@
+"""
+手不离地的起身（2026-11-10，育苗人教的方法）
+
+育苗人的话：两只手撑地的同时，膝盖弯曲，小腿蹬地站起来，躯体拱起来也要发力；用另一边的手臂撑住地面保持平衡。
+花然以前的做法是跪直以后只靠两条腿站，手早早离开了地面，所以往后倒。
+
+这里的动作是手工一步步排出来的关键帧（不是搜索，也不是强化学习）：
+  俯卧撑（pushup.py 的手臂路径）→ 身体拱起来 → 脚收到身体下面（手一直撑着）→ 重心移到脚上 → 松手 → 站起
+
+用法：
+    python getup_hands.py            # 跑一次，打印每个关键帧结束时的状态；成功就写 getup_best_hands.json
+    python getup_hands.py --quiet
+沿用整体模型的扭矩上限，加 10 rad/s 转速上限。
+"""
+import json
+import math
+import os
+import sys
+
+import mujoco
+import numpy as np
+
+import agility
+import figure_test
+import full_build as fb
+import full_demo as FD
+from balance import Balance
+from figure_test import stand_pose
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+_SIM = None
+
+
+def get_sim():
+    global _SIM
+    if _SIM is None:
+        figure_test.MODEL = fb.OUT
+        _SIM = FD.FullSim()
+        agility.add_speed_limit(_SIM)
+    return _SIM
+
+
+def sm(a):
+    a = max(0.0, min(1.0, a))
+    return 0.5 - 0.5 * math.cos(math.pi * a)
+
+
+def P(arm, L, R=None, wp=0.0, roll=(0.0, 0.0), neck=-0.3, arm_r=None):
+    """arm = (肩俯仰, 肩侧举, 肩转, 肘)；L / R = (髋, 膝, 踝)；roll = (左髋侧摆, 右髋侧摆)"""
+    R = L if R is None else R
+    arm_r = arm if arm_r is None else arm_r
+    p = stand_pose(0.05)
+    p["l_shoulder_pitch"], p["l_shoulder_roll"], p["l_shoulder_yaw"], p["l_elbow"] = arm[0], -arm[1], -arm[2], arm[3]
+    p["r_shoulder_pitch"], p["r_shoulder_roll"], p["r_shoulder_yaw"], p["r_elbow"] = arm_r
+    p["l_hip_pitch"], p["l_knee"], p["l_ankle_pitch"] = L
+    p["r_hip_pitch"], p["r_knee"], p["r_ankle_pitch"] = R
+    p["l_hip_roll"], p["r_hip_roll"] = roll
+    p["waist_pitch"] = wp
+    p["neck_pitch"] = neck
+    return p
+
+
+def default_keyframes():
+    px = json.load(open(os.path.join(HERE, "pushup_best.json"), encoding="utf-8"))["x"]
+    arm = [tuple(px[f"{j}{i}"] for j in ("sp", "roll", "yaw", "el")) for i in range(3)]
+    flat = (0.0, 0.05, 0.0)
+    lie = P((0.0, -0.15, 0.0, -0.2), flat)
+    ks = [(0.0, lie, "趴着"), (1.0, lie, "趴着")]
+    t = 1.3
+    ks.append((t, lie, "趴着"))
+    for i, dt_ in enumerate((1.0, 1.0, 1.3)):
+        t += dt_
+        ks.append((t, P(arm[i], flat), f"俯卧撑 {i+1}"))
+    return ks, arm, t
+
+
+def simulate(ks, hold=1.5, verbose=True, record=None, t_free=None, start="prone", relax_neck=True, init=None):
+    """ks: [(时间, 姿势, 名字)]。t_free：从这一刻起算"手可以离地"，接上平衡控制。"""
+    sim = get_sim()
+    m, d = sim.m, sim.d
+
+    def target(t):
+        for i in range(1, len(ks)):
+            t0, p0 = ks[i - 1][:2]
+            t1, p1 = ks[i][:2]
+            if t <= t1:
+                a = sm((t - t0) / (t1 - t0))
+                return {k: p0.get(k, 0.0) + (p1.get(k, 0.0) - p0.get(k, 0.0)) * a for k in set(p0) | set(p1)}
+        return dict(ks[-1][1])
+
+    sim.reset()
+    if start == "prone":      # 脸朝下趴着，头朝 +x
+        d.qpos[0:3] = [0, 0, 0.06]
+        d.qpos[3:7] = [math.cos(math.pi / 4), 0, math.sin(math.pi / 4), 0]
+    else:                     # 仰面躺着，脚朝 +x（背后有背包，所以垫高一点再落下）
+        d.qpos[0:3] = [0, 0, 0.10]
+        d.qpos[3:7] = [math.cos(math.pi / 4), 0, -math.sin(math.pi / 4), 0]
+    if init is not None:      # 直接从某个姿势开始（只用来单独检验后半段）
+        init(sim)
+    mujoco.mj_forward(m, d)
+    bal = Balance(sim)
+    bal.prev = None
+    dt = m.opt.timestep
+    t_end = ks[-1][0] + hold
+    t_free = ks[-2][0] if t_free is None else t_free
+    neck_i = [m.actuator(n).id for n in ("neck_pitch", "neck_low") if n in sim.act]
+    neck_base = m.actuator_forcerange[neck_i].copy()
+    if relax_neck:
+        m.actuator_forcerange[neck_i] = neck_base * 0.05
+    body_of = lambda g: m.body(m.geom_bodyid[g]).name
+    marks = {round(k[0], 3): k[2] for k in ks[1:]}
+    peak = {}
+    balancing, restored, ki = False, False, 1
+    hist = []
+    for k in range(int(t_end / dt)):
+        t = k * dt
+        tgt = target(t)
+        if not restored and t >= t_free:
+            m.actuator_forcerange[neck_i] = neck_base
+            restored = True
+        if t > t_free and sim.tilt_deg() < 35:
+            balancing = True
+        if balancing:
+            tgt = bal.adjust(tgt)
+        sim.set_targets(tgt)
+        sim.step()
+        if record is not None:
+            record(t)
+        for n, v in sim.torques().items():
+            if n[:2] not in ("L_", "R_"):
+                peak[n] = max(peak.get(n, 0.0), abs(v) / max(sim.limit.get(n, 1e9), 1e-9))
+        if k % int(0.25 / dt) == 0:
+            hist.append((round(t, 2), round(float(d.qpos[2]) * 100, 1), round(sim.tilt_deg(), 0)))
+        if verbose and ki < len(ks) and t >= ks[ki][0] - dt / 2:
+            load = {"手": 0.0, "脚": 0.0, "其它": 0.0}
+            f6 = np.zeros(6)
+            for c in range(d.ncon):
+                con = d.contact[c]
+                b1, b2 = body_of(con.geom1), body_of(con.geom2)
+                other = b2 if b1 == "world" else b1 if b2 == "world" else None
+                if other is None:
+                    continue
+                mujoco.mj_contactForce(m, d, c, f6)
+                key = "手" if other[:2] in ("L_", "R_") else "脚" if other.endswith("_foot") else "其它"
+                load[key] += f6[0]
+                if key == "其它":
+                    load.setdefault("碰地的", set()).add(other)
+            com = d.subtree_com[0]
+            kx = [d.xpos[m.body(f"{s}_shin").id] for s in "lr"]
+            fx = [d.xpos[m.body(f"{s}_foot").id] for s in "lr"]
+            hx = [d.xpos[m.body(f"{s}_palm").id] for s in "LR"]
+            print(f"{ks[ki][0]:5.2f}s {ks[ki][2]:<10} 骨盆高 {d.qpos[2]*100:5.1f} cm 倾斜 {sim.tilt_deg():4.0f}°  "
+                  f"重心 x {com[0]*100:6.1f} 骨盆 x {d.qpos[0]*100:5.1f} 左膝 x {kx[0][0]*100:5.1f} z {kx[0][2]*100:4.1f} 右膝 x {kx[1][0]*100:5.1f} z {kx[1][2]*100:4.1f}  左脚 x {fx[0][0]*100:6.1f} z {fx[0][2]*100:4.1f}  右脚 x {fx[1][0]*100:6.1f} z {fx[1][2]*100:4.1f}  "
+                  f"手 x {hx[0][0]*100:6.1f} z {hx[0][2]*100:4.1f}  受力 手 {load['手']:4.1f} 脚 {load['脚']:4.1f} 其它 {load['其它']:4.1f} {sorted(load.get('碰地的', []))}", flush=True)
+            ki += 1
+    m.actuator_forcerange[neck_i] = neck_base
+    z, tilt = float(d.qpos[2]), sim.tilt_deg()
+    ok = z > 0.20 and tilt < 20
+    top = sorted(peak.items(), key=lambda kv: -kv[1])[:5]
+    if verbose:
+        print(f"结束：骨盆高 {z*100:.1f} cm，倾斜 {tilt:.0f}°，{'站起来了' if ok else '没站起来'}；最吃力的关节（占上限）：" +
+              "，".join(f"{n} {v*100:.0f}%" for n, v in top))
+    return dict(ok=bool(ok), z_cm=z * 100, tilt=tilt, hist=hist, peak=dict(top))
