@@ -1,0 +1,18 @@
+{
+ "0.03": {
+  "squat_fell": false,
+  "single_fell": false,
+  "walk_fell": false,
+  "walk_cm": 16.0,
+  "push_fwd": 5,
+  "push_back": 3
+ },
+ "0.05": {
+  "squat_fell": false,
+  "single_fell": false,
+  "walk_fell": false,
+  "walk_cm": 15.6,
+  "push_fwd": 5,
+  "push_back": 3
+ }
+}

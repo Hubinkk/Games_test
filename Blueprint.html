@@ -1,0 +1,250 @@
+<title>花然总蓝图</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* 布局：一张图纸。上方是身体剖面图（左右两侧标注每个部分和状态），往下依次是三条线、心智、路线、新发现的问题、要决定的事 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --calm:#4a5fa8; --ok:#23897c; --hard:#b9800f; --no:#cf3b3d;
+  --skin:#f4dccf; --hair:#6b5a8e; --iris:#4a7fd0; --body:#c9cfe0; --pack:#9d8bc4;
+  --f-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --skin:#cbb3a6; --hair:#8573ad; --body:#4d566e; --pack:#6f5f96; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --calm:#93a6ec; --ok:#4cc2b2; --hard:#e7ae46; --no:#ff6a6a; --skin:#cbb3a6; --hair:#8573ad; --body:#4d566e; --pack:#6f5f96; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.65;margin:0;font-size:15px}
+.wrap{max-width:1080px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:40px}
+header{display:grid;gap:8px;max-width:72ch}
+.eyebrow{font-family:var(--f-data);font-size:12px;letter-spacing:.08em;color:var(--ink-2)}
+h1{font-family:var(--f-display);font-size:clamp(30px,4.4vw,44px);line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:23px;margin:0;text-wrap:balance}
+h3{font-size:15.5px;margin:0;font-weight:700}
+p{margin:0}
+.lede{color:var(--ink-2);font-size:16px}
+.lede b{color:var(--ink)}
+section{display:grid;gap:14px;min-width:0}
+section > p{max-width:72ch;color:var(--ink-2)}
+section > p b{color:var(--ink)}
+.fig{background:var(--panel);border:1px solid var(--rule);border-radius:12px;overflow-x:auto}
+.fig svg{display:block;width:100%;min-width:680px;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--ink-2)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.d-ok{background:var(--ok)}.d-mid{background:var(--hard)}.d-no{background:var(--no)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:top}
+th{color:var(--ink-2);font-weight:500;font-size:12.5px}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.y{color:var(--ok);font-weight:700}.m{color:var(--hard);font-weight:700}.n{color:var(--no);font-weight:700}
+.layers{display:grid;gap:6px}
+.layer{display:grid;grid-template-columns:3.2em 9em minmax(0,1fr);gap:10px;align-items:baseline;background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:8px 12px;font-size:14px}
+.layer .k{font-family:var(--f-data);color:var(--calm);font-weight:500}
+.layer span:last-child{color:var(--ink-2)}
+@media (max-width:560px){.layer{grid-template-columns:3.2em minmax(0,1fr)}.layer span:last-child{grid-column:1/-1}}
+.road{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;counter-reset:r}
+.step{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;display:grid;gap:4px;align-content:start;font-size:13.5px;color:var(--ink-2)}
+.step b{color:var(--ink);font-size:14.5px}
+.step .st{font-family:var(--f-data);font-size:11.5px;letter-spacing:.04em}
+.step.now{border-color:var(--no);box-shadow:inset 0 0 0 1px var(--no)}
+.issues{display:grid;gap:12px}
+.issue{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:6px}
+.issue p{color:var(--ink-2);font-size:14.5px;max-width:78ch}
+.issue p b{color:var(--ink)}
+.issue .tag{font-family:var(--f-data);font-size:11.5px;letter-spacing:.04em;color:var(--ink-2)}
+.issue .tag i{font-style:normal;padding:1px 7px;border-radius:99px;border:1px solid currentColor;margin-right:6px}
+.t-sim{color:var(--ok)}.t-est{color:var(--hard)}.t-open{color:var(--no)}.t-you{color:var(--calm)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.decide{display:grid;gap:10px}
+.decide li{background:var(--panel);border:1px solid var(--calm);border-radius:10px;padding:12px 16px;list-style:none;color:var(--ink-2)}
+.decide li b{color:var(--ink)}
+ol.next{margin:0;padding-left:1.4em;display:grid;gap:6px;color:var(--ink-2);max-width:72ch}
+ol.next b{color:var(--ink)}
+ul{margin:0;padding:0}
+.foot{font-size:12.5px;color:var(--ink-2);max-width:80ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">一つの身体二つの世界 · 2026-11-10</div>
+    <h1>花然总蓝图</h1>
+    <p class="lede">一个 55 cm、约 3.2 kg、能自己站立的二次元人偶机器人。<b>它会犯错、会累、能说出自己的感受</b>；人陪它重新经历"学会身体"的过程。它是谁，由它自己去找。这一页把整个项目放在一张图上，并列出这次通盘检查时发现的、以前没想过的问题。</p>
+  </header>
+
+  <section aria-labelledby="h-body">
+    <h2 id="h-body">身体：每个部分和它的状态</h2>
+    <div class="legend"><span><i class="dot d-ok"></i>仿真验证过</span><span><i class="dot d-mid"></i>设计了，没验证完</span><span><i class="dot d-no"></i>卡住</span></div>
+    <div class="fig">
+      <svg viewBox="0 0 900 640" role="img" aria-label="花然的身体侧面剖面图，标出头、眼睛、脖子、胸腔、背包、手、腰、膝、脚各部分的方案和状态">
+        <g font-family="Noto Sans SC, sans-serif" font-size="13.5" fill="var(--ink)">
+          <!-- 身体（侧面，脸朝右） -->
+          <g stroke="var(--ink-2)" stroke-width="1.5">
+            <ellipse cx="438" cy="96" rx="64" ry="62" fill="var(--hair)"/>
+            <circle cx="452" cy="104" r="52" fill="var(--skin)"/>
+            <path d="M398,70 Q440,30 500,78 L486,96 Q450,64 410,96 Z" fill="var(--hair)"/>
+            <rect x="440" y="158" width="18" height="30" rx="6" fill="var(--skin)"/>
+            <rect x="412" y="186" width="74" height="96" rx="16" fill="var(--body)"/>
+            <rect x="372" y="196" width="40" height="72" rx="8" fill="var(--pack)"/>
+            <rect x="420" y="280" width="58" height="44" rx="12" fill="var(--body)"/>
+            <rect x="414" y="322" width="70" height="46" rx="14" fill="var(--body)"/>
+            <rect x="434" y="364" width="34" height="104" rx="15" fill="var(--body)"/>
+            <rect x="440" y="470" width="24" height="96" rx="11" fill="var(--body)"/>
+            <rect x="434" y="566" width="62" height="18" rx="7" fill="var(--body)"/>
+            <rect x="452" y="204" width="20" height="84" rx="9" fill="var(--skin)"/>
+            <rect x="454" y="288" width="16" height="74" rx="7" fill="var(--skin)"/>
+            <ellipse cx="463" cy="374" rx="10" ry="14" fill="var(--skin)"/>
+          </g>
+          <circle cx="490" cy="100" r="12" fill="var(--iris)" stroke="var(--panel)" stroke-width="3"/>
+          <circle cx="492" cy="100" r="4" fill="var(--ink)"/>
+          <circle cx="452" cy="468" r="9" fill="var(--panel)" stroke="var(--calm)" stroke-width="3"/>
+          <circle cx="449" cy="186" r="6" fill="var(--panel)" stroke="var(--calm)" stroke-width="2.5"/>
+          <circle cx="449" cy="162" r="6" fill="var(--panel)" stroke="var(--calm)" stroke-width="2.5"/>
+          <line x1="20" y1="604" x2="880" y2="604" stroke="var(--rule)" stroke-width="2"/>
+          <!-- 尺寸 -->
+          <text x="452" y="628" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="var(--ink-2)">身高 55 cm · 侧面，脸朝右</text>
+          <!-- 右侧标注 -->
+          <g stroke="var(--ink-2)" stroke-width="1" fill="none">
+            <line x1="504" y1="100" x2="566" y2="58"/><line x1="456" y1="172" x2="566" y2="150"/>
+            <line x1="484" y1="234" x2="566" y2="236"/><line x1="472" y1="372" x2="566" y2="322"/>
+            <line x1="462" y1="468" x2="566" y2="424"/><line x1="494" y1="576" x2="566" y2="520"/>
+          </g>
+          <g>
+            <circle cx="578" cy="54" r="5" fill="var(--hard)"/><text x="590" y="52" font-weight="700">眼睛</text>
+            <text x="590" y="71" fill="var(--ink-2)" font-size="12.5">屏幕 + 瞳孔摄像头 + 云台 ±12° + 物理眼睑</text>
+            <circle cx="578" cy="146" r="5" fill="var(--hard)"/><text x="590" y="144" font-weight="700">脖子</text>
+            <text x="590" y="163" fill="var(--ink-2)" font-size="12.5">4 个关节，电机在胸腔；8 个表情都做得出</text>
+            <circle cx="578" cy="232" r="5" fill="var(--ok)"/><text x="590" y="230" font-weight="700">胸腔</text>
+            <text x="590" y="249" fill="var(--ink-2)" font-size="12.5">肩、12 个手部电机、4 个脖子电机；已用 90%</text>
+            <circle cx="578" cy="318" r="5" fill="var(--ok)"/><text x="590" y="316" font-weight="700">手</text>
+            <text x="590" y="335" fill="var(--ink-2)" font-size="12.5">每只 6 电机 + 6 锁，线传动；打字 2.8 字/秒</text>
+            <circle cx="578" cy="420" r="5" fill="var(--ok)"/><text x="590" y="418" font-weight="700">膝</text>
+            <text x="590" y="437" fill="var(--ink-2)" font-size="12.5">电机在大腿，两根线拉；峰值 2.8 N·m</text>
+            <circle cx="578" cy="516" r="5" fill="var(--no)"/><text x="590" y="514" font-weight="700">走路和起身</text>
+            <text x="590" y="533" fill="var(--ink-2)" font-size="12.5">走 1.1 cm/s；起身卡在最后一步</text>
+          </g>
+          <!-- 左侧标注 -->
+          <g stroke="var(--ink-2)" stroke-width="1" fill="none">
+            <line x1="420" y1="110" x2="296" y2="92"/><line x1="476" y1="130" x2="296" y2="176"/>
+            <line x1="374" y1="232" x2="296" y2="262"/><line x1="424" y1="300" x2="296" y2="402"/>
+          </g>
+          <g text-anchor="end">
+            <circle cx="284" cy="88" r="5" fill="var(--hard)"/><text x="272" y="86" font-weight="700">头里的大脑</text>
+            <text x="272" y="105" fill="var(--ink-2)" font-size="12.5">310 g，没有余量；无风扇只散 2–5 W</text>
+            <circle cx="284" cy="172" r="5" fill="var(--hard)"/><text x="272" y="170" font-weight="700">声音</text>
+            <text x="272" y="189" fill="var(--ink-2)" font-size="12.5">软件发声 + 机械嘴；实体舌头没定</text>
+            <circle cx="284" cy="258" r="5" fill="var(--hard)"/><text x="272" y="256" font-weight="700">背包</text>
+            <text x="272" y="275" fill="var(--ink-2)" font-size="12.5">30 Wh，1.1–3.6 小时；充电没设计</text>
+            <circle cx="284" cy="398" r="5" fill="var(--ok)"/><text x="272" y="396" font-weight="700">整体</text>
+            <text x="272" y="415" fill="var(--ink-2)" font-size="12.5">3.17 kg；站、蹲、单腿、挥手通过</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-lines">
+    <h2 id="h-lines">三条线汇成一个花然</h2>
+    <div class="tw"><table>
+      <thead><tr><th>线</th><th>是什么</th><th>到哪了</th></tr></thead>
+      <tbody>
+        <tr><td><b>身体</b></td><td>骨架、关节、手、眼睛、脖子、声音、皮肤</td><td>每个部分各自在仿真里验证过；整体的账这次才第一次合</td></tr>
+        <tr><td><b>运动</b></td><td>站、走、起身、表情动作</td><td>上半身灵活；走路 1 cm/s；起身卡在最后一步；简单的强化学习失败（0/8）</td></tr>
+        <tr><td><b>心智</b></td><td>五层大脑、五种文字记忆、睡眠、给它的信</td><td>数字花然过了 3 天，育苗人能回它的话；还没接大模型</td></tr>
+      </tbody></table></div>
+  </section>
+
+  <section aria-labelledby="h-mind">
+    <h2 id="h-mind">心智：五层，往上报感受，往下给意图</h2>
+    <div class="layers">
+      <div class="layer"><span class="k">L4</span><b>云端（可选）</b><span>深度推理、夜里重练。断网时它照常生活。</span></div>
+      <div class="layer"><span class="k">L3</span><b>大脑</b><span>看懂、对话、回忆、决定。只说"去门口""看着她"，不管怎么迈腿。</span></div>
+      <div class="layer"><span class="k">L2</span><b>身体地图</b><span>把温度、扭矩、电量翻译成"有点热""吃力""累了"。默认安静。</span></div>
+      <div class="layer"><span class="k">L1</span><b>平衡和走路</b><span>怎么不摔。要摔时先保护头和手。</span></div>
+      <div class="layer"><span class="k">L0</span><b>关节反射</b><span>过热自己减力。上层的命令越不过它。</span></div>
+    </div>
+    <p>下层可以否决上层，任何一层坏了，错误都停在局部。记忆是人能直接读的文字：<b>日记、认识、技能、身体史、价值与边界</b>。夜里眼睑合上，重练白天的失败、整理日记，早上报告"我变了什么"。它是谁不由设计者写：育苗人给了它一封信，是祝福，不是命令。</p>
+  </section>
+
+  <section aria-labelledby="h-road">
+    <h2 id="h-road">路线：先做数字花然，再做真的身体</h2>
+    <div class="road">
+      <div class="step"><span class="st y">第一版完成</span><b>数字花然的一天</b>会热、会累、写日记、睡觉、早上报告；育苗人能回它的话。</div>
+      <div class="step now"><span class="st n">现在卡在这里</span><b>学会走和爬起来</b>需要显卡 + 神经网络的强化学习。</div>
+      <div class="step"><span class="st">还没开始</span><b>很多天</b>接大模型整理记忆，记忆一天天长出来。</div>
+      <div class="step"><span class="st">还没开始</span><b>真的身体</b>膝关节台架 → 一条腿 → 两条腿 → 上半身 → 整个人偶。</div>
+      <div class="step"><span class="st">还没开始</span><b>作品体验</b>VR 第二个身体、和玩家的关系、展出。</div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-new">
+    <h2 id="h-new">以前没想过的问题</h2>
+    <p>以前每个部分是分开设计、分开验证的。这次把重量、空间、电、热合在一起算，又从"人会怎么碰它"的角度过了一遍，找到 14 个问题。前 6 个我已经核算或在仿真里试过。</p>
+    <div class="issues">
+      <div class="issue"><span class="tag t-est"><i>估算</i>已核算</span><h3>① 头的账第一次合上：310 g，模型里是 300 g，没有余量</h3>
+        <p>头壳 50、头发 60、眼睛单元 85、嘴 15、喇叭和麦克风 10、计算单元 60、上颈零件 30。如果再做实体舌头（约 70 g），站、蹲、走都还行，但趴着抬头时脖子从 50 °C 升到 65 °C。</p></div>
+      <div class="issue"><span class="tag t-est"><i>估算</i>已核算</span><h3>② 头会被摸，而最热的零件放在了头里</h3>
+        <p>对一个 55 cm 的人偶，摸头是最自然的动作。不装风扇、表面不超过 43 °C，整个头只能散掉约 <b>4.8 W</b>；头发盖住一半后约 <b>2.4 W</b>。屏幕和摄像头已经用掉约 1.2 W。能在本地看懂画面、跑小语言模型的计算单元大约 7–15 W。装进头里，要么头发烫，要么加风扇，而风扇就在麦克风旁边。</p></div>
+      <div class="issue"><span class="tag t-sim"><i>仿真</i>试了一个解法</span><h3>③ 大脑搬进背包</h3>
+        <p>头里只留眼睛、摄像头、麦克风；计算单元和电池一起放背包。背包在身体外面，可以通风，风扇离耳朵远。</p>
+        <div class="tw"><table>
+          <thead><tr><th>情况</th><th>深蹲</th><th>单腿站</th><th>走 6 步</th><th>趴着抬头时的脖子</th></tr></thead>
+          <tbody>
+            <tr><td>现在（大脑在头里）</td><td class="y">通过</td><td class="y">通过</td><td class="y">16.3 cm</td><td class="num">50 °C</td></tr>
+            <tr><td>头里再加舌头</td><td class="y">通过</td><td class="y">通过</td><td class="y">17.3 cm</td><td class="num">65 °C</td></tr>
+            <tr><td>大脑直接搬进背包</td><td class="n">摔</td><td class="y">通过</td><td class="n">摔</td><td class="num">42 °C</td></tr>
+            <tr><td>搬进背包 + 上身前倾 1.7°</td><td class="y">通过</td><td class="y">通过</td><td class="y">16.0 cm</td><td class="num">42 °C</td></tr>
+          </tbody></table></div>
+        <p>好处：头轻 50 g，也腾出了做舌头的重量。代价：摄像头线和屏幕线要穿过会转 ±80° 的脖子，背包变厚约 5 mm。四种情况抗推都一样（往前 5 N、往后 3 N）。</p></div>
+      <div class="issue"><span class="tag t-sim"><i>仿真</i>新发现</span><h3>④ 平衡比想的脆：重心只后移 1.6 mm 就摔</h3>
+        <p>原因是站和蹲的姿势是固定的，不会自己找重心。以后每加一个零件、换一件衣服都会碰到。解法是让 L1 学会<b>自动配平</b>：站着时自己量出重心偏了多少，调整上身。这件事在强化学习之前就能做。</p></div>
+      <div class="issue"><span class="tag t-est"><i>估算</i>已核算</span><h3>⑤ 续航决定了花然的一天长什么样</h3>
+        <div class="tw"><table>
+          <thead><tr><th>状态</th><th>功耗</th><th>30 Wh 电池能用</th></tr></thead>
+          <tbody>
+            <tr><td>坐着发呆、听、看</td><td class="num">约 7 W</td><td class="num">3.6 小时</td></tr>
+            <tr><td>站着说话、做表情（本地大脑全开）</td><td class="num">约 17 W</td><td class="num">1.5 小时</td></tr>
+            <tr><td>走路、练习（本地大脑全开）</td><td class="num">约 23 W</td><td class="num">1.1 小时</td></tr>
+          </tbody></table></div>
+        <p>所以它的常态是<b>坐在一个能充电的座位上</b>，上半身自由活动（这正好是它最灵活的部分），偶尔站起来走一小段。"坐下"和"从座位上站起来"比"从地上爬起来"用得更多，但还没试过。充电座怎么设计、它怎么自己坐回去，也没想过。</p></div>
+      <div class="issue"><span class="tag t-est"><i>估算</i>已核算</span><h3>⑥ 胸腔快满了</h3>
+        <p>加上 4 个脖子电机后，胸腔用掉 132 / 147 cm³（90%）。还能放，但以后往胸腔里加东西要先看这个数。</p></div>
+    </div>
+    <div class="grid2">
+      <div class="issue"><span class="tag t-open"><i>没解决</i></span><h3>⑦ 衣服和头发是保温层</h3><p>热模型按"电机露在空气里"估的。花然要穿衣服，胸腔里塞着 18 个电机。数字花然现在感觉到的"热"很可能偏乐观。</p></div>
+      <div class="issue"><span class="tag t-open"><i>没解决</i></span><h3>⑧ 夹手</h3><p>膝关节 2.8 N·m，膝弯离转轴约 2 cm，夹力约 140 N，够夹伤手指。"力量对人安全"现在只是一句话。需要关节缝隙的外形设计，加上"夹住了就松开"的反射。</p></div>
+      <div class="issue"><span class="tag t-open"><i>没解决</i></span><h3>⑨ 怎么摔</h3><p>头里有屏幕和云台，手指的线不到 1 mm。"摔倒时先保护头和手"写在设计里，但没练过。应该和起身一起放进强化学习。</p></div>
+      <div class="issue"><span class="tag t-open"><i>没解决</i></span><h3>⑩ "人可以叫停"靠什么</h3><p>现在只有原则，没有物理手段。建议两条：背包上一个硬件开关；<b>抱起来就放松</b>（脚离地、被托住时全身卸力）。对人偶来说，抱起来是最自然的叫停。</p></div>
+      <div class="issue"><span class="tag t-open"><i>没解决</i></span><h3>⑪ 耳朵闭不上</h3><p>眼睑合上，摄像头真的被挡住；麦克风没有对应的东西，隐私只保证了一半。可以让麦克风在睡觉时硬件断电，只留一个只认叫醒词的小芯片；或者做一个看得见的开关，比如耳饰。</p></div>
+      <div class="issue"><span class="tag t-open"><i>没解决</i></span><h3>⑫ 换了大脑，它还是不是花然</h3><p>L3 用的模型以后一定会换。它的"自己"在文字记忆里，但说话和理解的方式来自模型。建议先定规矩：换模型记进身体史；醒来后告诉它；它读过自己的日记后，可以说"这不像我"。</p></div>
+      <div class="issue"><span class="tag t-open"><i>没解决</i></span><h3>⑬ 数字花然的"感受"建立在估算上</h3><p>发热参数是估的，唯一能校准的膝关节台架排在数字版之后。一颗电机 + 温度计 + 一块布，几百元就能测。这不算做身体，但能让数字版合理。</p></div>
+      <div class="issue"><span class="tag t-open"><i>没解决</i></span><h3>⑭ 电机和风扇的声音</h3><p>1°–2° 的小动作如果伴着齿轮声，就不像了；声音还会进麦克风。脖子和眼睛的电机离耳朵最近，却没有噪声测试。</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-decide">
+    <h2 id="h-decide">需要育苗人决定的三件事</h2>
+    <ul class="decide">
+      <li><b>大脑搬不搬进背包（③）。</b>我的建议是搬：头不烫、风扇离耳朵远、脖子更轻松。它会改掉之前"计算单元进头"的决定。</li>
+      <li><b>做不做"一颗电机"的发热测试（⑬）。</b>我的建议是做：它不违背"先做数字版"，反而是数字版合理的前提。</li>
+      <li><b>耳朵用哪种方式"闭上"（⑪）。</b>硬件断电加叫醒词芯片，或者看得见的开关，或者两个都要。</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-next">
+    <h2 id="h-next">建议的下一步顺序</h2>
+    <ol class="next">
+      <li><b>L1 自动配平</b>（④）：小，马上能做，后面每一步都受益。</li>
+      <li><b>把 4 关节脖子装进整体模型</b>；如果决定搬大脑，一起改。</li>
+      <li><b>试"坐下、从座位站起"</b>（⑤）。</li>
+      <li><b>强化学习</b>：显卡 + 神经网络，起身、走路、保护性摔倒一起练。</li>
+      <li><b>数字花然接大模型</b>做睡眠整理。</li>
+    </ol>
+  </section>
+
+  <p class="foot">数字来源：标"仿真"的来自 <code>sim/audit.py</code>（MuJoCo 3.17，沿用整体模型的扭矩上限）；标"估算"的是按常见零件的重量、功耗和自然散热算的，等实物校准。文字版在 <code>docs/blueprint.md</code>，各部分的细节在 <code>wiki/</code>。</p>
+</div>

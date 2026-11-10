@@ -1,0 +1,111 @@
+{
+ "ledger": {
+  "head_g": 310,
+  "head_with_tongue_g": 380,
+  "head_model_g": 300,
+  "chest_need": 132,
+  "chest_avail": 147,
+  "power_base_W": 3.1,
+  "modes": {
+   "低功耗（听、看、发呆） · 坐着（下半身不出力）": {
+    "W": 7.1,
+    "hours": 3.6
+   },
+   "低功耗（听、看、发呆） · 站着说话、做表情": {
+    "W": 10.1,
+    "hours": 2.5
+   },
+   "低功耗（听、看、发呆） · 走路、练习": {
+    "W": 16.1,
+    "hours": 1.6
+   },
+   "本地跑视觉和小语言模型 · 坐着（下半身不出力）": {
+    "W": 14.1,
+    "hours": 1.8
+   },
+   "本地跑视觉和小语言模型 · 站着说话、做表情": {
+    "W": 17.1,
+    "hours": 1.5
+   },
+   "本地跑视觉和小语言模型 · 走路、练习": {
+    "W": 23.1,
+    "hours": 1.1
+   }
+  },
+  "heat": {
+   "area_cm2": 266,
+   "all_W": 4.8,
+   "half_W": 2.4
+  }
+ },
+ "sim": {
+  "now": {
+   "title": "① 现在的模型",
+   "head": 0.3,
+   "pack": 0.2,
+   "total_kg": 3.17,
+   "com_z_cm": 31.1,
+   "com_x_mm": -0.2,
+   "squat_fell": false,
+   "knee_peak_Nm": 1.3,
+   "single_fell": false,
+   "walk_fell": false,
+   "walk_cm": 16.3,
+   "push_fwd_N": 5,
+   "push_back_N": 3,
+   "neck_prone_C": 49.5,
+   "neck_prone_Nm": 0.107
+  },
+  "heavy": {
+   "title": "② 头变重（加舌头或厚头发）",
+   "head": 0.38,
+   "pack": 0.2,
+   "total_kg": 3.25,
+   "com_z_cm": 31.6,
+   "com_x_mm": -0.2,
+   "squat_fell": false,
+   "knee_peak_Nm": 1.36,
+   "single_fell": false,
+   "walk_fell": false,
+   "walk_cm": 17.3,
+   "push_fwd_N": 5,
+   "push_back_N": 3,
+   "neck_prone_C": 64.7,
+   "neck_prone_Nm": 0.136
+  },
+  "split": {
+   "title": "③ 大脑搬到背包",
+   "head": 0.25,
+   "pack": 0.29,
+   "total_kg": 3.21,
+   "com_z_cm": 31.1,
+   "com_x_mm": -1.8,
+   "squat_fell": true,
+   "knee_peak_Nm": 1.37,
+   "single_fell": false,
+   "walk_fell": true,
+   "walk_cm": -28.9,
+   "push_fwd_N": 5,
+   "push_back_N": 3,
+   "neck_prone_C": 41.9,
+   "neck_prone_Nm": 0.089
+  },
+  "split_tongue": {
+   "title": "④ 搬到背包 + 舌头",
+   "head": 0.32,
+   "pack": 0.29,
+   "total_kg": 3.28,
+   "com_z_cm": 31.5,
+   "com_x_mm": -1.8,
+   "squat_fell": true,
+   "knee_peak_Nm": 1.36,
+   "single_fell": false,
+   "walk_fell": true,
+   "walk_cm": -28.5,
+   "push_fwd_N": 5,
+   "push_back_N": 3,
+   "neck_prone_C": 53.0,
+   "neck_prone_Nm": 0.114
+  }
+ }
+}
