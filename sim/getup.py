@@ -256,7 +256,7 @@ def run(x, record=None):
     t_rise = ks[-2][0]
     t_end = ks[-1][0] + 1.5
     hist, best_prog, balancing = [], 0.0, False
-    neck_i = m.actuator("neck_pitch").id
+    neck_i = [m.actuator(n).id for n in ("neck_pitch", "neck_low") if n in sim.act]   # 4 关节脖子：上下两个俯仰都放松
     neck_base = m.actuator_forcerange[neck_i].copy()
     for k in range(int(t_end / dt)):
         t = k * dt

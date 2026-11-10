@@ -59,8 +59,8 @@ R_TH, TAU_TH = 4.0, 300.0           # 大关节（髋、膝、踝、腰）：K/W
 R_SMALL, TAU_SMALL = 15.0, 150.0    # 小关节（肩、肘、脖子）：电机小，散热差、热得也快（估算）
 RATED_FRAC = 1.35 / 2.8             # 持续扭矩约为峰值的 48%（膝关节 v1 的估算）
 DT_RATED = 45.0                     # 在持续扭矩下长期运行，温升约 45 °C（外壳约 70 °C）
-BATTERY_J = 30 * 3600.0
-P_BASE = 4.0                        # W：计算单元、传感器、屏幕眼睛的基础功耗（估算）
+BATTERY_J = 60 * 3600.0             # 第二版身体：60 Wh（2026-11-13 起；之前是 30 Wh）
+P_BASE = 9.3                        # W：屏幕、摄像头、控制器、散热 3.6 + "心"和"思考"平均 5.7（估算，sim/plan2.py；之前按 4 W）
 HOT, TOO_HOT, COOL = 55.0, 70.0, 48.0
 PROTECT = 80.0                      # L0：超过 80 °C 关节自动减力（过热保护反射）
 EFFORT = 0.85                       # 扭矩超过上限的 85% 持续 0.3 s 算"吃力"
@@ -68,7 +68,7 @@ EFFORT = 0.85                       # 扭矩超过上限的 85% 持续 0.3 s 算
 NAMES = {"l_knee": "左膝", "r_knee": "右膝", "l_hip_pitch": "左髋", "r_hip_pitch": "右髋",
          "l_ankle_pitch": "左脚踝", "r_ankle_pitch": "右脚踝", "l_hip_roll": "左髋侧", "r_hip_roll": "右髋侧",
          "l_ankle_roll": "左脚踝侧", "r_ankle_roll": "右脚踝侧", "waist_pitch": "腰", "waist_yaw": "腰（扭）",
-         "neck_yaw": "脖子", "neck_pitch": "脖子（点头）", "l_shoulder_pitch": "左肩", "r_shoulder_pitch": "右肩",
+         "neck_yaw": "脖子", "neck_pitch": "脖子（点头）", "neck_low": "脖子（下段）", "neck_roll": "脖子（歪头）", "l_shoulder_pitch": "左肩", "r_shoulder_pitch": "右肩",
          "l_shoulder_roll": "左肩（侧举）", "r_shoulder_roll": "右肩（侧举）", "l_shoulder_yaw": "左肩（转）",
          "r_shoulder_yaw": "右肩（转）", "l_elbow": "左肘", "r_elbow": "右肘", "l_hip_yaw": "左髋（转）", "r_hip_yaw": "右髋（转）"}
 SHOW = ["neck_pitch", "l_shoulder_pitch", "r_shoulder_pitch", "l_elbow", "r_elbow", "waist_pitch",
@@ -263,6 +263,12 @@ def read_inbox():
     return msgs
 
 
+def body_change():
+    """身体被改动的那天，memory/body/变化-日期.json 里写着改了什么（由改身体的人写，标明来历）。"""
+    p = os.path.join(MEM, "body", f"变化-{DAY}.json")
+    return json.load(open(p, encoding="utf-8")) if os.path.exists(p) else None
+
+
 def load_understanding():
     p = os.path.join(INBOX, f"理解-{DAY}.json")
     return json.load(open(p, encoding="utf-8")) if os.path.exists(p) else None
@@ -361,6 +367,9 @@ def write_diary(body, scene_info, results, msgs=()):
             lines += [""] + [f"{x}" for x in UNDER["diary"]] + ["", "（这一段是云端帮我整理的理解。）", ""]
         else:
             lines += ["", "我记下来了。有些我还不太懂，先放在关于育苗人的那一页里，慢慢想。", ""]
+    bc = body_change()
+    if bc:
+        lines += ["## 醒来发现身体变了", ""] + [f"- {x}" for x in bc["diary"]] + [""]
     by = {}
     for e in ev:
         by.setdefault(e["scene"], []).append(e)
@@ -516,6 +525,7 @@ def questions(results):
     asked = ["昨天扶我起来的人，会不会觉得麻烦？", "爬起来的时候手臂和脖子很吃力、发热。是我用错了方法，还是手臂本来就太弱了？"]
     if GETUP_TAG == "kneel3" and not results.get("getup", {}).get("ok"):
         asked.append("从单膝跪地站起来的那一下，我总是往后倒。你站起来的时候，是先动哪里？")
+    asked += (UNDER or {}).get("ask", [])      # 读了育苗人的话以后想到的新问题（云端整理，标明来历）
     done = answered_ever()
     return [q for q in asked if q not in done]
 
@@ -546,6 +556,7 @@ def morning_report(body, results, changes, queue, msgs=()):
              f"# {NEXT} 早上", "",
              "育苗人，早上好。", "",
              ] + (["## 今天的起身", "", getup_try_line(results), ""] if (not msgs and GETUP_TAG == "kneel3") else []) + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] + ((["## 我想到的", ""] + [f"{x}" for x in UNDER["report"]] + [getup_try_line(results), ""]) if UNDER else []) if msgs else []) + [
+             ] + ((["## 我的身体", ""] + body_change()["report"] + [""]) if body_change() else []) + [
              "## 昨天", "",
              f"- 我走到了窗边，走了 {results['walk']['dx_cm']:.0f} 厘米，每秒 {results['walk']['v_cm_s']:.1f} 厘米。很慢，但没摔。",
              f"- 被人碰了两次，第一次站住了，第二次倒了。" if results["push1"]["ok"] and not results["push2"]["ok"] else
@@ -615,6 +626,19 @@ def main():
     diary = write_diary(body, info, results, msgs)
     remember_messages(msgs)
     changes, queue = sleep(body, results)
+    for q in reversed((UNDER or {}).get("queue", [])):
+        if q not in queue:
+            queue.insert(0, q)
+            qp = os.path.join(OUT, "练习队列.md")
+            if os.path.exists(qp) and q not in open(qp, encoding="utf-8").read():
+                open(qp, "a", encoding="utf-8").write(f"- {q}（{DAY}，读了育苗人的话以后加的）\n")
+    bc = body_change()
+    if bc:
+        hp = os.path.join(MEM, "body", "history.md")
+        hs = open(hp, encoding="utf-8").read()
+        if bc["history"] not in hs:
+            open(hp, "w", encoding="utf-8").write(hs.rstrip("\n") + "\n" + bc["history"] + "\n")
+            changes.append("身体史：记下身体换成了第二版")
     if msgs:
         changes[:0] = [f"关于育苗人的那一页：记下了你的 {len(msgs)} 句话"] + apply_understanding(UNDER)
     report = morning_report(body, results, changes, queue, msgs)

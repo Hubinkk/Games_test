@@ -21,6 +21,49 @@ import tendon_knee as tk
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "figure55_full.xml")
+REF = os.path.join(HERE, "figure55_full_ref.xml")   # 第一版身体：动作是照着它设计的，自动配平拿它做参考
+
+# ---------- 第二版身体（2026-11-10，docs/blueprint.md 第 7 节）----------
+# 头：大脑留在头里，加一块冷板；背后模块：60 Wh 电池 + 散热；4 关节脖子，电机在胸腔；
+# 控制板搬到腹部；每只手的 2 个手腕电机搬进前臂
+V2_MASS = [
+    ('<geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.30"', '<geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.32"', 1),
+    ('<geom name="backpack" type="box" pos="-0.041 0 0.032" size="0.012 0.030 0.026" mass="0.20"',
+     '<geom name="backpack" type="box" pos="-0.051 0 0.032" size="0.022 0.030 0.026" mass="0.31"', 1),
+    ('<geom name="chest" type="box" pos="0 0 0.035" size="0.028 0.04 0.035" mass="0.62"/>',
+     '<geom name="chest" type="box" pos="0 0 0.035" size="0.028 0.04 0.035" mass="0.57"/>', 1),   # +4 个脖子电机 48 g，−控制板 50 g，−手腕电机 44 g
+    ('<geom type="capsule" fromto="0 0 0 0 0 0.045" size="0.03" mass="0.21"/>', '<geom type="capsule" fromto="0 0 0 0 0 0.045" size="0.03" mass="0.26"/>', 1),
+    ('<geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.05"/>', '<geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.072"/>', 2),
+]
+NECK_OLD = """<body name="neck" pos="0 0 0.07">
+            <joint name="neck_yaw" axis="0 0 1" range="-1.0 1.0" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 0.02" size="0.011" mass="0.03"/>
+            <body name="head" pos="0 0 0.022">
+              <joint name="neck_pitch" axis="0 1 0" range="-0.5 0.6" class="small"/>"""
+NECK_NEW = """<body name="neck" pos="0 0 0.07">
+            <joint name="neck_low" axis="0 1 0" range="-0.5 0.6" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 0.018" size="0.010" mass="0.012"/>
+            <body name="neck_up" pos="0 0 0.018">
+            <joint name="neck_yaw" axis="0 0 1" range="-1.4 1.4" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 0.006" size="0.009" mass="0.006"/>
+            <body name="head" pos="0 0 0.006">
+              <joint name="neck_pitch" axis="0 1 0" range="-0.7 0.6" class="small"/>
+              <joint name="neck_roll" axis="1 0 0" range="-0.45 0.45" class="small"/>"""
+NECK_ACT_OLD = '<position name="neck_pitch" joint="neck_pitch" kp="2" kv="0.05" forcerange="-0.3 0.3"/>'
+NECK_ACT_NEW = NECK_ACT_OLD + """
+    <position name="neck_low" joint="neck_low" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
+    <position name="neck_roll" joint="neck_roll" kp="2" kv="0.05" forcerange="-0.3 0.3"/>"""
+
+
+def v2(s):
+    for a, b, n in V2_MASS:
+        assert s.count(a) == n, a
+        s = s.replace(a, b)
+    assert s.count(NECK_OLD) == 1 and s.count(NECK_ACT_OLD) == 1
+    i = s.index(NECK_OLD)
+    j = s.index("</body>", i) + len("</body>")          # 头的结束标签；后面多补一个，关上 neck_up
+    s = s[:i] + NECK_NEW + s[i + len(NECK_OLD):j] + "\n            </body>" + s[j:]
+    return s.replace(NECK_ACT_OLD, NECK_ACT_NEW)
 
 # 体积预算推荐方案下的重量（kg）
 MASS = [
@@ -103,7 +146,8 @@ def build():
             act += f'    <position name="{p}{tn}" tendon="{p}{tn}" kp="6000" kv="{kv}" forcerange="-{fr} {fr}"/>\n'
     s = s.replace("  <tendon>\n", "  <contact>" + excl + "</contact>\n  <equality>\n" + eq + "  </equality>\n  <tendon>\n" + ten, 1)
     s = s.replace("  </actuator>", act + "  </actuator>", 1)
-    open(OUT, "w", encoding="utf-8").write(s)
+    open(REF, "w", encoding="utf-8").write(s)
+    open(OUT, "w", encoding="utf-8").write(v2(s))
 
 
 if __name__ == "__main__":

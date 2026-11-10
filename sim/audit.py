@@ -88,7 +88,7 @@ VARIANTS = [
 
 
 def variant_xml(head, pack):
-    s = open(fb.OUT, encoding="utf-8").read()
+    s = open(fb.REF, encoding="utf-8").read()
     a = '<geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.30"'
     b = '<geom name="backpack" type="box" pos="-0.041 0 0.032" size="0.012 0.030 0.026" mass="0.20"'
     assert s.count(a) == 1 and s.count(b) == 1

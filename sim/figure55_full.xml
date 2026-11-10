@@ -55,23 +55,28 @@
       <body name="abdomen" pos="0 0 0.035">
         <joint name="waist_yaw" axis="0 0 1" range="-0.8 0.8" class="big"/>
         <joint name="waist_pitch" axis="0 1 0" range="-0.3 0.6" class="big"/>
-        <geom type="capsule" fromto="0 0 0 0 0 0.045" size="0.03" mass="0.21"/>
+        <geom type="capsule" fromto="0 0 0 0 0 0.045" size="0.03" mass="0.26"/>
 
         <body name="chest" pos="0 0 0.05">
           <!-- 胸腔：大脑、散热风扇、肩部驱动器 -->
-          <geom name="chest" type="box" pos="0 0 0.035" size="0.028 0.04 0.035" mass="0.62"/>
+          <geom name="chest" type="box" pos="0 0 0.035" size="0.028 0.04 0.035" mass="0.57"/>
           <!-- 背包：30 Wh 电池，做成角色的背包 -->
-          <geom name="backpack" type="box" pos="-0.041 0 0.032" size="0.012 0.030 0.026" mass="0.20" rgba="0.62 0.52 0.78 1"/>
+          <geom name="backpack" type="box" pos="-0.051 0 0.032" size="0.022 0.030 0.026" mass="0.31" rgba="0.62 0.52 0.78 1"/>
 
           <body name="neck" pos="0 0 0.07">
-            <joint name="neck_yaw" axis="0 0 1" range="-1.0 1.0" class="small"/>
-            <geom type="capsule" fromto="0 0 0 0 0 0.02" size="0.011" mass="0.03"/>
-            <body name="head" pos="0 0 0.022">
-              <joint name="neck_pitch" axis="0 1 0" range="-0.5 0.6" class="small"/>
-              <geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.30" rgba="0.95 0.85 0.79 1"/>
+            <joint name="neck_low" axis="0 1 0" range="-0.5 0.6" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 0.018" size="0.010" mass="0.012"/>
+            <body name="neck_up" pos="0 0 0.018">
+            <joint name="neck_yaw" axis="0 0 1" range="-1.4 1.4" class="small"/>
+            <geom type="capsule" fromto="0 0 0 0 0 0.006" size="0.009" mass="0.006"/>
+            <body name="head" pos="0 0 0.006">
+              <joint name="neck_pitch" axis="0 1 0" range="-0.7 0.6" class="small"/>
+              <joint name="neck_roll" axis="1 0 0" range="-0.45 0.45" class="small"/>
+              <geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.32" rgba="0.95 0.85 0.79 1"/>
               <geom class="vis" type="ellipsoid" pos="-0.008 0 0.05" size="0.05 0.051 0.048" rgba="0.72 0.7 0.85 1"/>
               <geom class="vis" type="ellipsoid" pos="0.041 0.016 0.037" size="0.004 0.008 0.01" rgba="0.45 0.38 0.8 1"/>
               <geom class="vis" type="ellipsoid" pos="0.041 -0.016 0.037" size="0.004 0.008 0.01" rgba="0.45 0.38 0.8 1"/>
+            </body>
             </body>
           </body>
 
@@ -83,7 +88,7 @@
             <geom type="capsule" fromto="0 0 0 0 0 -0.085" size="0.011" mass="0.10"/>
             <body name="l_forearm" pos="0 0 -0.085">
               <joint name="l_elbow" axis="0 1 0" range="-2.4 0" class="small"/>
-              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.05"/>
+              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.072"/>
               <body name="L_hand" pos="0 0 -0.081" xyaxes="0 0 -1 -1 0 0" childclass="hand">
 <body name="L_palm">
         <joint name="L_wrist_pitch" axis="0 1 0" range="-0.9 0.9"/>
@@ -174,7 +179,7 @@
             <geom type="capsule" fromto="0 0 0 0 0 -0.085" size="0.011" mass="0.10"/>
             <body name="r_forearm" pos="0 0 -0.085">
               <joint name="r_elbow" axis="0 1 0" range="-2.4 0" class="small"/>
-              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.05"/>
+              <geom type="capsule" fromto="0 0 0 0 0 -0.075" size="0.009" mass="0.072"/>
               <body name="R_hand" pos="0 0 -0.081" xyaxes="0 0 -1 1 0 0" childclass="hand">
 <body name="R_palm">
         <joint name="R_wrist_pitch" axis="0 1 0" range="-0.9 0.9"/>
@@ -398,6 +403,8 @@
     <position name="waist_pitch" joint="waist_pitch" kp="15" kv="0.4" forcerange="-2.0 2.0"/>
     <position name="neck_yaw" joint="neck_yaw" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
     <position name="neck_pitch" joint="neck_pitch" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
+    <position name="neck_low" joint="neck_low" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
+    <position name="neck_roll" joint="neck_roll" kp="2" kv="0.05" forcerange="-0.3 0.3"/>
 
     <position name="l_shoulder_pitch" joint="l_shoulder_pitch" kp="4" kv="0.1" forcerange="-1.0 1.0"/>
     <position name="l_shoulder_roll" joint="l_shoulder_roll" kp="4" kv="0.1" forcerange="-1.0 1.0"/>

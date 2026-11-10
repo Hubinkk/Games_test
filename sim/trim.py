@@ -28,6 +28,7 @@ import numpy as np
 import figure_stress
 import figure_test
 import full_build as fb
+from autotrim import Trim
 from balance import Balance
 from full_demo import FullSim, scene_single_leg, scene_squat, scene_walk
 
@@ -37,61 +38,8 @@ EVERY = 0.02         # 每 20 ms 重算一次
 MAX_TRIM = 0.25      # 腰最多修正这么多弧度
 
 
-class Trim:
-    """包在 sim.set_targets 外面：每次给姿势时，顺便把腰修正到重心回到设计位置。"""
-
-    def __init__(self, sim, target_x):
-        self.sim, self.target = sim, target_x
-        self.m = sim.m
-        self.d = mujoco.MjData(self.m)          # 草稿：只用来"想"，不影响真的身体
-        self.mref = mujoco.MjModel.from_xml_path(fb.OUT)   # 参考身体：设计动作时的重量分布
-        self.dref = mujoco.MjData(self.mref)
-        self.q0 = self.m.qpos0.copy()
-        self.adr = {self.m.joint(j).name: self.m.jnt_qposadr[j] for j in range(self.m.njnt) if self.m.jnt_type[j] == 3}
-        self.feet = [self.m.geom(f"{s}_foot").id for s in ("l", "r")]
-        self.pelvis = self.m.body("pelvis").id
-        self.delta, self.t_last = 0.0, -1.0
-        self.orig = sim.set_targets
-        sim.set_targets = self.set_targets
-        self.history = []
-
-    def com_x(self, pose, waist_extra=0.0, ref=False):
-        d = self.dref if ref else self.d
-        m = self.mref if ref else self.m
-        d.qpos[:] = self.q0
-        for k, v in pose.items():
-            a = self.adr.get(k)
-            if a is not None:
-                d.qpos[a] = v
-        d.qpos[self.adr["waist_pitch"]] += waist_extra
-        mujoco.mj_kinematics(m, d)
-        mujoco.mj_comPos(m, d)
-        com = d.subtree_com[self.pelvis]
-        sup = np.mean([d.geom_xpos[g] for g in self.feet], axis=0)
-        # 骨盆在草稿里是直立的；脚不一定正好放平，所以用"相对脚掌中心"的水平距离
-        return float(com[0] - sup[0])
-
-    def solve(self, pose):
-        x0 = self.com_x(pose)
-        k = (self.com_x(pose, 0.05) - x0) / 0.05          # 腰前弯 1 弧度，重心前移多少米
-        if abs(k) < 1e-4:
-            return 0.0
-        return float(np.clip((self.com_x(pose, ref=True) - x0) / k, -MAX_TRIM, MAX_TRIM))
-
-    def set_targets(self, pose):
-        t = self.sim.d.time
-        if t - self.t_last >= EVERY or t < self.t_last:
-            body_pose = {k: v for k, v in pose.items() if not k.startswith("hand_")}
-            self.delta = self.solve(body_pose)
-            self.t_last = t
-            self.history.append(self.delta)
-        pose = dict(pose)
-        pose["waist_pitch"] = pose.get("waist_pitch", 0.0) + self.delta
-        self.orig(pose)
-
-
 def variant_xml(head, pack, pack_half_thick):
-    s = open(fb.OUT, encoding="utf-8").read()
+    s = open(fb.REF, encoding="utf-8").read()
     a = '<geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.30"'
     b = '<geom name="backpack" type="box" pos="-0.041 0 0.032" size="0.012 0.030 0.026" mass="0.20"'
     assert s.count(a) == 1 and s.count(b) == 1
@@ -114,23 +62,13 @@ def push_limit(sim, bal, sign):
     return best
 
 
-def measure_target():
-    """现在的模型站着时，重心在脚掌中心前后多少：这就是"设计位置"。"""
-    figure_test.MODEL = fb.OUT
-    sim = FullSim()
-    tr = Trim(sim, 0.0)
-    x = tr.com_x(figure_test.stand_pose())
-    sim.set_targets = tr.orig
-    return x
-
-
 def run(head, pack, thick, use_trim):
     path = variant_xml(head, pack, thick)
     try:
         figure_test.MODEL = path
         sim = FullSim()
         total = float(sum(sim.m.body_mass))
-        tr = Trim(sim, TARGET_X) if use_trim else None
+        tr = Trim(sim, fb.REF) if use_trim else None
         rec = type("R", (), {"label": ""})()
         sq = scene_squat(sim, rec)
         sl = scene_single_leg(sim, rec)
@@ -156,9 +94,7 @@ VARIANTS = [
 def main():
     global TARGET_X
     fb.build()
-    TARGET_X = measure_target()
-    print(f"设计位置：重心在脚掌中心前 {TARGET_X*1000:.1f} mm\n")
-    out = {"target_mm": round(TARGET_X * 1000, 1), "variants": {}}
+    out = {"variants": {}}
     for key, title, head, pack, thick in VARIANTS:
         res = {}
         for use in (False, True):

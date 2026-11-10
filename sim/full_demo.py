@@ -20,6 +20,7 @@ import os
 import mujoco
 import numpy as np
 
+import autotrim
 import figure_stress
 import figure_test
 import full_build as fb
@@ -70,6 +71,10 @@ class FullSim(tk.TendonSim):
         m = self.m
         self.hand_dofs = [m.jnt_dofadr[j] for j in range(m.njnt) if m.joint(j).name[:2] in ("L_", "R_")]
         self.hand_act = {k: [i for n, i in self.act.items() if n.startswith(k + "_")] for k in "LR"}
+        # 第二版身体：自动配平（L1）。只在用正式的整体模型时装上；测试用的临时模型自己决定装不装
+        self.trim = None
+        if os.path.abspath(figure_test.MODEL) == os.path.abspath(fb.OUT) and os.path.exists(fb.REF):
+            self.trim = autotrim.Trim(self, fb.REF)
 
     # ---------- 手部控制 ----------
     def full_q(self, q):
