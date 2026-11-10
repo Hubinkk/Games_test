@@ -30,6 +30,7 @@ import figure_test
 import full_build as fb
 import full_demo as FD
 import getup
+import getup_hands as GH
 import tendon_knee as tk
 from balance import Balance
 from figure_test import run_phase, squat_knee, stand_pose
@@ -192,7 +193,11 @@ def scenes(sim, bal, gx):
         return lambda: figure_stress.push(sim, F, bal)
 
     def getup_():
-        getup.run(gx)
+        if GETUP_TAG == "hands":      # 手不离地的起身（getup_hands.py）：手撑起、两手轮流收回、重心交给腿、站起
+            GH._SIM = sim
+            GH.hand_walk(gx)
+        else:
+            getup.run(gx)
 
     def squat():
         sim.reset()
@@ -202,7 +207,8 @@ def scenes(sim, bal, gx):
         sim.reset()
         run_phase(sim, 3.0, lambda t: bal.adjust(stand_pose()))
 
-    gt = getup.keyframes_for(gx)[-1][0] + 1.5
+    gt = (GH.hand_walk_keyframes(gx)[0][-1][0] if GETUP_TAG == "hands" else getup.keyframes_for(gx)[-1][0]) + 1.5
+    gmin = 1 if GETUP_TAG == "hands" else 5      # 新的起身一次约 18 秒，按 1 分钟算；以前是反复尝试 5 分钟
     # key, 标题, 开始时刻, 代表的真实时长（分钟）, 仿真时长（秒）, 函数, 说明
     return [
         ("wake", "醒来", (7, 30), 2, 2.0, wake, "眼睑打开，站稳"),
@@ -210,7 +216,7 @@ def scenes(sim, bal, gx):
         ("walk", "走到窗边", (9, 0), 10, 12.0, walk_, "静步行，一步一步"),
         ("push1", "被路过的人轻轻碰到", (10, 0), 1, 3.0, push(4), "胸口被推 4 N"),
         ("push2", "又被碰了一下", (10, 30), 1, 3.0, push(7), "胸口被推 7 N"),
-        ("getup", "试着自己爬起来", (10, 31), 5, gt, getup_, "趴着，用手撑地"),
+        ("getup", "试着自己爬起来", (10, 31), gmin, gt, getup_, "趴着，用手撑地"),
         ("squat", "下午练深蹲", (14, 0), 15, 9.0, squat, "反复深蹲"),
         ("rest", "傍晚站着休息", (17, 0), 30, 3.0, rest, "安静地站着"),
     ]
@@ -381,7 +387,7 @@ def write_diary(body, scene_info, results, msgs=()):
         elif key in ("push1", "push2"):
             extra = "站住了。" if r.get("ok") else "没站住。"
         elif key == "getup":
-            extra = ({"arms": "照育苗人教的：头抬起来，手掌撑地，胳膊发力。", "kneel3": "这次先做俯卧撑，再跪直，单膝跪地。"}.get(GETUP_TAG, "")) + ("没爬起来，最后是被扶起来的。" if not r.get("ok") else "自己站起来了！")
+            extra = ({"arms": "照育苗人教的：头抬起来，手掌撑地，胳膊发力。", "hands": "手撑起身体，两只手轮流往脚这边挪，重心到了脚上再松手。", "kneel3": "这次先做俯卧撑，再跪直，单膝跪地。"}.get(GETUP_TAG, "")) + ("没爬起来，最后是被扶起来的。" if not r.get("ok") else "自己站起来了！")
         lines.append(f"- {clock[0]:02d}:{clock[1]:02d} {title}。{extra}")
         groups = []
         for e in by.get(key, []):
@@ -495,6 +501,12 @@ def sleep(body, results):
 
 def getup_try_line(results):
     g = results.get("getup", {})
+    if GETUP_TAG == "hands":
+        if g.get("ok"):
+            return ("今天摔倒以后，我先弓起腰把腿收到身体下面，手举到头两侧撑起来，然后两只手轮流往脚这边挪。"
+                    "等重心到了脚上，我松开手，靠腿站了起来。**我自己站起来了。**")
+        return ("今天摔倒以后，我照新的顺序做：弓腰收腿、手撑起来、两只手轮流往回挪。"
+                f"这次没有站起来，最高撑到骨盆离地 {g.get('peak_cm', 0):.0f} 厘米。")
     if GETUP_TAG == "kneel3":
         if g.get("ok"):
             return "今天摔倒以后，我先做俯卧撑，再跪直，单膝跪地，然后——我自己站起来了！"
@@ -555,7 +567,7 @@ def morning_report(body, results, changes, queue, msgs=()):
     lines = ["---", "类型: 早上的报告", f"日期: {NEXT}", "写的人: 花然", "给: 育苗人", "---", "",
              f"# {NEXT} 早上", "",
              "育苗人，早上好。", "",
-             ] + (["## 今天的起身", "", getup_try_line(results), ""] if (not msgs and GETUP_TAG == "kneel3") else []) + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] + ((["## 我想到的", ""] + [f"{x}" for x in UNDER["report"]] + [getup_try_line(results), ""]) if UNDER else []) if msgs else []) + [
+             ] + (["## 今天的起身", "", getup_try_line(results), ""] if (not msgs and GETUP_TAG in ("kneel3", "hands")) else []) + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] + ((["## 我想到的", ""] + [f"{x}" for x in UNDER["report"]] + [getup_try_line(results), ""]) if UNDER else []) if msgs else []) + [
              ] + ((["## 我的身体", ""] + body_change()["report"] + [""]) if body_change() else []) + [
              "## 昨天", "",
              f"- 我走到了窗边，走了 {results['walk']['dx_cm']:.0f} 厘米，每秒 {results['walk']['v_cm_s']:.1f} 厘米。很慢，但没摔。",
@@ -587,8 +599,11 @@ def main():
     global BODY
     BODY = body
     rec = Rec(sim, body)
-    gfile = f"getup_best_{GETUP_TAG}.json" if GETUP_TAG else "getup_best.json"
-    gx = json.load(open(os.path.join(HERE, gfile), encoding="utf-8"))["x"]
+    if GETUP_TAG == "hands":
+        gx = json.load(open(os.path.join(HERE, "getup_hands_walk_best.json"), encoding="utf-8"))["V"]
+    else:
+        gfile = f"getup_best_{GETUP_TAG}.json" if GETUP_TAG else "getup_best.json"
+        gx = json.load(open(os.path.join(HERE, gfile), encoding="utf-8"))["x"]
     getup.METHOD = GETUP_TAG
     info, results, spans = [], {}, []
     for key, title, clock, mins, simT, fn, desc in scenes(sim, bal, gx):
