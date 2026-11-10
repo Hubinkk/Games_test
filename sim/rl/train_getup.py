@@ -62,6 +62,7 @@ def export(params, path):
 
 def main():
     smoke = "--smoke" in sys.argv
+    tag = "_smoke" if smoke else ""        # 试跑的产物另外起名，不和真正的训练结果混在一起
     steps = arg("steps", 200_000 if smoke else 100_000_000)
     envs = arg("envs", 16 if smoke else 2048)
     env = GetUp(os.path.join(HERE, "huaran_rl.xml"), os.path.join(HERE, "ref_getup.json"))
@@ -77,7 +78,7 @@ def main():
                    height=round(float(metrics.get("eval/episode_height", 0.0)) / episode * 100, 1))
         log.append(row)
         print(f"{row['steps']:>11,} 步  {row['minutes']:>6} 分钟  得分 {row['reward']:>7}  松手后站着的时间比例 {row['success']:.0%}  平均骨盆高 {row['height']} cm", flush=True)
-        json.dump(log, open(os.path.join(HERE, "getup_progress.json"), "w"), indent=1)
+        json.dump(log, open(os.path.join(HERE, f"getup_progress{tag}.json"), "w"), indent=1)
 
     net = functools.partial(ppo_networks.make_ppo_networks, policy_hidden_layer_sizes=HIDDEN, value_hidden_layer_sizes=(256, 256, 256))
     make_inference, params, _ = ppo.train(
@@ -87,8 +88,8 @@ def main():
         batch_size=16 if smoke else 256, num_minibatches=4 if smoke else 32, num_updates_per_batch=4,
         normalize_observations=True, reward_scaling=1.0, clipping_epsilon=0.2, max_grad_norm=1.0,
         network_factory=net, seed=arg("seed", 0), progress_fn=progress)
-    keys = export(params, os.path.join(HERE, "getup_policy.npz"))
-    print("已保存 getup_policy.npz：", len(keys), "个数组")
+    keys = export(params, os.path.join(HERE, f"getup_policy{tag}.npz"))
+    print(f"已保存 getup_policy{tag}.npz：", len(keys), "个数组")
     return make_inference, params, env
 
 
