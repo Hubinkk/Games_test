@@ -1,0 +1,139 @@
+{
+ "policy": "getup_policy.npz",
+ "push": true,
+ "head": 0.7,
+ "runs": [
+  {
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 16.0,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.5,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 16.0,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.5,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.8,
+   "seed": 0,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 16.0,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.8,
+   "seed": 1,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.5,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.8,
+   "seed": 2,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  },
+  {
+   "friction": 1.8,
+   "seed": 3,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6,
+   "head": 0.7,
+   "tilt_2_5s": 93
+  }
+ ]
+}

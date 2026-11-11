@@ -6,6 +6,7 @@
     python eval_robust.py getup_policy.npz [--trials=4] [--nopush]      # 写 eval_robust_result.json
 
 可选（2026-11-11 加，不给时和原来完全一样）：
+    --neck=turn       起身的头 4.5 秒，头转向左边并低头（结果文件名加 _neckturn）。
     --head=1.0        头（geom "head"，唯一会碰地的头部几何体）和地面之间单独用这个摩擦。
                       做法：给头设 priority=1，MuJoCo 对 priority 高的一方直接用它自己的摩擦，不再"两面取大"。
                       结果写 eval_robust_head<值>.json，并多记 2.5 秒时的倾斜（头顶着地往前拱那一步）。
@@ -25,6 +26,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, ".."))
 ACT_SCALE, SLEW = 0.3, 0.2
 FRICTIONS = (0.6, 0.8, 1.0, 1.2, 1.5)
+NECK = dict(neck_yaw=1.3, neck_pitch=0.4, neck_low=0.3) if "--neck=turn" in sys.argv else None      # 见 ../head_contact.py
 
 
 def run(args):
@@ -74,6 +76,8 @@ def run(args):
         target = target + np.clip(want - target, -SLEW, SLEW)
         pose = {n: float(v) for n, v in zip(names, target)}
         pose["waist_pitch"] = 2.0 * float(target[wi])
+        if NECK and t * ref["dt"] < 4.5:        # --neck=turn：起身的头 4.5 秒，头转向左边并低头（让侧面的头发着地，不让脸着地）
+            pose.update(NECK)
         pushing = 0 <= t - t_push < 10
         for _ in range(n_sub):
             sim.set_targets(pose)
@@ -114,7 +118,7 @@ def main():
                          + (f"，2.5 秒倾斜 {r['tilt_2_5s']}°" if head is not None else "") + "）" for r in rs if not r["ok"])
         print(f"地面摩擦 {f}" + (f"、头 {head}" if head is not None else "") + f"：{ok}/{len(rs)} 次站起来" + (f"  失败：{fails}" if fails else ""))
     print(f"合计 {total}/{len(res)}（起始姿势随机偏 ±0.05 弧度" + ("，中途被推一次 3 N" if push_on else "，不推") + "）")
-    out = "eval_robust_result.json" if head is None else f"eval_robust_head{head}.json"
+    out = ("eval_robust_result" if head is None else f"eval_robust_head{head}") + ("_neckturn" if NECK else "") + ".json"
     json.dump(dict(policy=os.path.basename(path), push=push_on, head=head, runs=res) if head is not None else
               dict(policy=os.path.basename(path), push=push_on, runs=res),
               open(os.path.join(HERE, out), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
