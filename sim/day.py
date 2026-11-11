@@ -692,6 +692,10 @@ def main():
         print(f"{clock[0]:02d}:{clock[1]:02d} {title}：帧 {len(rec.frames)-f0}，事件 {sum(1 for e in body.events if e['scene']==key)}", flush=True)
     global RESULTS
     RESULTS = results
+    if results.get("push2", {}).get("ok"):          # 这天没被碰倒：起身是自己趴下练的，不是"摔倒了"
+        for e in body.events:
+            if e.get("scene") == "getup" and e["text"] == "摔倒了":
+                e["text"] = "趴在地上，准备起身"
     ensure_memory()
     global UNDER
     UNDER = load_understanding()
