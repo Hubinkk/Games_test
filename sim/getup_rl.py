@@ -27,6 +27,10 @@ sys.path.insert(0, RL)
 from policy_np import Policy     # noqa: E402
 
 ACT_SCALE, SLEW, EXTRA = 0.3, 0.2, 25
+# 起身的头 4.5 秒，头转向左边并低头：让侧面的头发着地，脸和眼睛不碰地（育苗人 2026-11-11：脸不碰地更自然）。
+# 这几秒脖子不听策略的。稳不稳和不转头一样（rl/eval_robust.py --neck=turn：0.6–1.2 是 16/16）。设成 None 就是原样。
+TURN_HEAD = dict(neck_yaw=1.3, neck_pitch=0.4, neck_low=0.3)
+TURN_UNTIL = 4.5
 _POL, _REF = None, None
 
 
@@ -76,6 +80,8 @@ def run(sim, verbose=False):
         target = target + np.clip(want - target, -SLEW, SLEW)
         pose = {n: float(v) for n, v in zip(names, target)}
         pose["waist_pitch"] = 2.0 * float(target[wi])
+        if TURN_HEAD and t * ref["dt"] < TURN_UNTIL:
+            pose.update(TURN_HEAD)
         for _ in range(n_sub):
             sim.set_targets(pose)
             sim.step()

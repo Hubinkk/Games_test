@@ -56,7 +56,7 @@ OUT_ARG = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--out=
 OUT0 = os.path.join(ROOT, "digital-huaran")
 if OUT_ARG:
     OUT, JS = os.path.abspath(OUT_ARG), os.path.join(os.path.abspath(OUT_ARG), "digital_huaran_day.js")
-elif GETUP_TAG == "rl":
+elif GETUP_TAG == "rl" and "--main" not in sys.argv:      # 加 --main：学到的起身成为正式的一天，写进 digital-huaran/ 和网页数据
     OUT, JS = os.path.join(ROOT, "digital-huaran-rl"), os.path.join(ROOT, "digital_huaran_day_rl.js")
 else:
     OUT, JS = OUT0, os.path.join(ROOT, "digital_huaran_day.js")
@@ -544,7 +544,7 @@ def getup_try_line(results):
     if GETUP_TAG == "rl":
         if g.get("ok"):
             return (("今天摔倒以后，" if not results.get("push2", {}).get("ok") else "今天我自己趴到地上练起身。") +
-                    "动作的顺序和以前一样：弓腰收腿、手撑起来、两只手轮流往回挪、重心到了脚上再松手。"
+                    "动作的顺序和以前一样：弓腰收腿、手撑起来、两只手轮流往回挪、重心到了脚上再松手。开头我把头偏向一边，这样脸不用贴着地。"
                     "不一样的是，这次用的是在仿真里反复练出来的做法，手和腰会跟着身体的状态自己调一点，松手以后也是我自己站稳的，没有靠另外的平衡程序。**我自己站起来了。**")
         return ("今天摔倒以后，我用夜里练出来的做法起身，"
                 f"这次没有站起来，最高撑到骨盆离地 {g.get('peak_cm', 0):.0f} 厘米。")
