@@ -4,6 +4,9 @@
 用法：
     python full_build.py
     python day.py              # 过一天 → 写日记 → 睡眠整理 → 早上的报告；导出 ../digital_huaran_day.js 供网页回放
+    python day.py --day=2026-11-14 --getup=hands     # 第 5 天，手写的起身（getup_hands.py）
+    python day.py --day=2026-11-14 --getup=rl        # 同一天，强化学习的策略（getup_rl.py）；写到 digital-huaran-rl/、../digital_huaran_day_rl.js
+    加 --out=目录 时，所有产物都写进那个目录（对比用，见 day_getup_compare.py）
 
 流程（对应 docs/brain.md 第 7 节）：
   白天：在整体模型里过一天（醒来、挥手、走到窗边、被碰两次、试着爬起来、练深蹲、休息）。
@@ -35,20 +38,30 @@ import tendon_knee as tk
 from balance import Balance
 from figure_test import run_phase, squat_knee, stand_pose
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.join(HERE, "..")
-OUT = os.path.join(ROOT, "digital-huaran")
-MEM = os.path.join(OUT, "memory")
 import datetime
 import sys
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.join(HERE, "..")
 DAY = "2026-11-10"
 for _a in sys.argv[1:]:
     if _a.startswith("--day="):
         DAY = _a.split("=", 1)[1]
 NEXT = (datetime.date.fromisoformat(DAY) + datetime.timedelta(days=1)).isoformat()
-INBOX = os.path.join(MEM, "inbox")
 GETUP_TAG = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--getup=")), "")   # "arms"：育苗人教的起身方法
+# 产物写到哪里。默认是 digital-huaran/ 和 ../digital_huaran_day.js（网页用的、已提交的数据）。
+# --getup=rl 默认写到 digital-huaran-rl/ 和 ../digital_huaran_day_rl.js，不覆盖网页数据；第一次运行时从 digital-huaran/ 复制一份记忆。
+# --out=目录：所有产物（记忆、日记、报告、回放数据 digital_huaran_day.js）都写进这个目录（对比试验用）。
+OUT_ARG = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--out=")), "")
+OUT0 = os.path.join(ROOT, "digital-huaran")
+if OUT_ARG:
+    OUT, JS = os.path.abspath(OUT_ARG), os.path.join(os.path.abspath(OUT_ARG), "digital_huaran_day.js")
+elif GETUP_TAG == "rl":
+    OUT, JS = os.path.join(ROOT, "digital-huaran-rl"), os.path.join(ROOT, "digital_huaran_day_rl.js")
+else:
+    OUT, JS = OUT0, os.path.join(ROOT, "digital_huaran_day.js")
+MEM = os.path.join(OUT, "memory")
+INBOX = os.path.join(MEM, "inbox")
 UNDER = None
 BODY = None
 RESULTS = {}
@@ -196,6 +209,9 @@ def scenes(sim, bal, gx):
         if GETUP_TAG == "hands":      # 手不离地的起身（getup_hands.py）：手撑起、两手轮流收回、重心交给腿、站起
             GH._SIM = sim
             GH.hand_walk(gx)
+        elif GETUP_TAG == "rl":       # 强化学习学到的策略（getup_rl.py，控制循环同 rl/eval_full.py）；和 hands 一样从脸朝下趴着开始
+            import getup_rl
+            getup_rl.run(sim)
         else:
             getup.run(gx)
 
@@ -207,8 +223,12 @@ def scenes(sim, bal, gx):
         sim.reset()
         run_phase(sim, 3.0, lambda t: bal.adjust(stand_pose()))
 
-    gt = (GH.hand_walk_keyframes(gx)[0][-1][0] if GETUP_TAG == "hands" else getup.keyframes_for(gx)[-1][0]) + 1.5
-    gmin = 1 if GETUP_TAG == "hands" else 5      # 新的起身一次约 18 秒，按 1 分钟算；以前是反复尝试 5 分钟
+    if GETUP_TAG == "rl":
+        import getup_rl
+        gt = getup_rl.duration()
+    else:
+        gt = (GH.hand_walk_keyframes(gx)[0][-1][0] if GETUP_TAG == "hands" else getup.keyframes_for(gx)[-1][0]) + 1.5
+    gmin = 1 if GETUP_TAG in ("hands", "rl") else 5      # 新的起身一次约 18 秒，按 1 分钟算；以前是反复尝试 5 分钟
     # key, 标题, 开始时刻, 代表的真实时长（分钟）, 仿真时长（秒）, 函数, 说明
     return [
         ("wake", "醒来", (7, 30), 2, 2.0, wake, "眼睑打开，站稳"),
@@ -228,9 +248,27 @@ class Rec:
         self.base = FD.Recorder(sim)
         self.sim, self.body = sim, body
         self.frames = []
+        self.up = {}          # 每个场景：从哪一刻起"站着"（骨盆高 > 20 cm 且倾斜 < 20°）一直保持到场景结束；第一次站着的时刻
+        self.heat = {}        # 每个场景：各关节的铜损发热，按仿真里的秒数积分（焦耳），不乘压缩播放的倍数
 
     def __call__(self):
         self.body.step(self.sim.m.opt.timestep)
+        key = self.body.scene["key"]
+        if key == "getup":
+            d, t = self.sim.d, self.body.t_scene
+            ok = d.qpos[2] > 0.2 and self.sim.tilt_deg() < 20
+            u = self.up.setdefault(key, dict(first=None, since=None))
+            if ok and u["first"] is None:
+                u["first"] = t
+            if ok and u["since"] is None:
+                u["since"] = t
+            elif not ok:
+                u["since"] = None
+            h = self.heat.setdefault(key, {})
+            tq = self.sim.torques()
+            for n in self.body.joints:
+                tau = float(tq.get(n, 0.0))
+                h[n] = h.get(n, 0.0) + self.body.k[n] * tau * tau * self.sim.m.opt.timestep
         n0 = len(self.base.frames)
         self.base()
         if len(self.base.frames) > n0:
@@ -246,6 +284,8 @@ class Rec:
 
 # ---------------- 日记、睡眠、早上的报告 ----------------
 def ensure_memory():
+    if not os.path.isdir(MEM) and os.path.abspath(OUT) != os.path.abspath(OUT0) and os.path.isdir(os.path.join(OUT0, "memory")):
+        shutil.copytree(OUT0, OUT, dirs_exist_ok=True)      # 另写一份时，从现在的记忆接着过（不动 digital-huaran/）
     if not os.path.isdir(MEM):
         shutil.copytree(os.path.join(ROOT, "robot-memory"), MEM)
         for f in os.listdir(os.path.join(MEM, "diary")):
@@ -387,7 +427,7 @@ def write_diary(body, scene_info, results, msgs=()):
         elif key in ("push1", "push2"):
             extra = "站住了。" if r.get("ok") else "没站住。"
         elif key == "getup":
-            extra = ({"arms": "照育苗人教的：头抬起来，手掌撑地，胳膊发力。", "hands": "手撑起身体，两只手轮流往脚这边挪，重心到了脚上再松手。", "kneel3": "这次先做俯卧撑，再跪直，单膝跪地。"}.get(GETUP_TAG, "")) + ("没爬起来，最后是被扶起来的。" if not r.get("ok") else "自己站起来了！")
+            extra = ({"arms": "照育苗人教的：头抬起来，手掌撑地，胳膊发力。", "hands": "手撑起身体，两只手轮流往脚这边挪，重心到了脚上再松手。", "kneel3": "这次先做俯卧撑，再跪直，单膝跪地。", "rl": "还是手撑起、两手轮流往回挪，这次是夜里练出来的做法，边做边调整。"}.get(GETUP_TAG, "")) + ("没爬起来，最后是被扶起来的。" if not r.get("ok") else "自己站起来了！")
         lines.append(f"- {clock[0]:02d}:{clock[1]:02d} {title}。{extra}")
         groups = []
         for e in by.get(key, []):
@@ -501,6 +541,13 @@ def sleep(body, results):
 
 def getup_try_line(results):
     g = results.get("getup", {})
+    if GETUP_TAG == "rl":
+        if g.get("ok"):
+            return (("今天摔倒以后，" if not results.get("push2", {}).get("ok") else "今天我自己趴到地上练起身。") +
+                    "动作的顺序和以前一样：弓腰收腿、手撑起来、两只手轮流往回挪、重心到了脚上再松手。"
+                    "不一样的是，这次用的是在仿真里反复练出来的做法，手和腰会跟着身体的状态自己调一点，松手以后也是我自己站稳的，没有靠另外的平衡程序。**我自己站起来了。**")
+        return ("今天摔倒以后，我用夜里练出来的做法起身，"
+                f"这次没有站起来，最高撑到骨盆离地 {g.get('peak_cm', 0):.0f} 厘米。")
     if GETUP_TAG == "hands":
         if g.get("ok"):
             return (("今天摔倒以后，" if not results.get("push2", {}).get("ok") else "今天我自己趴到地上练起身。") + "我先弓起腰把腿收到身体下面，手举到头两侧撑起来，然后两只手轮流往脚这边挪。"
@@ -567,7 +614,7 @@ def morning_report(body, results, changes, queue, msgs=()):
     lines = ["---", "类型: 早上的报告", f"日期: {NEXT}", "写的人: 花然", "给: 育苗人", "---", "",
              f"# {NEXT} 早上", "",
              "育苗人，早上好。", "",
-             ] + (["## 今天的起身", "", getup_try_line(results), ""] if (not msgs and GETUP_TAG in ("kneel3", "hands")) else []) + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] + ((["## 我想到的", ""] + [f"{x}" for x in UNDER["report"]] + [getup_try_line(results), ""]) if UNDER else []) if msgs else []) + [
+             ] + (["## 今天的起身", "", getup_try_line(results), ""] if (not msgs and GETUP_TAG in ("kneel3", "hands", "rl")) else []) + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] + ((["## 我想到的", ""] + [f"{x}" for x in UNDER["report"]] + [getup_try_line(results), ""]) if UNDER else []) if msgs else []) + [
              ] + ((["## 我的身体", ""] + body_change()["report"] + [""]) if body_change() else []) + [
              "## 昨天", "",
              f"- 我走到了窗边，走了 {results['walk']['dx_cm']:.0f} 厘米，每秒 {results['walk']['v_cm_s']:.1f} 厘米。很慢，但没摔。",
@@ -599,7 +646,9 @@ def main():
     global BODY
     BODY = body
     rec = Rec(sim, body)
-    if GETUP_TAG == "hands":
+    if GETUP_TAG == "rl":
+        gx = None            # 策略和参考动作在 rl/getup_policy.npz、rl/ref_getup.json 里
+    elif GETUP_TAG == "hands":
         gx = json.load(open(os.path.join(HERE, "getup_hands_walk_best.json"), encoding="utf-8"))["V"]
     else:
         gfile = f"getup_best_{GETUP_TAG}.json" if GETUP_TAG else "getup_best.json"
@@ -627,7 +676,16 @@ def main():
             results[key] = dict(ok=bool(out))
         elif key == "getup":
             peak = max(fr["g"][1][2] for fr in rec.frames[f0:]) / 10 if len(rec.frames) > f0 else 0
-            results[key] = dict(ok=bool(not sim.fallen() and d.qpos[2] > 0.2), peak_cm=peak)
+            u = rec.up.get(key, {})
+            st, sp = body.scene_start[key], body.scene_peak.get(key, {})
+            hot = sorted(sp, key=lambda n: -sp[n])[:5]
+            results[key] = dict(ok=bool(not sim.fallen() and d.qpos[2] > 0.2), peak_cm=peak, method=GETUP_TAG or "default",
+                                z_cm=round(float(d.qpos[2]) * 100, 1), tilt=round(sim.tilt_deg(), 1), sim_s=round(body.t_scene, 2),
+                                first_up_s=None if u.get("first") is None else round(u["first"], 2),
+                                stood_s=None if u.get("since") is None else round(u["since"], 2),
+                                peak_T={NAMES.get(n, n): [round(st[n], 1), round(sp[n], 1)] for n in hot},
+                                heat_J={NAMES.get(n, n): round(v, 1) for n, v in sorted(rec.heat.get(key, {}).items(), key=lambda kv: -kv[1])[:5]},
+                                heat_total_J=round(sum(rec.heat.get(key, {}).values()), 1))
         spans.append(dict(key=key, title=title, clock=f"{clock[0]:02d}:{clock[1]:02d}", minutes=mins, desc=desc,
                           f0=f0, f1=len(rec.frames)))
         info.append((key, title, clock, mins, simT, desc))
@@ -665,9 +723,10 @@ def main():
     data = dict(day=DAY, fps=FPS, geoms=geoms, frames=rec.frames, spans=spans, events=body.events,
                 show=[NAMES[n] for n in SHOW], results=results, diary=diary, report=report, changes=changes, queue=queue,
                 limits=dict(hot=HOT, too_hot=TOO_HOT), read=[m["id"] for m in msgs])
-    with open(os.path.join(ROOT, "digital_huaran_day.js"), "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(JS), exist_ok=True)
+    with open(JS, "w", encoding="utf-8") as f:
         f.write("window.DAY = " + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n")
-    print(f"已导出 digital_huaran_day.js（{os.path.getsize(os.path.join(ROOT, 'digital_huaran_day.js'))/1e6:.1f} MB，{len(rec.frames)} 帧）")
+    print(f"已导出 {os.path.relpath(JS, ROOT)}（{os.path.getsize(JS)/1e6:.1f} MB，{len(rec.frames)} 帧）")
 
 
 if __name__ == "__main__":
