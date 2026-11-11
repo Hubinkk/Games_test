@@ -27,7 +27,9 @@ ACT_SCALE, SLEW = 0.3, 0.2
 def run(pol, ref, friction=1.0, use_policy=True):
     sim = G.get_sim()
     m, d = sim.m, sim.d
-    m.geom_friction[m.geom("floor").id][0] = friction
+    # 两个面接触时 MuJoCo 取两者中较大的摩擦。身体各处本来是 1.0，只改地面的话 0.6、0.8 和 1.0 其实是同一种情况
+    # （2026-11-11 发现）。所以把所有接触面一起改，这样"地面摩擦 0.6"才真的是 0.6。
+    m.geom_friction[:, 0] = friction
     names = ref["names"]
     q_ref = np.array(ref["q"])
     T = len(q_ref)

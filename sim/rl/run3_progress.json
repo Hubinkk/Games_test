@@ -1,0 +1,170 @@
+[
+ {
+  "steps": 0,
+  "minutes": 2.7,
+  "reward": 6.23,
+  "success": 0.0,
+  "height": 1.9,
+  "seconds": 3.9
+ },
+ {
+  "steps": 2621440,
+  "minutes": 7.6,
+  "reward": 7.01,
+  "success": 0.0,
+  "height": 2.4,
+  "seconds": 4.5
+ },
+ {
+  "steps": 5242880,
+  "minutes": 11.1,
+  "reward": 10.92,
+  "success": 0.0,
+  "height": 4.5,
+  "seconds": 7.5
+ },
+ {
+  "steps": 7864320,
+  "minutes": 14.7,
+  "reward": 12.39,
+  "success": 0.03,
+  "height": 5.2,
+  "seconds": 8.1
+ },
+ {
+  "steps": 10485760,
+  "minutes": 18.2,
+  "reward": 38.74,
+  "success": 0.755,
+  "height": 15.3,
+  "seconds": 18.1
+ },
+ {
+  "steps": 13107200,
+  "minutes": 21.8,
+  "reward": 30.37,
+  "success": 0.56,
+  "height": 11.8,
+  "seconds": 14.4
+ },
+ {
+  "steps": 15728640,
+  "minutes": 25.3,
+  "reward": 39.54,
+  "success": 0.77,
+  "height": 15.6,
+  "seconds": 18.4
+ },
+ {
+  "steps": 18350080,
+  "minutes": 28.8,
+  "reward": 39.03,
+  "success": 0.758,
+  "height": 15.3,
+  "seconds": 18.1
+ },
+ {
+  "steps": 20971520,
+  "minutes": 32.3,
+  "reward": 37.76,
+  "success": 0.731,
+  "height": 14.8,
+  "seconds": 17.6
+ },
+ {
+  "steps": 23592960,
+  "minutes": 35.8,
+  "reward": 39.67,
+  "success": 0.776,
+  "height": 15.6,
+  "seconds": 18.4
+ },
+ {
+  "steps": 26214400,
+  "minutes": 39.3,
+  "reward": 39.75,
+  "success": 0.779,
+  "height": 15.6,
+  "seconds": 18.4
+ },
+ {
+  "steps": 28835840,
+  "minutes": 42.8,
+  "reward": 39.82,
+  "success": 0.783,
+  "height": 15.6,
+  "seconds": 18.4
+ },
+ {
+  "steps": 31457280,
+  "minutes": 46.3,
+  "reward": 39.88,
+  "success": 0.786,
+  "height": 15.6,
+  "seconds": 18.4
+ },
+ {
+  "steps": 34078720,
+  "minutes": 49.8,
+  "reward": 39.93,
+  "success": 0.789,
+  "height": 15.7,
+  "seconds": 18.4
+ },
+ {
+  "steps": 36700160,
+  "minutes": 53.3,
+  "reward": 39.94,
+  "success": 0.79,
+  "height": 15.7,
+  "seconds": 18.4
+ },
+ {
+  "steps": 39321600,
+  "minutes": 56.8,
+  "reward": 39.92,
+  "success": 0.79,
+  "height": 15.8,
+  "seconds": 18.4
+ },
+ {
+  "steps": 41943040,
+  "minutes": 60.4,
+  "reward": 39.88,
+  "success": 0.786,
+  "height": 15.8,
+  "seconds": 18.4
+ },
+ {
+  "steps": 44564480,
+  "minutes": 63.9,
+  "reward": 39.86,
+  "success": 0.784,
+  "height": 15.8,
+  "seconds": 18.4
+ },
+ {
+  "steps": 47185920,
+  "minutes": 67.4,
+  "reward": 39.35,
+  "success": 0.774,
+  "height": 15.5,
+  "seconds": 18.2
+ },
+ {
+  "steps": 49807360,
+  "minutes": 71.0,
+  "reward": 30.61,
+  "success": 0.573,
+  "height": 11.9,
+  "seconds": 14.4
+ },
+ {
+  "steps": 52428800,
+  "minutes": 74.5,
+  "reward": 39.77,
+  "success": 0.795,
+  "height": 15.7,
+  "seconds": 18.3
+ }
+]

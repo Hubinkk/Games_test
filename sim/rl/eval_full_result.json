@@ -1,0 +1,66 @@
+{
+ "policy": [
+  {
+   "friction": 0.6,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2
+  },
+  {
+   "friction": 0.8,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2
+  },
+  {
+   "friction": 1.0,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2
+  },
+  {
+   "friction": 1.2,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2
+  },
+  {
+   "friction": 1.5,
+   "ok": false,
+   "z_cm": 5.5,
+   "tilt": 84
+  }
+ ],
+ "reference_only": [
+  {
+   "friction": 0.6,
+   "ok": false,
+   "z_cm": 3.7,
+   "tilt": 96
+  },
+  {
+   "friction": 0.8,
+   "ok": false,
+   "z_cm": 3.7,
+   "tilt": 96
+  },
+  {
+   "friction": 1.0,
+   "ok": false,
+   "z_cm": 5.7,
+   "tilt": 81
+  },
+  {
+   "friction": 1.2,
+   "ok": false,
+   "z_cm": 5.7,
+   "tilt": 88
+  },
+  {
+   "friction": 1.5,
+   "ok": false,
+   "z_cm": 5.7,
+   "tilt": 88
+  }
+ ]
+}

@@ -66,7 +66,8 @@ def main():
     steps = arg("steps", 200_000 if smoke else 100_000_000)
     envs = arg("envs", 16 if smoke else 2048)
     env = GetUp(os.path.join(HERE, "huaran_rl.xml"), os.path.join(HERE, "ref_getup.json"))
-    eval_env = GetUp(os.path.join(HERE, "huaran_rl.xml"), os.path.join(HERE, "ref_getup.json"))
+    # 评估时一律从趴着开始、做完整的一次起身（训练时七成的身体从动作中间开始）
+    eval_env = GetUp(os.path.join(HERE, "huaran_rl.xml"), os.path.join(HERE, "ref_getup.json"), mid_start=False)
     episode = env.T + 25
     log = []
     t0 = time.time()
@@ -75,19 +76,24 @@ def main():
         row = dict(steps=int(n), minutes=round((time.time() - t0) / 60, 1),
                    reward=round(float(metrics.get("eval/episode_reward", 0.0)), 2),
                    success=round(float(metrics.get("eval/episode_success", 0.0)) / max(env.T - env.t_free, 1), 3),
-                   height=round(float(metrics.get("eval/episode_height", 0.0)) / episode * 100, 1))
+                   height=round(float(metrics.get("eval/episode_height", 0.0)) / episode * 100, 1),
+                   seconds=round(float(metrics.get("eval/avg_episode_length", 0.0)) * env.dt, 1))
         log.append(row)
-        print(f"{row['steps']:>11,} 步  {row['minutes']:>6} 分钟  得分 {row['reward']:>7}  松手后站着的时间比例 {row['success']:.0%}  平均骨盆高 {row['height']} cm", flush=True)
+        print(f"{row['steps']:>11,} 步  {row['minutes']:>6} 分钟  得分 {row['reward']:>7}  松手后站着的时间比例 {row['success']:.0%}  "
+              f"平均骨盆高 {row['height']} cm  撑了 {row['seconds']} 秒才倒（满分 {episode * env.dt:.1f}）", flush=True)
         json.dump(log, open(os.path.join(HERE, f"getup_progress{tag}.json"), "w"), indent=1)
 
     net = functools.partial(ppo_networks.make_ppo_networks, policy_hidden_layer_sizes=HIDDEN, value_hidden_layer_sizes=(256, 256, 256))
     make_inference, params, _ = ppo.train(
         environment=env, eval_env=eval_env, num_timesteps=steps, num_envs=envs, episode_length=episode,
         num_evals=3 if smoke else 21, num_eval_envs=8 if smoke else 128, deterministic_eval=True,
-        learning_rate=3e-4, entropy_cost=5e-3, discounting=0.97, gae_lambda=0.95, unroll_length=20,
+        learning_rate=3e-4, entropy_cost=5e-3, discounting=arg("gamma", 0.99), gae_lambda=0.95, unroll_length=20,
         batch_size=16 if smoke else 256, num_minibatches=4 if smoke else 32, num_updates_per_batch=4,
         normalize_observations=True, reward_scaling=1.0, clipping_epsilon=0.2, max_grad_norm=1.0,
-        network_factory=net, seed=arg("seed", 0), progress_fn=progress)
+        network_factory=net, seed=arg("seed", 0), progress_fn=progress,
+        # 每次评估都把当时的策略存一份，训练中途停下也有东西可以检验
+        policy_params_fn=lambda n, make_policy, p: export(p, os.path.join(HERE, f"getup_policy{tag}.npz")))
+    # 注意：最后一份不一定是最好的。第二轮里 1000 万步那份在完整身体上是 4/5，1 亿步那份是 3/5。
     keys = export(params, os.path.join(HERE, f"getup_policy{tag}.npz"))
     print(f"已保存 getup_policy{tag}.npz：", len(keys), "个数组")
     return make_inference, params, env

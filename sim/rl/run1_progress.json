@@ -1,0 +1,44 @@
+[
+ {
+  "steps": 0,
+  "minutes": 2.1,
+  "reward": 14.55,
+  "success": 0.0,
+  "height": 9.9
+ },
+ {
+  "steps": 5079040,
+  "minutes": 8.8,
+  "reward": 14.62,
+  "success": 0.0,
+  "height": 10.1
+ },
+ {
+  "steps": 10158080,
+  "minutes": 14.2,
+  "reward": 14.86,
+  "success": 0.0,
+  "height": 8.2
+ },
+ {
+  "steps": 15237120,
+  "minutes": 19.6,
+  "reward": 14.87,
+  "success": 0.0,
+  "height": 9.2
+ },
+ {
+  "steps": 20316160,
+  "minutes": 25.0,
+  "reward": 15.13,
+  "success": 0.0,
+  "height": 5.4
+ },
+ {
+  "steps": 25395200,
+  "minutes": 30.5,
+  "reward": 15.34,
+  "success": 0.0,
+  "height": 5.2
+ }
+]

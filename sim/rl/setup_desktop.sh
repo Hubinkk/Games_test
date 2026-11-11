@@ -15,6 +15,12 @@ fi
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
 
 echo "== 2. Python =="
+# 2026-11-11 在育苗人的台式机（WSL2，Ubuntu 26.04）上实测：系统只有 Python 3.14、没有 pip，这一步过不去。
+# 实际的做法（不需要 sudo）：装 uv，用它建 Python 3.12 的环境——
+#     curl -LsSf https://astral.sh/uv/install.sh | sh
+#     uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python "jax[cuda12]==0.7.2" "mujoco-mjx==4.0.0" "brax==0.14.2"
+# 这组版本认得 5070 Ti。检验（eval_full.py、eval_robust.py、make_ref_state.py）要用 mujoco 3.17，另建一个环境：
+#     uv venv --python 3.12 ~/venv-sys && uv pip install --python ~/venv-sys/bin/python "mujoco==3.17.*" numpy
 PY=python3
 $PY --version
 $PY -m venv .venv 2>/dev/null || { echo "建不了虚拟环境。先运行：sudo apt install -y python3-venv python3-pip"; exit 1; }
