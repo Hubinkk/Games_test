@@ -4,6 +4,13 @@
 
 用法（用项目的 mujoco 3.17，不需要显卡）：
     python eval_robust.py getup_policy.npz [--trials=4] [--nopush]      # 写 eval_robust_result.json
+
+可选（2026-11-11 加，不给时和原来完全一样）：
+    --head=1.0        头（geom "head"，唯一会碰地的头部几何体）和地面之间单独用这个摩擦。
+                      做法：给头设 priority=1，MuJoCo 对 priority 高的一方直接用它自己的摩擦，不再"两面取大"。
+                      结果写 eval_robust_head<值>.json，并多记 2.5 秒时的倾斜（头顶着地往前拱那一步）。
+    --frics=0.6,1.8   换一组地面摩擦（默认 0.6, 0.8, 1.0, 1.2, 1.5）
+    --procs=10        同时跑几个
 """
 import json
 import math
@@ -21,7 +28,8 @@ FRICTIONS = (0.6, 0.8, 1.0, 1.2, 1.5)
 
 
 def run(args):
-    path, friction, seed, push_on = args
+    path, friction, seed, push_on = args[:4]
+    head = args[4] if len(args) > 4 else None
     import getup_hands as G
     from policy_np import Policy
     pol = Policy(path)
@@ -30,6 +38,11 @@ def run(args):
     sim = G.get_sim()
     m, d = sim.m, sim.d
     m.geom_friction[:, 0] = friction          # 所有接触面一起改（MuJoCo 取两个面里较大的摩擦）
+    if head is not None:                      # 头单独指定：priority 高的一方用自己的摩擦
+        hg = m.geom("head").id
+        m.geom_priority[hg] = 1
+        m.geom_friction[hg, 0] = head
+    tilt25 = None
     names = ref["names"]
     q_ref = np.array(ref["q"])
     T = len(q_ref)
@@ -69,31 +82,42 @@ def run(args):
         last = a
         if t > 150 and fell_at is None and d.qpos[2] < 0.08:
             fell_at = round((t + 1) * ref["dt"], 1)
+        if t + 1 == 125:
+            tilt25 = round(sim.tilt_deg())
     d.xfrc_applied[chest, 0:2] = 0
     if getattr(sim, "trim", None) is not None:
         sim.trim.enabled = True
     z, tilt = float(d.qpos[2]), sim.tilt_deg()
-    return dict(friction=friction, seed=seed, ok=bool(z > 0.20 and tilt < 20), z_cm=round(z * 100, 1), tilt=round(tilt),
-                fell_at=fell_at, push_at=round(t_push * ref["dt"], 1) if push_on else None)
+    out = dict(friction=friction, seed=seed, ok=bool(z > 0.20 and tilt < 20), z_cm=round(z * 100, 1), tilt=round(tilt),
+               fell_at=fell_at, push_at=round(t_push * ref["dt"], 1) if push_on else None)
+    if head is not None:
+        out.update(head=head, tilt_2_5s=tilt25)
+    return out
 
 
 def main():
     path = os.path.abspath(sys.argv[1])
     trials = next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--trials=")), 4)
     push_on = "--nopush" not in sys.argv
-    jobs = [(path, f, s, push_on) for f in FRICTIONS for s in range(trials)]
-    with Pool(min(10, len(jobs))) as pool:
+    head = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--head=")), None)
+    frics = next((tuple(float(x) for x in a.split("=")[1].split(",")) for a in sys.argv if a.startswith("--frics=")), FRICTIONS)
+    procs = next((int(a.split("=")[1]) for a in sys.argv if a.startswith("--procs=")), 10)
+    jobs = [(path, f, s, push_on) + ((head,) if head is not None else ()) for f in frics for s in range(trials)]
+    with Pool(min(procs, len(jobs))) as pool:
         res = pool.map(run, jobs)
     total = 0
-    for f in FRICTIONS:
+    for f in frics:
         rs = [r for r in res if r["friction"] == f]
         ok = sum(r["ok"] for r in rs)
         total += ok
-        fails = "；".join(f"第 {r['seed']} 次 {r['fell_at']} 秒时倒（{r['push_at']} 秒被推）" for r in rs if not r["ok"])
-        print(f"地面摩擦 {f}：{ok}/{len(rs)} 次站起来" + (f"  失败：{fails}" if fails else ""))
+        fails = "；".join(f"第 {r['seed']} 次 {r['fell_at']} 秒时倒（{r['push_at']} 秒被推"
+                         + (f"，2.5 秒倾斜 {r['tilt_2_5s']}°" if head is not None else "") + "）" for r in rs if not r["ok"])
+        print(f"地面摩擦 {f}" + (f"、头 {head}" if head is not None else "") + f"：{ok}/{len(rs)} 次站起来" + (f"  失败：{fails}" if fails else ""))
     print(f"合计 {total}/{len(res)}（起始姿势随机偏 ±0.05 弧度" + ("，中途被推一次 3 N" if push_on else "，不推") + "）")
-    json.dump(dict(policy=os.path.basename(path), push=push_on, runs=res),
-              open(os.path.join(HERE, "eval_robust_result.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    out = "eval_robust_result.json" if head is None else f"eval_robust_head{head}.json"
+    json.dump(dict(policy=os.path.basename(path), push=push_on, head=head, runs=res) if head is not None else
+              dict(policy=os.path.basename(path), push=push_on, runs=res),
+              open(os.path.join(HERE, out), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 
 if __name__ == "__main__":
