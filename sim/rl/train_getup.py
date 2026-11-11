@@ -51,6 +51,25 @@ def flatten(tree, prefix=""):
     return out
 
 
+def fill(tree, flat, prefix=""):
+    """flatten 的反过来：按同样的命名把数组填回 tree 的结构里（找不到的保留原样）。"""
+    import jax.numpy as jnp
+    if isinstance(tree, dict):
+        return {k: fill(v, flat, f"{prefix}{k}/") for k, v in tree.items()}
+    if hasattr(tree, "_fields"):
+        return type(tree)(*[fill(getattr(tree, k), flat, f"{prefix}{k}/") for k in tree._fields])
+    if isinstance(tree, (list, tuple)):
+        return type(tree)(fill(v, flat, f"{prefix}{i}/") for i, v in enumerate(tree))
+    if hasattr(tree, "__dataclass_fields__"):
+        return tree.replace(**{k: fill(getattr(tree, k), flat, f"{prefix}{k}/") for k in tree.__dataclass_fields__})
+    key = prefix.rstrip("/")
+    if tree is None or key not in flat or not hasattr(tree, "shape"):    # 设置项（比如归一化的 mode）不是数组，保持原样
+        return tree
+    v = flat[key]
+    assert np.shape(v) == np.shape(tree), key
+    return jnp.asarray(v, dtype=getattr(tree, "dtype", None))
+
+
 def export(params, path):
     """params = (观测归一化, 策略网络, 价值网络)。只存前两个，摊平成一组数组。"""
     flat = {}
@@ -63,6 +82,8 @@ def export(params, path):
 def main():
     smoke = "--smoke" in sys.argv
     tag = "_smoke" if smoke else ""        # 试跑的产物另外起名，不和真正的训练结果混在一起
+    if arg("tag", ""):                     # --tag=run4：产物写成 getup_policy_run4.npz，不覆盖正在用的 getup_policy.npz
+        tag = "_" + arg("tag", "")
     steps = arg("steps", 200_000 if smoke else 100_000_000)
     envs = arg("envs", 16 if smoke else 2048)
     env = GetUp(os.path.join(HERE, "huaran_rl.xml"), os.path.join(HERE, "ref_getup.json"))
@@ -84,7 +105,18 @@ def main():
         json.dump(log, open(os.path.join(HERE, f"getup_progress{tag}.json"), "w"), indent=1)
 
     net = functools.partial(ppo_networks.make_ppo_networks, policy_hidden_layer_sizes=HIDDEN, value_hidden_layer_sizes=(256, 256, 256))
+    restore = None
+    if arg("init", ""):
+        # --init=run3_final.npz：从一份已有的策略接着练（观测归一化和策略网络照搬，价值网络重新开始）
+        _, tmpl, _ = ppo.train(environment=env, num_timesteps=0, num_envs=envs, episode_length=episode,
+                               batch_size=256, num_minibatches=32, normalize_observations=True, network_factory=net,
+                               seed=arg("seed", 0))
+        z = np.load(os.path.join(HERE, arg("init", "")))
+        flat = {k: z[k] for k in z.files}
+        restore = (fill(tmpl[0], flat, "norm/"), fill(tmpl[1], flat, "policy/"), tmpl[2])
+        print(f"从 {arg('init', '')} 接着练", flush=True)
     make_inference, params, _ = ppo.train(
+        restore_params=restore, restore_value_fn=False,
         environment=env, eval_env=eval_env, num_timesteps=steps, num_envs=envs, episode_length=episode,
         num_evals=3 if smoke else 21, num_eval_envs=8 if smoke else 128, deterministic_eval=True,
         learning_rate=3e-4, entropy_cost=5e-3, discounting=arg("gamma", 0.99), gae_lambda=0.95, unroll_length=20,
@@ -92,7 +124,9 @@ def main():
         normalize_observations=True, reward_scaling=1.0, clipping_epsilon=0.2, max_grad_norm=1.0,
         network_factory=net, seed=arg("seed", 0), progress_fn=progress,
         # 每次评估都把当时的策略存一份，训练中途停下也有东西可以检验
-        policy_params_fn=lambda n, make_policy, p: export(p, os.path.join(HERE, f"getup_policy{tag}.npz")))
+        # 用了 --tag 时，每次评估另外留一份带步数的（getup_policy_run4_10M.npz），中途的也能拿去检验
+        policy_params_fn=lambda n, make_policy, p: (export(p, os.path.join(HERE, f"getup_policy{tag}.npz")),
+                                                    arg("tag", "") and export(p, os.path.join(HERE, f"getup_policy{tag}_{int(n) // 1_000_000}M.npz"))))
     # 注意：最后一份不一定是最好的。第二轮里 1000 万步那份在完整身体上是 4/5，1 亿步那份是 3/5。
     keys = export(params, os.path.join(HERE, f"getup_policy{tag}.npz"))
     print(f"已保存 getup_policy{tag}.npz：", len(keys), "个数组")

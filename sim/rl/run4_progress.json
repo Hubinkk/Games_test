@@ -1,0 +1,58 @@
+[
+ {
+  "steps": 0,
+  "minutes": 3.3,
+  "reward": 16.22,
+  "success": 0.231,
+  "height": 6.1,
+  "seconds": 8.3
+ },
+ {
+  "steps": 1638400,
+  "minutes": 9.2,
+  "reward": 19.24,
+  "success": 0.298,
+  "height": 7.3,
+  "seconds": 9.7
+ },
+ {
+  "steps": 3276800,
+  "minutes": 13.5,
+  "reward": 17.98,
+  "success": 0.279,
+  "height": 6.8,
+  "seconds": 9.0
+ },
+ {
+  "steps": 4915200,
+  "minutes": 17.9,
+  "reward": 19.58,
+  "success": 0.317,
+  "height": 7.4,
+  "seconds": 9.7
+ },
+ {
+  "steps": 6553600,
+  "minutes": 22.3,
+  "reward": 21.59,
+  "success": 0.361,
+  "height": 8.3,
+  "seconds": 10.6
+ },
+ {
+  "steps": 8192000,
+  "minutes": 26.7,
+  "reward": 24.36,
+  "success": 0.438,
+  "height": 9.3,
+  "seconds": 11.7
+ },
+ {
+  "steps": 9830400,
+  "minutes": 33.4,
+  "reward": 23.2,
+  "success": 0.406,
+  "height": 8.9,
+  "seconds": 11.2
+ }
+]

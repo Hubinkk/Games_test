@@ -26,7 +26,10 @@ def build():
     root.set("model", "huaran_rl")
     opt = root.find("option")
     opt.attrib.clear()
-    opt.attrib.update(timestep="0.002", integrator="implicitfast", iterations="6", ls_iterations="10")
+    # 摩擦锥要和整体模型一样用 elliptic（"各个方向都一样涩"）。第三轮用的是默认的 pyramidal，
+    # 它在涩地面上比 elliptic 好滑：同一份策略，完整身体换成 pyramidal 在摩擦 1.5 上能站起来，
+    # 简化身体换成 elliptic 就在 2.5 秒时和完整身体一样卡住（头顶在地上转不过去，2026-11-11，diag_getup.py）。
+    opt.attrib.update(timestep="0.002", integrator="implicitfast", cone="elliptic", iterations="6", ls_iterations="10")
     # 手：去掉手指，换成手掌
     for parent in root.iter("body"):
         for child in list(parent):
@@ -46,11 +49,16 @@ def build():
                 # 四根手指合成一块软的板。没有它的话，训练时遇不到"手指粘在地上滑不动"：
                 # 完整身体在摩擦 1.2 的地面上，3 秒左右手贴地往前滑时手指和手掌粘住、肩膀卡住，人往前栽倒。
                 # 软硬和放松时的弯曲角是粗略估的（结果对它们很敏感），训练时每一局随机变（见 getup_env.py）。
+                # 第四轮（2026-11-11）更正：上面那件事只在 pyramidal 摩擦锥下成立。换成和整体模型一样的 elliptic 以后，
+                # 这块板反而比真的手指更"抓地"：第三轮的策略在摩擦 1.0、1.2 上都在 3 秒左右卡住（完整身体是成功的），
+                # 练了 1000 万步，简化身体上 1.2 和 1.5 仍是 0/64。让手指板不碰地（只剩手掌碰地）后，
+                # 同一份策略在简化身体上 1.0、1.2 成功、1.5 在 2.5 秒头顶着地卡住倒下，和完整身体一模一样（diag_getup.py）。
+                # 所以手指板留着当重量，不再参与碰撞。
                 fing = ET.SubElement(hand, "body", name=f"{side}_fingers", pos="0 0 -0.019")
                 ET.SubElement(fing, "joint", name=f"{side}_fingers", axis=f"{-1 if side == 'l' else 1} 0 0", range="-0.25 1.6",
                               stiffness="0.2", springref="0.25", damping="0.002", armature="1e-5", frictionloss="0")
                 ET.SubElement(fing, "geom", name=f"{side}_fingers", type="box", pos="0 0 -0.008", size="0.010 0.002 0.008",
-                              mass=str(FINGER_MASS), rgba="0.95 0.85 0.79 1")
+                              mass=str(FINGER_MASS), contype="0", conaffinity="0", rgba="0.95 0.85 0.79 1")
     # 肌腱、手的联动和碰撞排除都去掉；腰的联动留下
     for tag in ("tendon", "contact"):
         for e in root.findall(tag):

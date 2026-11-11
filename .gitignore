@@ -4,3 +4,4 @@ sim/rl/__pycache__/
 sim/rl/*_smoke.*
 digital-huaran-rl/
 digital_huaran_day_rl.js
+sim/rl/diag_out/
