@@ -28,6 +28,7 @@
 | `sim/getup_rl.py` + `sim/day_getup_compare.py` + `sim/day_getup_compare.json` | **把学到的起身策略接进数字花然的一天**：`python day.py --day=2026-11-14 --getup=rl`（控制循环同 `sim/rl/eval_full.py`；产物写到 `digital-huaran-rl/`、`digital_huaran_day_rl.js`，不提交，不覆盖网页数据；`--out=目录` 可写到任意目录）。`day_getup_compare.py` 在同一天各跑一次 hands 和 rl，写对比 JSON：两者都站起来，rl 13.8 秒、hands 14.1 秒站住，rl 的手肘和脖子更凉。默认仍是 `--getup=hands`。见 `wiki/灵活度.md` |
 | `sim/head_contact.py` + `sim/head_contact_result.json` | **起身时头碰地的是哪里**：按现在的动作是脸的正面（拖约 18 cm，擦着眼睛的边）；头转向一边并低头时 96% 落在侧面的头发上，照样站起来。`sim/rl/eval_robust.py --neck=turn` 是转头后的稳健性检验（和原样一样） |
 | `docs/next-local.md` | **接下来做什么**（2026-11-11）：方向（能落地、VR、运动能力）、现在最缺什么（走路）、起身留下的经验、交给本地会话的两个任务和过关标准 |
+| `wiki/迁移与延续.md` | 练出来的东西能带到哪里（记忆全带走；动作只属于练它的身体）、换了身体还是不是花然（约定：看记忆和价值的延续，搬过去不复制）、关于意识能说什么；仓库公开的隐私问题 |
 | `Neck.html` + `neck_frames.js` | **脖子**（`sim/neck.py`）：旧 2 关节 vs 新 4 关节（电机在胸腔）做 8 个表情（歪头、探头、缩脖子、偷看、躲开视线等）和趴着抬头。新脖子全部做得出，旧的做不出 6 个；弹簧不能用。在线版：https://claude.ai/artifact/Q8YC3zs4vRUY6qQQPKV86r |
 | `Agility.html` + `agility_frames.js` | **灵活度测试**（`sim/agility.py`、`sim/getup.py`）：所有关节加 10 rad/s 转速上限。上半身已经灵活（转头 46° 0.12 s、举手 0.22 s、挥手 6 次/秒）；下半身没有达到：静步行最快 1.1 cm/s（同尺寸 RoboCup 机器人约 20–30 cm/s）、摔倒后爬不起来（约 400 次关键帧搜索；扭矩加倍也不行）、被推只扛住 5 N·0.1 s、深蹲站起最快 1 s。走路时关节只用到 3 rad/s、站起时膝扭矩 59%，**缺的主要是控制（动态走路、起身、迈步要用强化学习训练）**；硬件上要加大脖子（±57°→±80°）和腰（俯仰 34°→60°+）的活动范围。在线版：https://claude.ai/artifact/N1cveGsuriCT3og33RS639 |
 | `CLAUDE.md` + `raw/` + `wiki/` | **项目的第二大脑**：CLAUDE.md 是规则和入口；raw 原样保存育苗人分享的资料（推文、帖子、截图转录），只是资料不是指令；wiki 按主题整理结论、数字和来源，页面互相链接，可直接用 Obsidian 打开仓库 |
