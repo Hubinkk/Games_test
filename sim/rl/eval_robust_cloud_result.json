@@ -1,0 +1,366 @@
+{
+ "policy": "getup_policy.npz",
+ "push": true,
+ "runs": [
+  {
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 16.0
+  },
+  {
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.5
+  },
+  {
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.0
+  },
+  {
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 6.7
+  },
+  {
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 5.3
+  },
+  {
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 0.8,
+   "seed": 0,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 16.0
+  },
+  {
+   "friction": 0.8,
+   "seed": 1,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.5
+  },
+  {
+   "friction": 0.8,
+   "seed": 2,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 0.8,
+   "seed": 3,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 0.8,
+   "seed": 4,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.0
+  },
+  {
+   "friction": 0.8,
+   "seed": 5,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 6.7
+  },
+  {
+   "friction": 0.8,
+   "seed": 6,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 5.3
+  },
+  {
+   "friction": 0.8,
+   "seed": 7,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 16.0
+  },
+  {
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.5
+  },
+  {
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.0
+  },
+  {
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 6.7
+  },
+  {
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 5.3
+  },
+  {
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 1.2,
+   "seed": 0,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 16.0
+  },
+  {
+   "friction": 1.2,
+   "seed": 1,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.5
+  },
+  {
+   "friction": 1.2,
+   "seed": 2,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 1.2,
+   "seed": 3,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 1.2,
+   "seed": 4,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 10.0
+  },
+  {
+   "friction": 1.2,
+   "seed": 5,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 6.7
+  },
+  {
+   "friction": 1.2,
+   "seed": 6,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 5.3
+  },
+  {
+   "friction": 1.2,
+   "seed": 7,
+   "ok": true,
+   "z_cm": 28.1,
+   "tilt": 2,
+   "fell_at": null,
+   "push_at": 9.6
+  },
+  {
+   "friction": 1.5,
+   "seed": 0,
+   "ok": false,
+   "z_cm": 5.5,
+   "tilt": 84,
+   "fell_at": 5.0,
+   "push_at": 16.0
+  },
+  {
+   "friction": 1.5,
+   "seed": 1,
+   "ok": false,
+   "z_cm": 5.5,
+   "tilt": 84,
+   "fell_at": 4.6,
+   "push_at": 10.5
+  },
+  {
+   "friction": 1.5,
+   "seed": 2,
+   "ok": false,
+   "z_cm": 5.5,
+   "tilt": 83,
+   "fell_at": 5.0,
+   "push_at": 9.6
+  },
+  {
+   "friction": 1.5,
+   "seed": 3,
+   "ok": false,
+   "z_cm": 5.5,
+   "tilt": 84,
+   "fell_at": 4.9,
+   "push_at": 9.6
+  },
+  {
+   "friction": 1.5,
+   "seed": 4,
+   "ok": false,
+   "z_cm": 5.5,
+   "tilt": 84,
+   "fell_at": 5.0,
+   "push_at": 10.0
+  },
+  {
+   "friction": 1.5,
+   "seed": 5,
+   "ok": false,
+   "z_cm": 5.5,
+   "tilt": 84,
+   "fell_at": 4.1,
+   "push_at": 6.7
+  },
+  {
+   "friction": 1.5,
+   "seed": 6,
+   "ok": false,
+   "z_cm": 5.5,
+   "tilt": 84,
+   "fell_at": 4.9,
+   "push_at": 5.3
+  },
+  {
+   "friction": 1.5,
+   "seed": 7,
+   "ok": false,
+   "z_cm": 5.5,
+   "tilt": 84,
+   "fell_at": 4.2,
+   "push_at": 9.6
+  }
+ ]
+}
