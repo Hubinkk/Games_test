@@ -107,7 +107,8 @@ def run(job):
     yaw_of = lambda: math.atan2(d.xmat[pel].reshape(3, 3)[1, 0], d.xmat[pel].reshape(3, 3)[0, 0])
     xs, yaws, fell_at = [d.qpos[0:2].copy()], [yaw_of()], None
     cscale = np.array(W.CMD_SCALE)
-    peak = 0.0
+    fg = [m.geom("l_foot").id, m.geom("r_foot").id]
+    lifts = []
     for t in range(T):
         si = int(np.searchsorted(ends, (t + 0.5) * W.DT))
         cmd = np.array(test["seg"][si][1], dtype=float)
@@ -125,6 +126,7 @@ def run(job):
             d.xfrc_applied[chest, 0:2] = [push_n * math.cos(ang), push_n * math.sin(ang)] if pushing else [0.0, 0.0]
             sim.step()
         last = a
+        lifts.append(max(d.geom_xpos[fg[0], 2], d.geom_xpos[fg[1], 2]) - W.FOOT_HALF)
         xs.append(d.qpos[0:2].copy())
         yaws.append(yaw_of())
         up = d.xmat[pel].reshape(3, 3)[2, 2]
@@ -154,6 +156,7 @@ def run(job):
         start = end
     return dict(test=name, friction=friction, seed=seed, ok=fell_at is None, fell_at=fell_at,
                 push_at=round(t_push * W.DT, 1) if push_n else None, segs=segs,
+                lift_cm=round(float(np.percentile(lifts, 95)) * 100, 2),      # 抬得较高那只脚的脚掌中心离地（95% 分位）
                 heading_deg=round(math.degrees(float(yaws[-1] - yaws[0])), 1))
 
 
@@ -186,6 +189,7 @@ def main():
                     s += f"，最后 2 秒挪了 {mean('drift_cm'):.1f} cm"
                 parts.append(s)
             fails = "；".join(f"第 {r['seed']} 次 {r['fell_at']} 秒摔" + (f"（{r['push_at']} 秒被推）" if r["push_at"] else "") for r in rs if not r["ok"])
+            parts.append(f"抬脚 {np.mean([r['lift_cm'] for r in rs]):.1f} cm")
             print(f"  {n}  摩擦 {f}：{ok}/{len(rs)} 没摔  " + "  ".join(parts) + (f"  摔：{fails}" if fails else ""))
     out = "eval_walk_" + os.path.basename(path).replace(".npz", "") + ("_simple" if simple else "") + ("_quick" if quick else "") + ".json"
     json.dump(dict(policy=os.path.basename(path), body="simple" if simple else "full", trials=trials, runs=res),
