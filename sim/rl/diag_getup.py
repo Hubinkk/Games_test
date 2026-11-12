@@ -5,6 +5,7 @@
     python diag_getup.py full  [策略.npz] --fric=1.5 [--from=2.5 --to=6.0]
     python diag_getup.py simple [策略.npz] --fric=1.5 [--k=0.2 --rest=0.15 --wk=1.0] [--from= --to=]
     python diag_getup.py names                      # 打印参考动作里的关节名
+    两种都可以加 --ref=turnL（或 turnR，转头的参考，make_ref_turn.py）、--head=0.7（头和地面之间单独的摩擦）
 
 每行记：骨盆高、倾斜；肩俯仰和肘的实际角/目标角（左右）；手臂关节里用到力气上限的比例；
 各部位压在地上的法向力（手指、拇指、手掌、前臂、上臂、头颈、躯干、大腿/膝、小腿、脚）；
@@ -133,6 +134,10 @@ def run_full(pol, ref, friction, t_lo, t_hi):
     if arg("cone", ""):
         m.opt.cone = mujoco.mjtCone.mjCONE_ELLIPTIC if arg("cone", "") == "elliptic" else mujoco.mjtCone.mjCONE_PYRAMIDAL
     m.geom_friction[:, 0] = friction
+    if arg("head", 0.0):                    # --head=0.7：头和地面之间单独用这个摩擦（同 eval_robust.py --head=）
+        hg = m.geom("head").id
+        m.geom_priority[hg] = 1
+        m.geom_friction[hg, 0] = arg("head", 0.0)
     # 反事实试验：--part=thumb,fing:1.0 只把这些部位的摩擦改成 1.0（地面也得低于它才有效，MuJoCo 取两者较大的）
     pf = arg("part", "")
     if pf:
@@ -188,8 +193,11 @@ def run_full(pol, ref, friction, t_lo, t_hi):
 
 def run_simple(pol, ref, friction, t_lo, t_hi, k=0.2, rest=0.25, wk=1.0):
     m = mujoco.MjModel.from_xml_path(os.path.join(HERE, "huaran_rl.xml"))
-    st = json.load(open(os.path.join(HERE, "ref_state.json"), encoding="utf-8"))
+    st = json.load(open(os.path.join(HERE, ref.get("state_file", "ref_state.json")), encoding="utf-8"))
     m.geom_friction[:, 0] *= friction
+    if arg("head", 0.0):                    # 和 getup_env.py 的 HEAD_FRIC 一样：地面 0.01，头单独一个值（两面取大）
+        m.geom_friction[m.geom("floor").id, 0] = 0.01
+        m.geom_friction[m.geom("head").id, 0] = arg("head", 0.0)
     if arg("cone", ""):
         m.opt.cone = mujoco.mjtCone.mjCONE_ELLIPTIC if arg("cone", "") == "elliptic" else mujoco.mjtCone.mjCONE_PYRAMIDAL
     if arg("dt", 0.0):
@@ -257,7 +265,10 @@ def show(rows):
 
 def main():
     mode = sys.argv[1]
-    ref = json.load(open(os.path.join(HERE, "ref_getup.json"), encoding="utf-8"))
+    rname = arg("ref", "")                  # --ref=turnL / turnR：转头的参考（make_ref_turn.py）
+    ref = json.load(open(os.path.join(HERE, f"ref_getup_{rname}.json" if rname else "ref_getup.json"), encoding="utf-8"))
+    if rname:
+        ref["state_file"] = f"ref_state_{rname}.json"
     if mode == "names":
         print(ref["names"], ref["dt"], ref["t_free"], len(ref["q"]))
         return
@@ -273,6 +284,8 @@ def main():
         k, rest, wk = arg("k", 0.2), arg("rest", 0.25), arg("wk", 1.0)
         rows, end = run_simple(pol, ref, f, lo, hi, k, rest, wk)
         tag = f"simple_{f}_k{k}_r{rest}_w{wk}" + (f"_{arg('cone', '')}" if arg("cone", "") else "") + ("_handsol" if "--handsol" in sys.argv else "") + ("_nofing" if "--nofing" in sys.argv else "")
+    if rname or arg("head", 0.0):
+        tag += (f"_{rname}" if rname else "") + (f"_head{arg('head', 0.0)}" if arg("head", 0.0) else "")
     show(rows)
     print(f"结束时：骨盆 {end['z_cm']} cm，倾斜 {end['tilt']}°（{'站起来了' if end['z_cm'] > 20 and end['tilt'] < 20 else '没站起来'}）")
     json.dump(dict(policy=os.path.basename(path), mode=mode, friction=f, end=end, rows=rows),

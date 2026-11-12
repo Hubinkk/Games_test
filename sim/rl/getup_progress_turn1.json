@@ -1,0 +1,74 @@
+[
+ {
+  "steps": 0,
+  "minutes": 4.8,
+  "reward": 38.7,
+  "success": 0.778,
+  "height": 15.6,
+  "seconds": 18.2,
+  "face_s": 0.43
+ },
+ {
+  "steps": 1146880,
+  "minutes": 55.9,
+  "reward": 39.48,
+  "success": 0.803,
+  "height": 15.8,
+  "seconds": 18.4,
+  "face_s": 0.37
+ },
+ {
+  "steps": 2293760,
+  "minutes": 105.3,
+  "reward": 39.42,
+  "success": 0.808,
+  "height": 15.8,
+  "seconds": 18.4,
+  "face_s": 0.54
+ },
+ {
+  "steps": 3440640,
+  "minutes": 154.7,
+  "reward": 39.06,
+  "success": 0.795,
+  "height": 15.7,
+  "seconds": 18.3,
+  "face_s": 0.55
+ },
+ {
+  "steps": 4587520,
+  "minutes": 204.0,
+  "reward": 39.04,
+  "success": 0.792,
+  "height": 15.7,
+  "seconds": 18.3,
+  "face_s": 0.53
+ },
+ {
+  "steps": 5734400,
+  "minutes": 253.3,
+  "reward": 39.25,
+  "success": 0.794,
+  "height": 15.7,
+  "seconds": 18.3,
+  "face_s": 0.44
+ },
+ {
+  "steps": 6881280,
+  "minutes": 302.6,
+  "reward": 39.22,
+  "success": 0.796,
+  "height": 15.7,
+  "seconds": 18.3,
+  "face_s": 0.48
+ },
+ {
+  "steps": 8028160,
+  "minutes": 352.0,
+  "reward": 39.46,
+  "success": 0.81,
+  "height": 15.8,
+  "seconds": 18.4,
+  "face_s": 0.5
+ }
+]

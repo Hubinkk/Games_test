@@ -86,9 +86,20 @@ def main():
         tag = "_" + arg("tag", "")
     steps = arg("steps", 200_000 if smoke else 100_000_000)
     envs = arg("envs", 16 if smoke else 2048)
-    env = GetUp(os.path.join(HERE, "huaran_rl.xml"), os.path.join(HERE, "ref_getup.json"))
+    refs = os.path.join(HERE, "ref_getup.json")
+    if arg("ref", "") == "turn":
+        # --ref=turn（2026-11-12）：头偏向一边。左右两份参考各占一半；起始姿势多样；推 3–6 N、0.2 秒；
+        # 地面摩擦 0.5–2.0，头和地面之间单独 0.3–1.0（头用光滑材料）。见 getup_env.py 开头和 make_ref_turn.py
+        import getup_env as E
+        refs = [os.path.join(HERE, f"ref_getup_turn{s}.json") for s in "LR"]
+        E.VARY, E.PUSH_N, E.PUSH_STEPS = True, 5.0, 10
+        E.FACE_W = arg("facew", 1.0)
+        E.FRIC = tuple(float(x) for x in arg("fric", "0.5,2.0").split(","))
+        E.HEAD_FRIC = tuple(float(x) for x in arg("headfric", "0.3,1.0").split(","))
+        print(f"转头：地面摩擦 {E.FRIC}，头 {E.HEAD_FRIC}，推 {E.PUSH_N} N × {E.PUSH_STEPS} 步，起始姿势多样", flush=True)
+    env = GetUp(os.path.join(HERE, "huaran_rl.xml"), refs)
     # 评估时一律从趴着开始、做完整的一次起身（训练时七成的身体从动作中间开始）
-    eval_env = GetUp(os.path.join(HERE, "huaran_rl.xml"), os.path.join(HERE, "ref_getup.json"), mid_start=False)
+    eval_env = GetUp(os.path.join(HERE, "huaran_rl.xml"), refs, mid_start=False)
     episode = env.T + 25
     log = []
     t0 = time.time()
@@ -98,10 +109,11 @@ def main():
                    reward=round(float(metrics.get("eval/episode_reward", 0.0)), 2),
                    success=round(float(metrics.get("eval/episode_success", 0.0)) / max(env.T - env.t_free, 1), 3),
                    height=round(float(metrics.get("eval/episode_height", 0.0)) / episode * 100, 1),
-                   seconds=round(float(metrics.get("eval/avg_episode_length", 0.0)) * env.dt, 1))
+                   seconds=round(float(metrics.get("eval/avg_episode_length", 0.0)) * env.dt, 1),
+                   face_s=round(float(metrics.get("eval/episode_face", 0.0)) * env.dt, 2))
         log.append(row)
         print(f"{row['steps']:>11,} 步  {row['minutes']:>6} 分钟  得分 {row['reward']:>7}  松手后站着的时间比例 {row['success']:.0%}  "
-              f"平均骨盆高 {row['height']} cm  撑了 {row['seconds']} 秒才倒（满分 {episode * env.dt:.1f}）", flush=True)
+              f"平均骨盆高 {row['height']} cm  撑了 {row['seconds']} 秒才倒（满分 {episode * env.dt:.1f}）  脸着地 {row['face_s']} 秒", flush=True)
         json.dump(log, open(os.path.join(HERE, f"getup_progress{tag}.json"), "w"), indent=1)
 
     net = functools.partial(ppo_networks.make_ppo_networks, policy_hidden_layer_sizes=HIDDEN, value_hidden_layer_sizes=(256, 256, 256))

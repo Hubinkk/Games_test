@@ -11,7 +11,7 @@
 策略只练过从这个姿势开始。
 
 用法（单独跑一次，在默认地面上）：
-    python getup_rl.py
+    python getup_rl.py [--side=L|R]
 """
 import json
 import math
@@ -27,9 +27,14 @@ sys.path.insert(0, RL)
 from policy_np import Policy     # noqa: E402
 
 ACT_SCALE, SLEW, EXTRA = 0.3, 0.2, 25
-# 起身的头 4.5 秒，头转向左边并低头：让侧面的头发着地，脸和眼睛不碰地（育苗人 2026-11-11：脸不碰地更自然）。
-# 这几秒脖子不听策略的。稳不稳和不转头一样（rl/eval_robust.py --neck=turn：0.6–1.2 是 16/16）。设成 None 就是原样。
-TURN_HEAD = dict(neck_yaw=1.3, neck_pitch=0.4, neck_low=0.3)
+# 头偏向一边（2026-11-12 起由策略自己做）：参考动作 rl/ref_getup_turnL.json 里写了"起身的头 4.5 秒脖子转向左边并低头，之后回正"，
+# 策略（getup_policy.npz = getup_policy_turn1_4M.npz）跟着它转，侧面的头发着地，脸不碰地。
+# 转右 = 把转左整条左右镜像（rl/mirror_lr.py）：参考动作镜像，策略看到的观测镜像、给出的动作再镜像回来。
+# SIDE："L"、"R"，或 None = 每次起身随机选一边。
+SIDE = None
+# 以前（2026-11-11）的做法是起身的头 4.5 秒强行把脖子设成下面这个、不听策略的。现在关掉（None）；
+# 只在用旧策略 rl/run3_final.npz + 原来的 ref_getup.json 时才需要。
+TURN_HEAD = None
 TURN_UNTIL = 4.5
 _POL, _REF = None, None
 
@@ -38,7 +43,7 @@ def load():
     global _POL, _REF
     if _POL is None:
         _POL = Policy(os.path.join(RL, "getup_policy.npz"))
-        _REF = json.load(open(os.path.join(RL, "ref_getup.json"), encoding="utf-8"))
+        _REF = json.load(open(os.path.join(RL, "ref_getup_turnL.json"), encoding="utf-8"))
     return _POL, _REF
 
 
@@ -48,11 +53,19 @@ def duration():
     return (len(ref["q"]) + EXTRA) * ref["dt"]
 
 
-def run(sim, verbose=False):
+def run(sim, verbose=False, side=None):
+    """side：头转向哪边（"L" / "R"）；不给时用 SIDE，SIDE 也是 None 就随机。"""
     pol, ref = load()
+    side = side or SIDE or ("L" if np.random.random() < 0.5 else "R")
     m, d = sim.m, sim.d
     names = ref["names"]
     q_ref = np.array(ref["q"])
+    if side == "R":
+        from mirror_lr import Mirror
+        P = Mirror(names)
+        q_ref = P.q(q_ref)
+        pol0 = pol
+        pol = lambda o: P.q(pol0(P.obs(o)))      # noqa: E731
     T = len(q_ref)
     jid = [m.joint(n).id for n in names]
     qa = np.array([m.jnt_qposadr[j] for j in jid])
@@ -93,10 +106,10 @@ def run(sim, verbose=False):
     if trim is not None:
         trim.enabled = True
     z, tilt = float(d.qpos[2]), sim.tilt_deg()
-    return dict(ok=bool(z > 0.20 and tilt < 20), z_cm=z * 100, tilt=tilt, hist=hist)
+    return dict(ok=bool(z > 0.20 and tilt < 20), z_cm=z * 100, tilt=tilt, hist=hist, side=side)
 
 
 if __name__ == "__main__":
     import getup_hands as G
-    r = run(G.get_sim(), verbose=True)
-    print(f"结束：骨盆高 {r['z_cm']:.1f} cm，倾斜 {r['tilt']:.0f}°，{'站起来了' if r['ok'] else '没站起来'}")
+    r = run(G.get_sim(), verbose=True, side=next((a.split("=")[1] for a in sys.argv if a.startswith("--side=")), None))
+    print(f"结束（头转向{'左' if r['side'] == 'L' else '右'}）：骨盆高 {r['z_cm']:.1f} cm，倾斜 {r['tilt']:.0f}°，{'站起来了' if r['ok'] else '没站起来'}")
