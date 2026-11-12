@@ -28,6 +28,7 @@ import getup_hands as G          # noqa: E402
 
 TURN = dict(neck_yaw=1.3, neck_pitch=0.4, neck_low=0.3)      # 和 getup_rl.TURN_HEAD 一样
 T_IN, T_HOLD, T_OUT = 0.15, 4.5, 5.0      # 转进去要快：趴着开始时脸贴着地，转得越慢脸着地越久（0.3 秒时右边约 12%）
+T_IN = next((float(a.split("=")[1]) for a in sys.argv if a.startswith("--tin=")), T_IN)   # --tin=0：参考从第 0 步就是转到位的角度
 
 
 def weight(t):
