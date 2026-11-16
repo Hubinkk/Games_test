@@ -23,6 +23,11 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DAY = next((a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--day=")), "2026-11-14")
+# --policy=walk_policy_w3_152M.npz：用 sim/rl/ 里另一份走路策略（经环境变量 WALK_POLICY 传给 walk_rl.py 和 day.py），
+# 结果写 day_walk_compare_<策略名>.json，不动默认的 day_walk_compare.json；这时只跑 static 和 rl 两次
+POLICY = next((a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--policy=")), None)
+if POLICY:
+    os.environ["WALK_POLICY"] = POLICY
 LEGS = [f"{s}_{j}" for s in "lr" for j in ("hip_yaw", "hip_roll", "hip_pitch", "knee", "ankle_pitch", "ankle_roll")]
 
 
@@ -71,8 +76,10 @@ def continuous_heat():
     B = day.Body(sim)
     out = {}
     # 学会的走路：15 cm/s 连续 10 秒（前 1 秒起步不算）
-    t2, dx, fell = walk_rl.mean_tau2(sim, LEGS, 10.0)
-    out["rl"] = dict(desc="学会的走路 15 cm/s，连续 10 秒（去掉前 1 秒）", dist_cm=round(dx * 100, 1), fell=fell, tau2=t2)
+    mean = {}
+    t2, dx, fell = walk_rl.mean_tau2(sim, LEGS, 10.0, mean_out=mean)
+    out["rl"] = dict(desc="学会的走路 15 cm/s，连续 10 秒（去掉前 1 秒）", dist_cm=round(dx * 100, 1), fell=fell, tau2=t2,
+                     mean_Nm={day.NAMES.get(j, j): round(v, 3) for j, v in mean.items()})
     # 静步行：和一天里一样的 4 步、12 秒，全程都算
     acc, n = {j: 0.0 for j in LEGS}, [0]
 
@@ -103,13 +110,15 @@ def continuous_heat():
 def main():
     base = os.path.join(tempfile.gettempdir(), "huaran_walk_compare")
     os.makedirs(base, exist_ok=True)
-    res = {"day": DAY, "note": "仿真（mujoco 3.17，地面摩擦 1.0，整体模型）；起身都用 --getup=rl；走路策略 sim/rl/walk_policy.npz = 第 2 轮（walk_policy_w2_81M）",
+    res = {"day": DAY, "note": "仿真（mujoco 3.17，地面摩擦 1.0，整体模型）；起身都用 --getup=rl；走路策略 "
+                               + (f"sim/rl/{POLICY}" if POLICY else "sim/rl/walk_policy.npz = 第 2 轮（walk_policy_w2_81M）"),
            "runs_note": "static = 手写静步行；rl = 学会的走路，交回时策略继续跑、目标姿势按比例混进平时站姿（walk_rl.HANDOFF='mix'，默认）；"
                         "rl_freeze = 第一版交回（策略停下、目标角过渡），第 2 轮策略这样会在交回 0.57 秒时摔倒",
            "thresholds": {"有点热": 55, "太热": 70, "过热保护（自动减力）": 80},
-           "runs": [one(t, base) for t in ("static", "rl", "rl_freeze")]}
+           "runs": [one(t, base) for t in (("static", "rl") if POLICY else ("static", "rl", "rl_freeze"))]}
     res["continuous_walk_heat"] = continuous_heat()
-    json.dump(res, open(os.path.join(HERE, "day_walk_compare.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    name = "day_walk_compare" + ("_" + POLICY.replace(".npz", "") if POLICY else "") + ".json"
+    json.dump(res, open(os.path.join(HERE, name), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     for r in res["runs"]:
         if r.get("crashed"):
             print(r["method"], "运行出错：", r["stderr"])

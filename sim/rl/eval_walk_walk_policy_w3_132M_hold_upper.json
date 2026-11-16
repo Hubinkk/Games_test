@@ -1,0 +1,5037 @@
+{
+ "policy": "walk_policy_w3_132M.npz",
+ "body": "full",
+ "trials": 8,
+ "opts": {
+  "hold": true,
+  "upper": true,
+  "reflex": false,
+  "smooth": false
+ },
+ "runs": [
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1466,
+     "vy": 0.0015,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0083,
+     "vy": 0.0064,
+     "wz": -0.003,
+     "drift_cm": 2.15
+    }
+   ],
+   "lift_cm": 2.33,
+   "heading_deg": -2.4
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1494,
+     "vy": 0.0009,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0077,
+     "vy": 0.0089,
+     "wz": -0.012,
+     "drift_cm": 2.25
+    }
+   ],
+   "lift_cm": 2.36,
+   "heading_deg": 7.9
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1474,
+     "vy": 0.0025,
+     "wz": -0.007
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0063,
+     "vy": 0.0057,
+     "wz": -0.013,
+     "drift_cm": 1.91
+    }
+   ],
+   "lift_cm": 2.31,
+   "heading_deg": -10.4
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1492,
+     "vy": -0.0011,
+     "wz": 0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0123,
+     "vy": 0.0061,
+     "wz": 0.017,
+     "drift_cm": 2.76
+    }
+   ],
+   "lift_cm": 2.31,
+   "heading_deg": -1.2
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1473,
+     "vy": 0.0015,
+     "wz": 0.0
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0037,
+     "vy": 0.0063,
+     "wz": 0.029,
+     "drift_cm": 2.24
+    }
+   ],
+   "lift_cm": 2.37,
+   "heading_deg": -1.1
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1472,
+     "vy": 0.0051,
+     "wz": 0.0
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0005,
+     "vy": 0.0018,
+     "wz": -0.011,
+     "drift_cm": 1.11
+    }
+   ],
+   "lift_cm": 2.34,
+   "heading_deg": 2.6
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.145,
+     "vy": 0.003,
+     "wz": 0.003
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0026,
+     "vy": 0.0086,
+     "wz": -0.013,
+     "drift_cm": 2.03
+    }
+   ],
+   "lift_cm": 2.36,
+   "heading_deg": -2.4
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1438,
+     "vy": 0.0016,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0045,
+     "vy": 0.0031,
+     "wz": -0.012,
+     "drift_cm": 1.08
+    }
+   ],
+   "lift_cm": 2.36,
+   "heading_deg": -5.6
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1493,
+     "vy": -0.0002,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0072,
+     "vy": 0.0052,
+     "wz": -0.006,
+     "drift_cm": 1.83
+    }
+   ],
+   "lift_cm": 2.38,
+   "heading_deg": 0.1
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1468,
+     "vy": 0.0006,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0073,
+     "vy": 0.006,
+     "wz": -0.035,
+     "drift_cm": 2.03
+    }
+   ],
+   "lift_cm": 2.35,
+   "heading_deg": -8.8
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1463,
+     "vy": 0.0016,
+     "wz": 0.0
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.007,
+     "vy": 0.0064,
+     "wz": -0.036,
+     "drift_cm": 1.7
+    }
+   ],
+   "lift_cm": 2.35,
+   "heading_deg": -5.6
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1576,
+     "vy": -0.0045,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0055,
+     "vy": 0.0073,
+     "wz": -0.019,
+     "drift_cm": 1.95
+    }
+   ],
+   "lift_cm": 2.37,
+   "heading_deg": -7.0
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1503,
+     "vy": 0.0016,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0091,
+     "vy": 0.0063,
+     "wz": 0.003,
+     "drift_cm": 2.61
+    }
+   ],
+   "lift_cm": 2.34,
+   "heading_deg": -3.5
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1496,
+     "vy": 0.0031,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0131,
+     "vy": 0.0103,
+     "wz": 0.0,
+     "drift_cm": 3.36
+    }
+   ],
+   "lift_cm": 2.35,
+   "heading_deg": -1.2
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.147,
+     "vy": 0.0044,
+     "wz": 0.006
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0073,
+     "vy": 0.0065,
+     "wz": -0.062,
+     "drift_cm": 2.15
+    }
+   ],
+   "lift_cm": 2.36,
+   "heading_deg": -11.0
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1446,
+     "vy": 0.0021,
+     "wz": -0.0
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0071,
+     "vy": 0.0096,
+     "wz": -0.052,
+     "drift_cm": 2.37
+    }
+   ],
+   "lift_cm": 2.37,
+   "heading_deg": -9.7
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1439,
+     "vy": 0.001,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0165,
+     "vy": 0.0016,
+     "wz": -0.013,
+     "drift_cm": 3.28
+    }
+   ],
+   "lift_cm": 2.36,
+   "heading_deg": -3.0
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1421,
+     "vy": 0.0044,
+     "wz": 0.003
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0058,
+     "vy": 0.0062,
+     "wz": -0.023,
+     "drift_cm": 1.59
+    }
+   ],
+   "lift_cm": 2.37,
+   "heading_deg": 0.6
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1425,
+     "vy": 0.0017,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0067,
+     "vy": 0.0085,
+     "wz": -0.024,
+     "drift_cm": 2.26
+    }
+   ],
+   "lift_cm": 2.33,
+   "heading_deg": -7.4
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1453,
+     "vy": 0.0022,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0053,
+     "vy": 0.0066,
+     "wz": -0.028,
+     "drift_cm": 1.72
+    }
+   ],
+   "lift_cm": 2.33,
+   "heading_deg": -7.1
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1444,
+     "vy": 0.0006,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.006,
+     "vy": 0.0076,
+     "wz": -0.028,
+     "drift_cm": 1.88
+    }
+   ],
+   "lift_cm": 2.33,
+   "heading_deg": -6.7
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1494,
+     "vy": 0.0034,
+     "wz": 0.002
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0098,
+     "vy": 0.0025,
+     "wz": -0.012,
+     "drift_cm": 2.16
+    }
+   ],
+   "lift_cm": 2.37,
+   "heading_deg": -1.7
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1467,
+     "vy": 0.0007,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0025,
+     "vy": 0.0021,
+     "wz": -0.001,
+     "drift_cm": 0.97
+    }
+   ],
+   "lift_cm": 2.32,
+   "heading_deg": -4.4
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1434,
+     "vy": 0.0016,
+     "wz": 0.005
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0085,
+     "vy": 0.0059,
+     "wz": -0.026,
+     "drift_cm": 2.18
+    }
+   ],
+   "lift_cm": 2.34,
+   "heading_deg": -0.0
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1382,
+     "vy": -0.0034,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.34,
+   "heading_deg": -1.2
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.8,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1527,
+     "vy": -0.006,
+     "wz": -0.0
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -0.2
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.5,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1563,
+     "vy": 0.0057,
+     "wz": 0.001
+    }
+   ],
+   "lift_cm": 2.39,
+   "heading_deg": -1.1
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1479,
+     "vy": -0.0106,
+     "wz": -0.0
+    }
+   ],
+   "lift_cm": 2.36,
+   "heading_deg": -0.6
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.8,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1517,
+     "vy": 0.0047,
+     "wz": -0.039
+    }
+   ],
+   "lift_cm": 2.47,
+   "heading_deg": -20.4
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.6,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1621,
+     "vy": 0.0068,
+     "wz": 0.004
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": 1.2
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1436,
+     "vy": 0.0061,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": 0.7
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.149,
+     "vy": 0.0107,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": -1.6
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.144,
+     "vy": -0.004,
+     "wz": 0.011
+    }
+   ],
+   "lift_cm": 2.38,
+   "heading_deg": 4.4
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1445,
+     "vy": 0.011,
+     "wz": -0.005
+    }
+   ],
+   "lift_cm": 2.35,
+   "heading_deg": -1.7
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1393,
+     "vy": 0.0011,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.38,
+   "heading_deg": -1.0
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1487,
+     "vy": 0.0028,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.39,
+   "heading_deg": -2.4
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1538,
+     "vy": -0.0079,
+     "wz": 0.004
+    }
+   ],
+   "lift_cm": 2.39,
+   "heading_deg": -0.8
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1524,
+     "vy": 0.015,
+     "wz": 0.0
+    }
+   ],
+   "lift_cm": 2.42,
+   "heading_deg": -0.0
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1505,
+     "vy": -0.0006,
+     "wz": -0.0
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -0.9
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1531,
+     "vy": -0.0015,
+     "wz": 0.002
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -0.4
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1407,
+     "vy": 0.0054,
+     "wz": -0.004
+    }
+   ],
+   "lift_cm": 2.47,
+   "heading_deg": 0.5
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1395,
+     "vy": -0.0027,
+     "wz": 0.0
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -0.3
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1421,
+     "vy": 0.0079,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.35,
+   "heading_deg": -1.7
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1545,
+     "vy": -0.0094,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.38,
+   "heading_deg": -1.5
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.5,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1399,
+     "vy": 0.0093,
+     "wz": -0.007
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -1.7
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.148,
+     "vy": -0.0194,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.37,
+   "heading_deg": -2.5
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.5,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1458,
+     "vy": -0.0151,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.38,
+   "heading_deg": -1.9
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1447,
+     "vy": 0.0165,
+     "wz": -0.0
+    }
+   ],
+   "lift_cm": 2.36,
+   "heading_deg": -1.5
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2412,
+     "vy": 0.0021,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.26,
+   "heading_deg": -1.2
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2485,
+     "vy": -0.0002,
+     "wz": -0.006
+    }
+   ],
+   "lift_cm": 2.46,
+   "heading_deg": -1.1
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2517,
+     "vy": 0.0028,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.42,
+   "heading_deg": 0.1
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2508,
+     "vy": -0.003,
+     "wz": 0.001
+    }
+   ],
+   "lift_cm": 2.44,
+   "heading_deg": 0.1
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2475,
+     "vy": 0.0021,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.43,
+   "heading_deg": -2.4
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2486,
+     "vy": 0.0041,
+     "wz": 0.006
+    }
+   ],
+   "lift_cm": 2.5,
+   "heading_deg": 0.8
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2434,
+     "vy": 0.0021,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": -1.2
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2492,
+     "vy": 0.0031,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.44,
+   "heading_deg": -1.9
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2554,
+     "vy": -0.0033,
+     "wz": -0.011
+    }
+   ],
+   "lift_cm": 2.54,
+   "heading_deg": -0.8
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2485,
+     "vy": 0.0018,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": -0.5
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2388,
+     "vy": 0.0036,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -1.0
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2578,
+     "vy": -0.0091,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.58,
+   "heading_deg": -0.8
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2501,
+     "vy": 0.0029,
+     "wz": 0.005
+    }
+   ],
+   "lift_cm": 2.42,
+   "heading_deg": 0.1
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2501,
+     "vy": 0.0037,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.47,
+   "heading_deg": 0.7
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2409,
+     "vy": 0.0013,
+     "wz": -0.013
+    }
+   ],
+   "lift_cm": 2.38,
+   "heading_deg": -5.1
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2449,
+     "vy": 0.0028,
+     "wz": 0.002
+    }
+   ],
+   "lift_cm": 2.46,
+   "heading_deg": -0.7
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.238,
+     "vy": 0.0017,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -0.6
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2402,
+     "vy": 0.0043,
+     "wz": 0.007
+    }
+   ],
+   "lift_cm": 2.43,
+   "heading_deg": 1.9
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2399,
+     "vy": 0.0032,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.43,
+   "heading_deg": -3.1
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2413,
+     "vy": 0.0022,
+     "wz": 0.001
+    }
+   ],
+   "lift_cm": 2.43,
+   "heading_deg": -1.7
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2373,
+     "vy": 0.0022,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": -0.5
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2445,
+     "vy": 0.0042,
+     "wz": 0.01
+    }
+   ],
+   "lift_cm": 2.52,
+   "heading_deg": 3.1
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2368,
+     "vy": 0.0024,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.36,
+   "heading_deg": -1.1
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2355,
+     "vy": 0.0026,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": 0.2
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0036,
+     "vy": 0.0049,
+     "wz": 0.601
+    }
+   ],
+   "lift_cm": 2.1,
+   "heading_deg": 207.6
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0039,
+     "vy": 0.0053,
+     "wz": 0.598
+    }
+   ],
+   "lift_cm": 2.12,
+   "heading_deg": 207.2
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0054,
+     "vy": 0.0047,
+     "wz": 0.607
+    }
+   ],
+   "lift_cm": 2.07,
+   "heading_deg": 208.6
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.0004,
+     "vy": 0.0008,
+     "wz": 0.608
+    }
+   ],
+   "lift_cm": 2.17,
+   "heading_deg": 208.4
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0007,
+     "vy": 0.0037,
+     "wz": 0.6
+    }
+   ],
+   "lift_cm": 2.18,
+   "heading_deg": 206.6
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.005,
+     "vy": 0.005,
+     "wz": 0.604
+    }
+   ],
+   "lift_cm": 2.18,
+   "heading_deg": 208.2
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0002,
+     "vy": 0.0032,
+     "wz": 0.599
+    }
+   ],
+   "lift_cm": 2.18,
+   "heading_deg": 206.8
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.0007,
+     "vy": 0.0056,
+     "wz": 0.6
+    }
+   ],
+   "lift_cm": 2.18,
+   "heading_deg": 207.0
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.0003,
+     "vy": 0.0036,
+     "wz": 0.606
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": 209.7
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0004,
+     "vy": 0.0029,
+     "wz": 0.604
+    }
+   ],
+   "lift_cm": 2.16,
+   "heading_deg": 208.0
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0027,
+     "vy": 0.0071,
+     "wz": 0.6
+    }
+   ],
+   "lift_cm": 2.09,
+   "heading_deg": 207.5
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0085,
+     "vy": -0.0097,
+     "wz": 0.61
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": 209.0
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0065,
+     "vy": 0.0037,
+     "wz": 0.603
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": 208.0
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.004,
+     "vy": 0.0016,
+     "wz": 0.592
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": 205.4
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.0005,
+     "vy": 0.0057,
+     "wz": 0.598
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": 206.8
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.0009,
+     "vy": 0.004,
+     "wz": 0.6
+    }
+   ],
+   "lift_cm": 2.16,
+   "heading_deg": 207.5
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0007,
+     "vy": 0.0044,
+     "wz": 0.598
+    }
+   ],
+   "lift_cm": 2.18,
+   "heading_deg": 207.1
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0002,
+     "vy": 0.007,
+     "wz": 0.602
+    }
+   ],
+   "lift_cm": 2.16,
+   "heading_deg": 207.7
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0,
+     "vy": 0.005,
+     "wz": 0.603
+    }
+   ],
+   "lift_cm": 2.11,
+   "heading_deg": 207.9
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0017,
+     "vy": 0.0048,
+     "wz": 0.596
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": 206.4
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0037,
+     "vy": 0.0027,
+     "wz": 0.606
+    }
+   ],
+   "lift_cm": 2.16,
+   "heading_deg": 208.9
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.0029,
+     "vy": 0.0065,
+     "wz": 0.602
+    }
+   ],
+   "lift_cm": 2.12,
+   "heading_deg": 208.0
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0031,
+     "vy": 0.0038,
+     "wz": 0.6
+    }
+   ],
+   "lift_cm": 2.08,
+   "heading_deg": 207.8
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0025,
+     "vy": 0.0034,
+     "wz": 0.581
+    }
+   ],
+   "lift_cm": 2.08,
+   "heading_deg": 202.4
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0053,
+     "vy": 0.0476,
+     "wz": -0.0
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0777,
+     "vy": 0.0086,
+     "wz": 0.001
+    }
+   ],
+   "lift_cm": 2.05,
+   "heading_deg": 0.2
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0034,
+     "vy": 0.0497,
+     "wz": 0.006
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0808,
+     "vy": 0.0114,
+     "wz": -0.006
+    }
+   ],
+   "lift_cm": 2.11,
+   "heading_deg": -0.5
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.006,
+     "vy": 0.0465,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0882,
+     "vy": 0.0079,
+     "wz": -0.022
+    }
+   ],
+   "lift_cm": 2.09,
+   "heading_deg": -4.5
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0041,
+     "vy": 0.0473,
+     "wz": 0.009
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0821,
+     "vy": 0.0071,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.11,
+   "heading_deg": -0.3
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0053,
+     "vy": 0.0481,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0849,
+     "vy": 0.0077,
+     "wz": 0.007
+    }
+   ],
+   "lift_cm": 2.11,
+   "heading_deg": 0.1
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0032,
+     "vy": 0.0507,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.082,
+     "vy": 0.01,
+     "wz": -0.043
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": -0.5
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0062,
+     "vy": 0.0473,
+     "wz": 0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0861,
+     "vy": 0.007,
+     "wz": 0.002
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": 0.6
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0068,
+     "vy": 0.0478,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0798,
+     "vy": 0.0083,
+     "wz": 0.009
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": 1.7
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0049,
+     "vy": 0.0518,
+     "wz": -0.004
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.08,
+     "vy": 0.0074,
+     "wz": -0.006
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": 0.2
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0049,
+     "vy": 0.0472,
+     "wz": 0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.074,
+     "vy": 0.0085,
+     "wz": 0.002
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": -0.2
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0063,
+     "vy": 0.0509,
+     "wz": 0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0835,
+     "vy": 0.0073,
+     "wz": 0.016
+    }
+   ],
+   "lift_cm": 2.1,
+   "heading_deg": 1.2
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0017,
+     "vy": 0.0506,
+     "wz": -0.0
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0792,
+     "vy": 0.0073,
+     "wz": -0.009
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": -0.0
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0021,
+     "vy": 0.0515,
+     "wz": 0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0801,
+     "vy": 0.0077,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.12,
+   "heading_deg": 0.8
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0001,
+     "vy": 0.0465,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0805,
+     "vy": 0.0078,
+     "wz": 0.002
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": 0.1
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0057,
+     "vy": 0.0487,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0814,
+     "vy": 0.0059,
+     "wz": 0.005
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": 1.5
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0066,
+     "vy": 0.0486,
+     "wz": -0.0
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0794,
+     "vy": 0.0088,
+     "wz": 0.002
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": 0.4
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0063,
+     "vy": 0.0474,
+     "wz": -0.004
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0783,
+     "vy": 0.0091,
+     "wz": 0.0
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": -0.3
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0049,
+     "vy": 0.0484,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0742,
+     "vy": 0.0109,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.11,
+   "heading_deg": 0.5
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0074,
+     "vy": 0.0479,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0787,
+     "vy": 0.0082,
+     "wz": -0.006
+    }
+   ],
+   "lift_cm": 2.1,
+   "heading_deg": -0.4
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0064,
+     "vy": 0.0485,
+     "wz": 0.003
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.079,
+     "vy": 0.0066,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.1,
+   "heading_deg": 0.8
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0039,
+     "vy": 0.0466,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0798,
+     "vy": 0.0107,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.1,
+   "heading_deg": 0.6
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0057,
+     "vy": 0.0493,
+     "wz": -0.007
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0759,
+     "vy": 0.0123,
+     "wz": 0.002
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": 1.2
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0054,
+     "vy": 0.0452,
+     "wz": 0.0
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0814,
+     "vy": 0.0093,
+     "wz": 0.001
+    }
+   ],
+   "lift_cm": 2.08,
+   "heading_deg": 0.4
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0056,
+     "vy": 0.0456,
+     "wz": -0.0
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.081,
+     "vy": 0.008,
+     "wz": 0.008
+    }
+   ],
+   "lift_cm": 2.09,
+   "heading_deg": 1.5
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1305,
+     "vy": -0.0077,
+     "wz": 0.011
+    }
+   ],
+   "lift_cm": 2.39,
+   "heading_deg": 4.4
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1394,
+     "vy": 0.0204,
+     "wz": -0.005
+    }
+   ],
+   "lift_cm": 2.35,
+   "heading_deg": -1.7
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1282,
+     "vy": -0.0009,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.37,
+   "heading_deg": -1.0
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1424,
+     "vy": 0.0048,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.39,
+   "heading_deg": -2.4
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1549,
+     "vy": -0.0195,
+     "wz": 0.005
+    }
+   ],
+   "lift_cm": 2.39,
+   "heading_deg": -0.7
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.157,
+     "vy": 0.0272,
+     "wz": 0.0
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -0.0
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1587,
+     "vy": -0.0044,
+     "wz": -0.0
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -0.9
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.163,
+     "vy": -0.0026,
+     "wz": 0.002
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -0.4
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1077,
+     "vy": -0.0088,
+     "wz": 0.008
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": 2.8
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1338,
+     "vy": 0.0324,
+     "wz": -0.005
+    }
+   ],
+   "lift_cm": 2.35,
+   "heading_deg": -1.7
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1089,
+     "vy": -0.0077,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.39,
+   "heading_deg": -1.0
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.129,
+     "vy": 0.011,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": -2.4
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1584,
+     "vy": -0.0342,
+     "wz": 0.005
+    }
+   ],
+   "lift_cm": 2.42,
+   "heading_deg": -0.6
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1622,
+     "vy": 0.0455,
+     "wz": 0.0
+    }
+   ],
+   "lift_cm": 2.39,
+   "heading_deg": -0.0
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1859,
+     "vy": -0.0044,
+     "wz": -0.0
+    }
+   ],
+   "lift_cm": 2.42,
+   "heading_deg": -1.0
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.177,
+     "vy": -0.0063,
+     "wz": 0.002
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -0.4
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0108,
+     "vy": 0.0025,
+     "wz": 0.007,
+     "drift_cm": 4.63
+    }
+   ],
+   "lift_cm": 1.86,
+   "heading_deg": 0.7
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.8,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.001,
+     "vy": -0.0072,
+     "wz": -0.017,
+     "drift_cm": 0.62
+    }
+   ],
+   "lift_cm": 1.92,
+   "heading_deg": -11.6
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0007,
+     "vy": 0.0103,
+     "wz": -0.031,
+     "drift_cm": 4.06
+    }
+   ],
+   "lift_cm": 1.92,
+   "heading_deg": -13.6
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0055,
+     "vy": -0.0055,
+     "wz": -0.001,
+     "drift_cm": 2.45
+    }
+   ],
+   "lift_cm": 1.87,
+   "heading_deg": 0.1
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.8,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0086,
+     "vy": 0.0109,
+     "wz": -0.028,
+     "drift_cm": 3.2
+    }
+   ],
+   "lift_cm": 1.94,
+   "heading_deg": -14.5
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.003,
+     "vy": 0.0102,
+     "wz": -0.008,
+     "drift_cm": 1.91
+    }
+   ],
+   "lift_cm": 1.93,
+   "heading_deg": -4.4
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0136,
+     "vy": 0.0093,
+     "wz": -0.025,
+     "drift_cm": 1.12
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -11.4
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0074,
+     "vy": 0.0205,
+     "wz": -0.007,
+     "drift_cm": 3.02
+    }
+   ],
+   "lift_cm": 1.92,
+   "heading_deg": -3.2
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0116,
+     "vy": -0.0011,
+     "wz": 0.013,
+     "drift_cm": 1.77
+    }
+   ],
+   "lift_cm": 1.92,
+   "heading_deg": 4.2
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0112,
+     "vy": 0.0209,
+     "wz": -0.046,
+     "drift_cm": 1.15
+    }
+   ],
+   "lift_cm": 1.89,
+   "heading_deg": -15.5
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0168,
+     "vy": 0.0068,
+     "wz": -0.008,
+     "drift_cm": 1.66
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -0.6
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0055,
+     "vy": 0.0073,
+     "wz": -0.009,
+     "drift_cm": 2.92
+    }
+   ],
+   "lift_cm": 1.9,
+   "heading_deg": -3.9
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0039,
+     "vy": 0.0014,
+     "wz": -0.056,
+     "drift_cm": 4.58
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -23.4
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0028,
+     "vy": 0.0226,
+     "wz": -0.004,
+     "drift_cm": 2.44
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -2.3
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0,
+     "vy": 0.0046,
+     "wz": -0.015,
+     "drift_cm": 1.99
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -4.4
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0012,
+     "vy": 0.0041,
+     "wz": -0.014,
+     "drift_cm": 1.57
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -7.1
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.017,
+     "vy": 0.0101,
+     "wz": -0.034,
+     "drift_cm": 3.95
+    }
+   ],
+   "lift_cm": 1.95,
+   "heading_deg": -7.2
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0105,
+     "vy": 0.0007,
+     "wz": -0.019,
+     "drift_cm": 1.15
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -7.4
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0072,
+     "vy": 0.0137,
+     "wz": -0.029,
+     "drift_cm": 1.93
+    }
+   ],
+   "lift_cm": 1.86,
+   "heading_deg": -14.9
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0071,
+     "vy": -0.0075,
+     "wz": -0.044,
+     "drift_cm": 1.59
+    }
+   ],
+   "lift_cm": 1.92,
+   "heading_deg": -20.2
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.012,
+     "vy": 0.019,
+     "wz": -0.02,
+     "drift_cm": 2.7
+    }
+   ],
+   "lift_cm": 1.9,
+   "heading_deg": -4.2
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0085,
+     "vy": -0.0127,
+     "wz": 0.016,
+     "drift_cm": 2.34
+    }
+   ],
+   "lift_cm": 1.88,
+   "heading_deg": 6.4
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0035,
+     "vy": -0.0117,
+     "wz": -0.007,
+     "drift_cm": 1.65
+    }
+   ],
+   "lift_cm": 1.89,
+   "heading_deg": -2.3
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0068,
+     "vy": 0.0199,
+     "wz": -0.016,
+     "drift_cm": 1.52
+    }
+   ],
+   "lift_cm": 1.9,
+   "heading_deg": -8.5
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0206,
+     "vy": 0.0036,
+     "wz": 0.057,
+     "drift_cm": 11.99
+    }
+   ],
+   "lift_cm": 1.87,
+   "heading_deg": 22.0
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.8,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0056,
+     "vy": -0.012,
+     "wz": -0.019,
+     "drift_cm": 0.38
+    }
+   ],
+   "lift_cm": 1.92,
+   "heading_deg": -12.3
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0115,
+     "vy": 0.0204,
+     "wz": -0.037,
+     "drift_cm": 15.05
+    }
+   ],
+   "lift_cm": 1.93,
+   "heading_deg": -16.1
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0045,
+     "vy": -0.0163,
+     "wz": 0.02,
+     "drift_cm": 2.37
+    }
+   ],
+   "lift_cm": 1.88,
+   "heading_deg": 8.9
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.8,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0041,
+     "vy": 0.0171,
+     "wz": -0.029,
+     "drift_cm": 3.19
+    }
+   ],
+   "lift_cm": 1.94,
+   "heading_deg": -14.8
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0109,
+     "vy": 0.0194,
+     "wz": -0.022,
+     "drift_cm": 5.57
+    }
+   ],
+   "lift_cm": 1.96,
+   "heading_deg": -10.3
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0261,
+     "vy": 0.0163,
+     "wz": -0.034,
+     "drift_cm": 1.41
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -15.4
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0028,
+     "vy": 0.0312,
+     "wz": 0.015,
+     "drift_cm": 3.37
+    }
+   ],
+   "lift_cm": 1.92,
+   "heading_deg": 6.3
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0259,
+     "vy": -0.0023,
+     "wz": 0.034,
+     "drift_cm": 2.25
+    }
+   ],
+   "lift_cm": 1.93,
+   "heading_deg": 13.2
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.013,
+     "vy": 0.0304,
+     "wz": -0.054,
+     "drift_cm": 1.13
+    }
+   ],
+   "lift_cm": 1.89,
+   "heading_deg": -19.0
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0305,
+     "vy": 0.0062,
+     "wz": -0.01,
+     "drift_cm": 1.66
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -1.2
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0176,
+     "vy": 0.0107,
+     "wz": -0.017,
+     "drift_cm": 2.77
+    }
+   ],
+   "lift_cm": 1.93,
+   "heading_deg": -7.5
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0105,
+     "vy": -0.0049,
+     "wz": -0.069,
+     "drift_cm": 11.16
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -29.3
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0014,
+     "vy": 0.0399,
+     "wz": -0.004,
+     "drift_cm": 2.43
+    }
+   ],
+   "lift_cm": 1.94,
+   "heading_deg": -2.5
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0102,
+     "vy": 0.0011,
+     "wz": -0.017,
+     "drift_cm": 1.92
+    }
+   ],
+   "lift_cm": 1.9,
+   "heading_deg": -5.4
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0095,
+     "vy": 0.0021,
+     "wz": -0.014,
+     "drift_cm": 1.57
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -7.4
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0239,
+     "vy": 0.0142,
+     "wz": -0.067,
+     "drift_cm": 4.83
+    }
+   ],
+   "lift_cm": 1.96,
+   "heading_deg": -21.2
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0227,
+     "vy": -0.0027,
+     "wz": 0.02,
+     "drift_cm": 6.94
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": 9.0
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.014,
+     "vy": 0.0228,
+     "wz": -0.056,
+     "drift_cm": 1.95
+    }
+   ],
+   "lift_cm": 1.86,
+   "heading_deg": -26.5
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0145,
+     "vy": -0.0165,
+     "wz": -0.044,
+     "drift_cm": 1.61
+    }
+   ],
+   "lift_cm": 1.92,
+   "heading_deg": -20.4
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0164,
+     "vy": 0.0271,
+     "wz": -0.061,
+     "drift_cm": 2.93
+    }
+   ],
+   "lift_cm": 1.89,
+   "heading_deg": -21.8
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0093,
+     "vy": -0.0258,
+     "wz": 0.022,
+     "drift_cm": 1.9
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": 8.9
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0019,
+     "vy": -0.0245,
+     "wz": -0.017,
+     "drift_cm": 3.7
+    }
+   ],
+   "lift_cm": 1.89,
+   "heading_deg": -6.5
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0084,
+     "vy": 0.0322,
+     "wz": -0.069,
+     "drift_cm": 1.51
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -31.2
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.04,
+     "vy": 0.0003,
+     "wz": 0.043,
+     "drift_cm": 2.24
+    }
+   ],
+   "lift_cm": 1.97,
+   "heading_deg": 17.1
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0156,
+     "vy": 0.0464,
+     "wz": -0.049,
+     "drift_cm": 1.14
+    }
+   ],
+   "lift_cm": 1.89,
+   "heading_deg": -16.7
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0466,
+     "vy": 0.0054,
+     "wz": -0.016,
+     "drift_cm": 1.34
+    }
+   ],
+   "lift_cm": 1.91,
+   "heading_deg": -3.8
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0314,
+     "vy": 0.018,
+     "wz": -0.005,
+     "drift_cm": 2.81
+    }
+   ],
+   "lift_cm": 1.93,
+   "heading_deg": -2.3
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0204,
+     "vy": -0.0223,
+     "wz": -0.009,
+     "drift_cm": 25.92
+    }
+   ],
+   "lift_cm": 1.97,
+   "heading_deg": -3.3
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0198,
+     "vy": 0.0525,
+     "wz": 0.044,
+     "drift_cm": 2.42
+    }
+   ],
+   "lift_cm": 1.95,
+   "heading_deg": 18.5
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0224,
+     "vy": -0.0083,
+     "wz": 0.005,
+     "drift_cm": 1.94
+    }
+   ],
+   "lift_cm": 1.92,
+   "heading_deg": 4.2
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0287,
+     "vy": 0.0003,
+     "wz": -0.016,
+     "drift_cm": 1.57
+    }
+   ],
+   "lift_cm": 1.93,
+   "heading_deg": -8.1
+  }
+ ]
+}

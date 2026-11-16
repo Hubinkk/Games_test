@@ -44,7 +44,8 @@ _POL = None
 def policy():
     global _POL
     if _POL is None:
-        _POL = Policy(os.path.join(HERE, "rl", "walk_policy.npz"))
+        # 环境变量 WALK_POLICY 可以换一份策略（文件名，相对 sim/rl/），验收新一轮时用，不动 walk_policy.npz
+        _POL = Policy(os.path.join(HERE, "rl", os.environ.get("WALK_POLICY", "walk_policy.npz")))
     return _POL
 
 
@@ -188,23 +189,29 @@ def run(sim, bal=None, dist=STATIC_DX, v=V_CMD, reset=True, handoff=None):
                 end_tilt=round(sim.tilt_deg(), 1), end_z_cm=round(float(d.qpos[2]) * 100, 1))
 
 
-def mean_tau2(sim, joints, seconds=10.0, v=V_CMD, skip=1.0):
-    """连续按 v 走 seconds 秒（从站姿开始，前 skip 秒不算），返回各关节扭矩平方的平均值（N·m²）和走出的距离。"""
+def mean_tau2(sim, joints, seconds=10.0, v=V_CMD, skip=1.0, mean_out=None):
+    """连续按 v 走 seconds 秒（从站姿开始，前 skip 秒不算），返回各关节扭矩平方的平均值（N·m²）和走出的距离。
+    mean_out 给一个字典时，另外填进各关节扭矩的平均值（带正负号，看是不是一直偏向一边）。"""
     sim.reset()
     w = Walker(sim)
     acc, n = {j: 0.0 for j in joints}, [0]
+    acc1 = {j: 0.0 for j in joints}
 
     def sub():
         if w.t * W.DT >= skip:
             tq = sim.torques()
             for j in joints:
-                acc[j] += float(tq.get(j, 0.0)) ** 2
+                x = float(tq.get(j, 0.0))
+                acc[j] += x ** 2
+                acc1[j] += x
             n[0] += 1
     x0 = float(sim.d.qpos[0])
     while w.t * W.DT < seconds and w.fell_at is None:
         w.step((v, 0.0, 0.0), sub)
     if w.trim is not None:
         w.trim.enabled = True
+    if mean_out is not None:
+        mean_out.update({j: acc1[j] / max(1, n[0]) for j in joints})
     return {j: acc[j] / max(1, n[0]) for j in joints}, float(sim.d.qpos[0]) - x0, w.fell_at
 
 
