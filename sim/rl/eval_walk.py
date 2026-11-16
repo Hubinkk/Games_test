@@ -17,7 +17,7 @@
     侧移后退  指令侧移 5 cm/s 走 5 秒，再后退 8 cm/s 走 5 秒
     大推      同"走+推"，推力 8 N、12 N（只在摩擦 1.0 上）
     站+推     指令 0 站 9 秒，第 3–8 秒之间被推 5 N、8 N（12 N 只在摩擦 1.0 上）：看它会不会迈步接住自己
-选项：--reflex 站着被推歪时临时改成原地踏步；--only=站+推 只跑一部分项目；--hold 加一层朝向控制（走偏了就在转向指令上补）；--upper 上身每 2 秒被摆到一个随机姿势（策略看不到）
+选项：--smooth 上身连续地来回动（每个关节一条正弦，0.2–1.2 Hz）；--reflex 站着被推歪时临时改成原地踏步；--only=站+推 只跑一部分项目；--hold 加一层朝向控制（走偏了就在转向指令上补）；--upper 上身每 2 秒被摆到一个随机姿势（策略看不到）
 """
 import json
 import math
@@ -118,6 +118,10 @@ def run(job):
     fg = [m.geom("l_foot").id, m.geom("r_foot").id]
     lifts = []
     reflex_until = -1
+    _lo = np.array([W.UPPER[n][0] for n in W.UPPER]); _hi = np.array([W.UPPER[n][1] for n in W.UPPER])
+    _u = np.random.default_rng(seed * 7919 + int(friction * 100) + 1).uniform(size=(4, len(W.UPPER)))
+    _amp = _u[1] * 0.5 * (_hi - _lo)
+    sm_par = [0.2 + 1.0 * _u[0], _amp, _lo + _amp + _u[2] * (_hi - _lo - 2 * _amp), 2 * math.pi * _u[3]]
     for t in range(T):
         si = int(np.searchsorted(ends, (t + 0.5) * W.DT))
         cmd = np.array(test["seg"][si][1], dtype=float)
@@ -135,7 +139,11 @@ def run(job):
             yaw_ref += cmd[2] * W.DT
             err = (yaw_ref - yaws[-1] + math.pi) % (2 * math.pi) - math.pi
             cmd[2] = float(np.clip(cmd[2] + HOLD_K * err, -0.8, 0.8))
-        if opts["upper"] and t % W.UPPER_EVERY == up_off:
+        if opts["smooth"]:
+            # 上身连续地来回动（和 walk_env.py 里 smooth 的做法一样）：每个关节一条正弦
+            upose = {n: float(sm_par[2][i] + sm_par[1][i] * math.sin(2 * math.pi * sm_par[0][i] * t * W.DT + sm_par[3][i])) for i, n in enumerate(W.UPPER)}
+            upose["waist_pitch"] *= 2.0
+        elif opts["upper"] and t % W.UPPER_EVERY == up_off:
             # 上身被别处指挥：每 2 秒换一个随机姿势（三成的时候回到自然下垂），策略看不到
             upose = {n: dp.get(n, 0.0) for n in W.UPPER} if rng.uniform() < W.UPPER_REST else {n: rng.uniform(a, b) for n, (a, b) in W.UPPER.items()}
             upose["waist_pitch"] *= 2.0            # 姿势里写的是腰两段合起来的角
@@ -196,7 +204,7 @@ def main():
     frics = get("frics", (0.6, 1.0, 1.5), lambda s: tuple(float(x) for x in s.split(",")))
     procs = get("procs", 10, int)
     names = ["走停"] if quick else list(TESTS)
-    opts = dict(hold="--hold" in sys.argv, upper="--upper" in sys.argv, reflex="--reflex" in sys.argv)
+    opts = dict(hold="--hold" in sys.argv, upper="--upper" in sys.argv, reflex="--reflex" in sys.argv, smooth="--smooth" in sys.argv)
     only = get("only", "", str)                      # --only=站+推 只跑名字里带这几个字的项目
     names = [n for n in names if only in n]
     jobs = [(path, simple, n, f, s, opts) for n in names for f in frics if TESTS[n].get("only", f) == f for s in range(trials)]
@@ -225,7 +233,7 @@ def main():
                 parts.append(f"朝向偏 {np.mean([abs(r['heading_deg']) for r in rs]):.0f}°")
             print(f"  {n}  摩擦 {f}：{ok}/{len(rs)} 没摔  " + "  ".join(parts) + (f"  摔：{fails}" if fails else ""))
     out = ("eval_walk_" + os.path.basename(path).replace(".npz", "") + ("_simple" if simple else "") + ("_quick" if quick else "")
-           + ("_hold" if opts["hold"] else "") + ("_upper" if opts["upper"] else "") + ("_reflex" if opts["reflex"] else "") + (f"_{only}" if only else "") + ".json")
+           + ("_hold" if opts["hold"] else "") + ("_upper" if opts["upper"] else "") + ("_smooth" if opts["smooth"] else "") + ("_reflex" if opts["reflex"] else "") + (f"_{only}" if only else "") + ".json")
     json.dump(dict(policy=os.path.basename(path), body="simple" if simple else "full", trials=trials, opts=opts, runs=res),
               open(os.path.join(HERE, out), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 

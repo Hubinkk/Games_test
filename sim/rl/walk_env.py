@@ -38,9 +38,14 @@ NOISE = dict(grav=0.03, gyro=0.2, q=0.02, qd=1.0)
 
 
 class Walk(Env):
-    def __init__(self, xml_path, n_frames=10, noise=True, upper=False, push_max=PUSH_MAX):
+    def __init__(self, xml_path, n_frames=10, noise=True, upper=False, push_max=PUSH_MAX, smooth=False, effort_w=0.02):
         """upper=True（第 2 轮）：上身（腰、脖子、手臂）每 2 秒被指挥到一个随机姿势，策略看不到也管不了，腿要照样走。"""
-        self.upper, self.push_max = upper, float(push_max)
+        # smooth=True（第 3 轮）：一半的局里上身不是每 2 秒跳一次，而是连续地来回动（每个关节一条正弦，0.2–1.2 Hz），
+        # 更接近 VR 里头和手连续跟着人动的样子。
+        self.upper, self.push_max, self.smooth = upper, float(push_max), bool(smooth)
+        # effort_w："费力"（各电机出力占上限的比例的平方，取平均）的扣分系数。发热和出力的平方成正比。
+        # 第 1、2 轮是 0.02。第 2 轮的策略在数字花然里脚踝侧摆到 71 °C（第 1 轮约 49 °C），第 3 轮加到 0.08。
+        self.effort_w = float(effort_w)
         self.mj = mujoco.MjModel.from_xml_path(xml_path)
         self.mx = mjx.put_model(self.mj)
         self.n_frames = n_frames
@@ -146,7 +151,8 @@ class Walk(Env):
         push = jnp.zeros(2, dtype=jnp.float32)
         k0 = jnp.zeros((), dtype=jnp.int32)
         info = dict(k=k0, target=self.default, last_act=zero, rng=rng, fric=fric, kp=kp, cmd=cmd, ph0=ph0,
-                    push=push, push_left=jnp.zeros((), dtype=jnp.int32), up_tgt=self.up_default)
+                    push=push, push_left=jnp.zeros((), dtype=jnp.int32), up_tgt=self.up_default,
+                    up_par=jnp.zeros((4, len(UPPER)), dtype=jnp.float32), up_sm=jnp.zeros(()))
         s = self._sense(d)
         obs = self._obs(s, zero, cmd, self._phases(k0, ph0), k5, fric, kp, push)
         zf = jnp.zeros(())
@@ -180,7 +186,18 @@ class Walk(Env):
         off = (ph0 * UPPER_EVERY).astype(jnp.int32)
         up_tgt = jnp.where(first, self.up_default, info["up_tgt"])
         up_tgt = jnp.where((k % UPPER_EVERY == off) & self.upper, new_up, up_tgt)
-        want = self.default.at[self.leg].add(ACT_SCALE * action).at[self.up].set(up_tgt)
+        # 连续地动：每一局给每个关节抽一条正弦（频率、幅度、中心、起始相位），一半的局用它
+        ks = jax.random.split(k8, 3)
+        us = jax.random.uniform(ks[1], (4, len(UPPER)))
+        half = 0.5 * (self.up_hi - self.up_lo)
+        amp = us[1] * half
+        new_par = jnp.stack([0.2 + 1.0 * us[0], amp, self.up_lo + amp + us[2] * (self.up_hi - self.up_lo - 2.0 * amp), 2.0 * jnp.pi * us[3]])
+        up_par = jnp.where(first, new_par, info["up_par"])
+        up_sm = jnp.where(first, (jax.random.uniform(ks[2], ()) < 0.5).astype(jnp.float32), info["up_sm"])
+        t_sec = k.astype(jnp.float32) * self.dt
+        wave = up_par[2] + up_par[1] * jnp.sin(2.0 * jnp.pi * up_par[0] * t_sec + up_par[3])
+        up_now = jnp.where((up_sm > 0.5) & self.smooth & self.upper, wave, up_tgt)
+        want = self.default.at[self.leg].add(ACT_SCALE * action).at[self.up].set(up_now)
         want = jnp.clip(want, self.lo, self.hi)
         g = jnp.ones(self.mj.nu, dtype=jnp.float32).at[self.leg].set(kp)
         mx = self.mx.replace(geom_friction=self.fric0 * jnp.array([fric, 1.0, 1.0]),
@@ -222,13 +239,13 @@ class Walk(Env):
         pose = jnp.sum(self.pose_w * dq ** 2)
         still = (1.0 - moving) * (jnp.mean(dq ** 2) + 0.01 * jnp.mean(s["qd"] ** 2))
         reward = (1.5 * r_lin + 0.8 * r_ang + 1.0 * r_step + 0.2
-                  - 2.0 * tilt - 0.02 * wob - 100.0 * dz - 5.0 * slip - 0.05 * rate - 0.02 * effort - 0.3 * pose - 1.0 * still)
+                  - 2.0 * tilt - 0.02 * wob - 100.0 * dz - 5.0 * slip - 0.05 * rate - self.effort_w * effort - 0.3 * pose - 1.0 * still)
         bad = jnp.any(jnp.isnan(d.qpos)) | jnp.any(jnp.isnan(d.qvel))
         fell = (s["z"] < FALL_Z) | (s["up"] < math.cos(math.radians(FALL_DEG)))
         done = bad | fell
         reward = jnp.where(done, 0.0, jnp.clip(reward, 0.0, 10.0)) * self.dt
         info = dict(info)
-        info.update(k=k1n, target=target, last_act=action, rng=rng, fric=fric, kp=kp, cmd=cmd, ph0=ph0, push=push, push_left=left, up_tgt=up_tgt)
+        info.update(k=k1n, target=target, last_act=action, rng=rng, fric=fric, kp=kp, cmd=cmd, ph0=ph0, push=push, push_left=left, up_tgt=up_tgt, up_par=up_par, up_sm=up_sm)
         metrics = dict(state.metrics)          # 训练库的包装器会往里加自己的项，不能整个换掉
         metrics.update(vx=s["v"][0], err=jnp.sqrt(verr), werr=jnp.sqrt(werr), fell=fell.astype(jnp.float32), height=s["z"],
                        lift=jnp.max(fz))

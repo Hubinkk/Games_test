@@ -45,7 +45,8 @@ def main():
     envs = arg("envs", 32 if smoke else 4096)
     xml = os.path.join(HERE, "huaran_walk.xml")
     # 第 2 轮：--upper 让上身随意摆（策略看不到），--push=12 把推力上限从 6 N 加到 12 N
-    kw = dict(upper="--upper" in sys.argv, push_max=arg("push", 6.0))
+    # 第 3 轮：--smooth 让一半的局里上身连续地来回动（要和 --upper 一起给）
+    kw = dict(upper="--upper" in sys.argv, push_max=arg("push", 6.0), smooth="--smooth" in sys.argv, effort_w=arg("effort", 0.02))
     env = Walk(xml, **kw)
     eval_env = Walk(xml, **kw)
     episode = 1000                         # 20 秒
