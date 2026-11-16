@@ -16,6 +16,18 @@ CMD_SCALE = (5.0, 10.0, 1.0)         # 指令（前进 m/s、侧移 m/s、转 ra
 FALL_Z, FALL_DEG = 0.17, 40.0        # 骨盆低于 17 cm 或躯干歪过 40° 算摔
 
 
+# 第 2 轮（2026-11-16）：上身不归走路的策略管，由别处指挥（以后是 VR 里育苗人的头和手）。
+# 训练和检验时让上身在下面的范围里随意摆，腿要照样走稳。范围比关节的极限小一些。
+UPPER = {
+    "waist_yaw": (-0.5, 0.5), "waist_pitch": (-0.05, 0.2),
+    "neck_yaw": (-1.0, 1.0), "neck_pitch": (-0.4, 0.4), "neck_low": (-0.3, 0.3), "neck_roll": (-0.3, 0.3),
+    "l_shoulder_pitch": (-2.0, 0.6), "l_shoulder_roll": (-0.1, 1.5), "l_shoulder_yaw": (-1.0, 1.0), "l_elbow": (-2.0, 0.0),
+    "r_shoulder_pitch": (-2.0, 0.6), "r_shoulder_roll": (-1.5, 0.1), "r_shoulder_yaw": (-1.0, 1.0), "r_elbow": (-2.0, 0.0),
+}
+UPPER_EVERY = 100                    # 每 2 秒换一次上身的目标姿势
+UPPER_REST = 0.3                     # 三成的时候回到自然下垂
+
+
 def default_pose():
     p = {}
     for s in "lr":

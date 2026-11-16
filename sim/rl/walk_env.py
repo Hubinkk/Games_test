@@ -27,7 +27,7 @@ from mujoco import mjx
 
 # 站姿、动作幅度、节拍这些和检验脚本共用的数字都在 walk_common.py（两边必须一样）
 from walk_common import (ACT_SCALE, CMD_SCALE, FALL_DEG, FALL_Z, FOOT_HALF, GAIT_HZ, LEGS, RATE, STEP_H, SWING,
-                         default_pose, stand_height)
+                         UPPER, UPPER_EVERY, UPPER_REST, default_pose, stand_height)
 
 FRIC = (0.5, 1.7)
 KP_RANGE = (0.85, 1.15)
@@ -38,7 +38,9 @@ NOISE = dict(grav=0.03, gyro=0.2, q=0.02, qd=1.0)
 
 
 class Walk(Env):
-    def __init__(self, xml_path, n_frames=10, noise=True):
+    def __init__(self, xml_path, n_frames=10, noise=True, upper=False, push_max=PUSH_MAX):
+        """upper=True（第 2 轮）：上身（腰、脖子、手臂）每 2 秒被指挥到一个随机姿势，策略看不到也管不了，腿要照样走。"""
+        self.upper, self.push_max = upper, float(push_max)
         self.mj = mujoco.MjModel.from_xml_path(xml_path)
         self.mx = mjx.put_model(self.mj)
         self.n_frames = n_frames
@@ -48,6 +50,10 @@ class Walk(Env):
         dp = default_pose()
         self.default = jnp.array([dp.get(n, 0.0) for n in names], dtype=jnp.float32)
         self.leg = jnp.array([names.index(n) for n in LEGS])
+        self.up = jnp.array([names.index(n) for n in UPPER])
+        self.up_lo = jnp.array([UPPER[n][0] for n in UPPER], dtype=jnp.float32)
+        self.up_hi = jnp.array([UPPER[n][1] for n in UPPER], dtype=jnp.float32)
+        self.up_default = self.default[self.up]
         jid = self.mj.actuator_trnid[:, 0]
         self.act_q = jnp.array(self.mj.jnt_qposadr[jid])
         self.lo = jnp.array(self.mj.jnt_range[jid, 0], dtype=jnp.float32)
@@ -140,7 +146,7 @@ class Walk(Env):
         push = jnp.zeros(2, dtype=jnp.float32)
         k0 = jnp.zeros((), dtype=jnp.int32)
         info = dict(k=k0, target=self.default, last_act=zero, rng=rng, fric=fric, kp=kp, cmd=cmd, ph0=ph0,
-                    push=push, push_left=jnp.zeros((), dtype=jnp.int32))
+                    push=push, push_left=jnp.zeros((), dtype=jnp.int32), up_tgt=self.up_default)
         s = self._sense(d)
         obs = self._obs(s, zero, cmd, self._phases(k0, ph0), k5, fric, kp, push)
         zf = jnp.zeros(())
@@ -163,12 +169,18 @@ class Walk(Env):
         left = jnp.where(first, 0, info["push_left"])
         start = (left == 0) & (jax.random.uniform(k5, ()) < PUSH_PROB)
         u = jax.random.uniform(k6, (2,))
-        new_push = PUSH_MAX * u[0] * jnp.array([jnp.cos(2 * jnp.pi * u[1]), jnp.sin(2 * jnp.pi * u[1])])
+        new_push = self.push_max * u[0] * jnp.array([jnp.cos(2 * jnp.pi * u[1]), jnp.sin(2 * jnp.pi * u[1])])
         push = jnp.where(start, new_push, jnp.where(left > 0, info["push"], jnp.zeros(2)))
         left = jnp.where(start, PUSH_STEPS - 1, jnp.maximum(left - 1, 0))
 
         action = jnp.clip(action, -1.0, 1.0)
-        want = self.default.at[self.leg].add(ACT_SCALE * action)
+        # 上身的目标：每 UPPER_EVERY 步换一次（每个身体换的时刻错开），三成的时候回到自然下垂
+        uu = jax.random.uniform(k8, (len(UPPER) + 1,))
+        new_up = jnp.where(uu[0] < UPPER_REST, self.up_default, self.up_lo + uu[1:] * (self.up_hi - self.up_lo))
+        off = (ph0 * UPPER_EVERY).astype(jnp.int32)
+        up_tgt = jnp.where(first, self.up_default, info["up_tgt"])
+        up_tgt = jnp.where((k % UPPER_EVERY == off) & self.upper, new_up, up_tgt)
+        want = self.default.at[self.leg].add(ACT_SCALE * action).at[self.up].set(up_tgt)
         want = jnp.clip(want, self.lo, self.hi)
         g = jnp.ones(self.mj.nu, dtype=jnp.float32).at[self.leg].set(kp)
         mx = self.mx.replace(geom_friction=self.fric0 * jnp.array([fric, 1.0, 1.0]),
@@ -216,7 +228,7 @@ class Walk(Env):
         done = bad | fell
         reward = jnp.where(done, 0.0, jnp.clip(reward, 0.0, 10.0)) * self.dt
         info = dict(info)
-        info.update(k=k1n, target=target, last_act=action, rng=rng, fric=fric, kp=kp, cmd=cmd, ph0=ph0, push=push, push_left=left)
+        info.update(k=k1n, target=target, last_act=action, rng=rng, fric=fric, kp=kp, cmd=cmd, ph0=ph0, push=push, push_left=left, up_tgt=up_tgt)
         metrics = dict(state.metrics)          # 训练库的包装器会往里加自己的项，不能整个换掉
         metrics.update(vx=s["v"][0], err=jnp.sqrt(verr), werr=jnp.sqrt(werr), fell=fell.astype(jnp.float32), height=s["z"],
                        lift=jnp.max(fz))

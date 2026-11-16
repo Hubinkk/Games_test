@@ -44,8 +44,10 @@ def main():
     steps = arg("steps", 300_000 if smoke else 150_000_000)
     envs = arg("envs", 32 if smoke else 4096)
     xml = os.path.join(HERE, "huaran_walk.xml")
-    env = Walk(xml)
-    eval_env = Walk(xml)
+    # 第 2 轮：--upper 让上身随意摆（策略看不到），--push=12 把推力上限从 6 N 加到 12 N
+    kw = dict(upper="--upper" in sys.argv, push_max=arg("push", 6.0))
+    env = Walk(xml, **kw)
+    eval_env = Walk(xml, **kw)
     episode = 1000                         # 20 秒
     log = []
     t0 = time.time()
@@ -73,18 +75,28 @@ def main():
         z = np.load(os.path.join(HERE, arg("init", "")))
         flat = {k: z[k] for k in z.files}
         for k in ("norm/mean", "norm/std", "norm/summed_variance", "norm/count"):       # 存的时候去掉了 /state，这里加回去
-            if k in flat:
+            if k in flat and k + "/state" not in flat:
                 flat[k + "/state"] = flat[k]
-        restore = (fill(tmpl[0], flat, "norm/"), fill(tmpl[1], flat, "policy/"), tmpl[2])
-        print(f"从 {arg('init', '')} 接着练", flush=True)
+        # 接着练要用"完整存档"（walk_full_<tag>.npz：策略 + 打分网络 + 两份观测的均值方差）。
+        # 只有策略的存档（walk_policy*.npz）也能接，但打分网络得从零开始，头 1000 万步会把策略练坏：
+        # 第 2 轮（2026-11-16）就是这样，撑的时间从 14.9 秒掉到 5.1 秒，之后等于从头学。
+        has_value = any(k.startswith("value/") for k in flat)
+        restore = (fill(tmpl[0], flat, "norm/"), fill(tmpl[1], flat, "policy/"), fill(tmpl[2], flat, "value/") if has_value else tmpl[2])
+        print(f"从 {arg('init', '')} 接着练" + ("（连打分网络一起）" if has_value else "（只有策略，打分网络从零开始：开头会掉）"), flush=True)
+    else:
+        has_value = False
 
     def save(n, make_policy, p):
         export(p, os.path.join(HERE, f"walk_policy{tag}.npz"))
+        full = {}
+        for i, pre in enumerate(("norm/", "policy/", "value/")):
+            full.update(flatten(p[i], pre))
+        np.savez(os.path.join(HERE, f"walk_full{tag}.npz"), **full)        # 完整存档：以后接着练用这个（只留最新一份）
         if not smoke:
             export(p, os.path.join(HERE, f"walk_policy{tag}_{int(n) // 1_000_000}M.npz"))
 
     _, params, _ = ppo.train(
-        restore_params=restore, restore_value_fn=False,
+        restore_params=restore, restore_value_fn=has_value,
         environment=env, eval_env=eval_env, num_timesteps=steps, num_envs=envs,
         num_evals=3 if smoke else arg("evals", 16), num_eval_envs=16 if smoke else 256, deterministic_eval=True,
         learning_rate=arg("lr", 3e-4), entropy_cost=arg("ent", 5e-3), discounting=arg("gamma", 0.97), gae_lambda=0.95, unroll_length=20,

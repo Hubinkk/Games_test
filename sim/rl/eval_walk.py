@@ -16,6 +16,8 @@
     原地转    指令 0.6 rad/s 转 6 秒
     侧移后退  指令侧移 5 cm/s 走 5 秒，再后退 8 cm/s 走 5 秒
     大推      同"走+推"，推力 8 N、12 N（只在摩擦 1.0 上）
+    站+推     指令 0 站 9 秒，第 3–8 秒之间被推 5 N、8 N（12 N 只在摩擦 1.0 上）：看它会不会迈步接住自己
+选项：--reflex 站着被推歪时临时改成原地踏步；--only=站+推 只跑一部分项目；--hold 加一层朝向控制（走偏了就在转向指令上补）；--upper 上身每 2 秒被摆到一个随机姿势（策略看不到）
 """
 import json
 import math
@@ -30,6 +32,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, ".."))
 import walk_common as W
 
+HOLD_K = 1.5          # 朝向控制：朝向每偏 1 弧度，转向指令补 1.5 rad/s
+
 TESTS = {
     "走停": dict(seg=[(10.0, (0.15, 0, 0)), (4.0, (0, 0, 0))]),
     "走+推5N": dict(seg=[(10.0, (0.15, 0, 0))], push=5.0),
@@ -38,6 +42,9 @@ TESTS = {
     "侧移后退": dict(seg=[(5.0, (0, 0.05, 0)), (5.0, (-0.08, 0, 0))]),
     "走+推8N": dict(seg=[(10.0, (0.15, 0, 0))], push=8.0, only=1.0),
     "走+推12N": dict(seg=[(10.0, (0.15, 0, 0))], push=12.0, only=1.0),
+    "站+推5N": dict(seg=[(9.0, (0, 0, 0))], push=5.0),
+    "站+推8N": dict(seg=[(9.0, (0, 0, 0))], push=8.0),
+    "站+推12N": dict(seg=[(9.0, (0, 0, 0))], push=12.0, only=1.0),
 }
 
 
@@ -71,7 +78,7 @@ class Simple:
 
 
 def run(job):
-    path, simple, name, friction, seed = job
+    path, simple, name, friction, seed, opts = job
     from policy_np import Policy
     test = TESTS[name]
     pol = Policy(path)
@@ -107,11 +114,31 @@ def run(job):
     yaw_of = lambda: math.atan2(d.xmat[pel].reshape(3, 3)[1, 0], d.xmat[pel].reshape(3, 3)[0, 0])
     xs, yaws, fell_at = [d.qpos[0:2].copy()], [yaw_of()], None
     cscale = np.array(W.CMD_SCALE)
+    yaw_ref, upose, up_off = yaws[0], {}, int(rng.integers(0, W.UPPER_EVERY))
     fg = [m.geom("l_foot").id, m.geom("r_foot").id]
     lifts = []
+    reflex_until = -1
     for t in range(T):
         si = int(np.searchsorted(ends, (t + 0.5) * W.DT))
         cmd = np.array(test["seg"][si][1], dtype=float)
+        if opts["reflex"] and not cmd.any():
+            # 站着被推的反射（策略外面的一层）：站着时策略不抬脚，被推得厉害就接不住。
+            # 躯干歪过 6° 或晃得快（> 0.8 rad/s）时，接下来 2 秒改成"原地踏步"（给一个很小的前进指令，脚就会按节拍抬）。
+            Rr = d.xmat[pel].reshape(3, 3)
+            if math.degrees(math.acos(min(1.0, Rr[2, 2]))) > 6.0 or float(np.linalg.norm(d.qvel[3:5])) > 0.8:
+                reflex_until = t + 100
+            if t < reflex_until:
+                cmd[0] = 0.01
+        if opts["hold"] and cmd.any():
+            # 朝向控制（策略外面的一层）：把"该朝哪边"按指令的转速累加起来，实际朝向偏了就在转向指令上补一点。
+            # 实物上朝向可以由 IMU 的陀螺积分得到。
+            yaw_ref += cmd[2] * W.DT
+            err = (yaw_ref - yaws[-1] + math.pi) % (2 * math.pi) - math.pi
+            cmd[2] = float(np.clip(cmd[2] + HOLD_K * err, -0.8, 0.8))
+        if opts["upper"] and t % W.UPPER_EVERY == up_off:
+            # 上身被别处指挥：每 2 秒换一个随机姿势（三成的时候回到自然下垂），策略看不到
+            upose = {n: dp.get(n, 0.0) for n in W.UPPER} if rng.uniform() < W.UPPER_REST else {n: rng.uniform(a, b) for n, (a, b) in W.UPPER.items()}
+            upose["waist_pitch"] *= 2.0            # 姿势里写的是腰两段合起来的角
         R = d.xmat[pel].reshape(3, 3)
         ph = ph0 + t * W.DT * W.GAIT_HZ
         a2 = 2 * math.pi * np.array([ph % 1.0, (ph + 0.5) % 1.0])
@@ -119,6 +146,7 @@ def run(job):
         a = pol(obs)
         want = np.clip(q0 + W.ACT_SCALE * a, lo, hi)
         pose = dict(dp)
+        pose.update(upose)
         pose.update({n: float(v) for n, v in zip(W.LEGS, want)})
         pushing = bool(push_n) and 0 <= t - t_push < 10
         for _ in range(n_sub):
@@ -168,7 +196,10 @@ def main():
     frics = get("frics", (0.6, 1.0, 1.5), lambda s: tuple(float(x) for x in s.split(",")))
     procs = get("procs", 10, int)
     names = ["走停"] if quick else list(TESTS)
-    jobs = [(path, simple, n, f, s) for n in names for f in frics if TESTS[n].get("only", f) == f for s in range(trials)]
+    opts = dict(hold="--hold" in sys.argv, upper="--upper" in sys.argv, reflex="--reflex" in sys.argv)
+    only = get("only", "", str)                      # --only=站+推 只跑名字里带这几个字的项目
+    names = [n for n in names if only in n]
+    jobs = [(path, simple, n, f, s, opts) for n in names for f in frics if TESTS[n].get("only", f) == f for s in range(trials)]
     with Pool(min(procs, len(jobs))) as pool:
         res = pool.map(run, jobs)
     print(f"策略 {os.path.basename(path)}，{'简化身体' if simple else '完整身体'}，每格 {trials} 次")
@@ -190,9 +221,12 @@ def main():
                 parts.append(s)
             fails = "；".join(f"第 {r['seed']} 次 {r['fell_at']} 秒摔" + (f"（{r['push_at']} 秒被推）" if r["push_at"] else "") for r in rs if not r["ok"])
             parts.append(f"抬脚 {np.mean([r['lift_cm'] for r in rs]):.1f} cm")
+            if n != "原地转":
+                parts.append(f"朝向偏 {np.mean([abs(r['heading_deg']) for r in rs]):.0f}°")
             print(f"  {n}  摩擦 {f}：{ok}/{len(rs)} 没摔  " + "  ".join(parts) + (f"  摔：{fails}" if fails else ""))
-    out = "eval_walk_" + os.path.basename(path).replace(".npz", "") + ("_simple" if simple else "") + ("_quick" if quick else "") + ".json"
-    json.dump(dict(policy=os.path.basename(path), body="simple" if simple else "full", trials=trials, runs=res),
+    out = ("eval_walk_" + os.path.basename(path).replace(".npz", "") + ("_simple" if simple else "") + ("_quick" if quick else "")
+           + ("_hold" if opts["hold"] else "") + ("_upper" if opts["upper"] else "") + ("_reflex" if opts["reflex"] else "") + (f"_{only}" if only else "") + ".json")
+    json.dump(dict(policy=os.path.basename(path), body="simple" if simple else "full", trials=trials, opts=opts, runs=res),
               open(os.path.join(HERE, out), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 
