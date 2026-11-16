@@ -1,0 +1,83 @@
+[
+ {
+  "steps": 0,
+  "minutes": 3.9,
+  "reward": 37.98,
+  "seconds": 14.9,
+  "err_cm_s": 8.5,
+  "werr": 0.26,
+  "lift_cm": 1.1
+ },
+ {
+  "steps": 10158080,
+  "minutes": 13.2,
+  "reward": 7.92,
+  "seconds": 5.1,
+  "err_cm_s": 14.4,
+  "werr": 0.6,
+  "lift_cm": 0.7
+ },
+ {
+  "steps": 20316160,
+  "minutes": 21.1,
+  "reward": 27.28,
+  "seconds": 15.6,
+  "err_cm_s": 11.4,
+  "werr": 0.68,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 30474240,
+  "minutes": 29.1,
+  "reward": 37.13,
+  "seconds": 19.1,
+  "err_cm_s": 9.5,
+  "werr": 0.59,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 40632320,
+  "minutes": 37.0,
+  "reward": 41.32,
+  "seconds": 19.8,
+  "err_cm_s": 8.4,
+  "werr": 0.52,
+  "lift_cm": 1.0
+ },
+ {
+  "steps": 50790400,
+  "minutes": 44.7,
+  "reward": 43.21,
+  "seconds": 19.5,
+  "err_cm_s": 7.8,
+  "werr": 0.46,
+  "lift_cm": 1.0
+ },
+ {
+  "steps": 60948480,
+  "minutes": 52.5,
+  "reward": 45.48,
+  "seconds": 19.6,
+  "err_cm_s": 7.2,
+  "werr": 0.41,
+  "lift_cm": 1.0
+ },
+ {
+  "steps": 71106560,
+  "minutes": 60.4,
+  "reward": 47.61,
+  "seconds": 19.8,
+  "err_cm_s": 6.8,
+  "werr": 0.37,
+  "lift_cm": 1.0
+ },
+ {
+  "steps": 81264640,
+  "minutes": 68.2,
+  "reward": 47.59,
+  "seconds": 19.6,
+  "err_cm_s": 6.8,
+  "werr": 0.36,
+  "lift_cm": 1.0
+ }
+]
