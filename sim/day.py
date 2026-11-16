@@ -6,6 +6,7 @@
     python day.py              # 过一天 → 写日记 → 睡眠整理 → 早上的报告；导出 ../digital_huaran_day.js 供网页回放
     python day.py --day=2026-11-14 --getup=hands     # 第 5 天，手写的起身（getup_hands.py）
     python day.py --day=2026-11-14 --getup=rl        # 同一天，强化学习的策略（getup_rl.py）；写到 digital-huaran-rl/、../digital_huaran_day_rl.js
+    python day.py --day=2026-11-14 --getup=rl --walk=rl   # 走到窗边也用学会的走路（walk_rl.py），默认是手写的静步行；对比见 day_walk_compare.py
     加 --out=目录 时，所有产物都写进那个目录（对比用，见 day_getup_compare.py）
 
 流程（对应 docs/brain.md 第 7 节）：
@@ -49,6 +50,8 @@ for _a in sys.argv[1:]:
         DAY = _a.split("=", 1)[1]
 NEXT = (datetime.date.fromisoformat(DAY) + datetime.timedelta(days=1)).isoformat()
 GETUP_TAG = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--getup=")), "")   # "arms"：育苗人教的起身方法
+WALK_TAG = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--walk=")), "")      # "rl"：学会的走路（walk_rl.py）；默认是手写的静步行
+WALK_RES = {}
 # 产物写到哪里。默认是 digital-huaran/ 和 ../digital_huaran_day.js（网页用的、已提交的数据）。
 # --getup=rl 默认写到 digital-huaran-rl/ 和 ../digital_huaran_day_rl.js，不覆盖网页数据；第一次运行时从 digital-huaran/ 复制一份记忆。
 # --out=目录：所有产物（记忆、日记、报告、回放数据 digital_huaran_day.js）都写进这个目录（对比试验用）。
@@ -56,7 +59,7 @@ OUT_ARG = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--out=
 OUT0 = os.path.join(ROOT, "digital-huaran")
 if OUT_ARG:
     OUT, JS = os.path.abspath(OUT_ARG), os.path.join(os.path.abspath(OUT_ARG), "digital_huaran_day.js")
-elif GETUP_TAG == "rl" and "--main" not in sys.argv:      # 加 --main：学到的起身成为正式的一天，写进 digital-huaran/ 和网页数据
+elif (GETUP_TAG == "rl" or WALK_TAG == "rl") and "--main" not in sys.argv:      # 加 --main：学到的起身成为正式的一天，写进 digital-huaran/ 和网页数据
     OUT, JS = os.path.join(ROOT, "digital-huaran-rl"), os.path.join(ROOT, "digital_huaran_day_rl.js")
 else:
     OUT, JS = OUT0, os.path.join(ROOT, "digital_huaran_day.js")
@@ -198,9 +201,13 @@ def scenes(sim, bal, gx):
         agility.wave(sim, bal, 2.0, seconds=3.0)
 
     def walk_():
-        import walk
         b = Balance(sim)
-        walk.walk(sim, b, 4, 0.03, T=2.4)
+        if WALK_TAG == "rl":          # 学会的走路：15 cm/s 走到和静步行一样远（11.2 cm），站 2 秒，平滑交回站姿（walk_rl.py）
+            import walk_rl
+            WALK_RES.update(walk_rl.run(sim, b))
+        else:
+            import walk
+            WALK_RES.update(dict(zip(("fell_at", "dx", "dy"), walk.walk(sim, b, 4, 0.03, T=2.4)[:3])))
 
     def push(F):
         return lambda: figure_stress.push(sim, F, bal)
@@ -229,11 +236,16 @@ def scenes(sim, bal, gx):
     else:
         gt = (GH.hand_walk_keyframes(gx)[0][-1][0] if GETUP_TAG == "hands" else getup.keyframes_for(gx)[-1][0]) + 1.5
     gmin = 1 if GETUP_TAG in ("hands", "rl") else 5      # 新的起身一次约 18 秒，按 1 分钟算；以前是反复尝试 5 分钟
+    if WALK_TAG == "rl":
+        import walk_rl
+        wt = walk_rl.est_seconds()    # 约 6.2 秒；这一段和静步行一样按 10 分钟算
+    else:
+        wt = 12.0
     # key, 标题, 开始时刻, 代表的真实时长（分钟）, 仿真时长（秒）, 函数, 说明
     return [
         ("wake", "醒来", (7, 30), 2, 2.0, wake, "眼睑打开，站稳"),
         ("wave", "和育苗人打招呼", (8, 0), 1, 4.2, wave, "举手挥手"),
-        ("walk", "走到窗边", (9, 0), 10, 12.0, walk_, "静步行，一步一步"),
+        ("walk", "走到窗边", (9, 0), 10, wt, walk_, "学会的走路，15 cm/s" if WALK_TAG == "rl" else "静步行，一步一步"),
         ("push1", "被路过的人轻轻碰到", (10, 0), 1, 3.0, push(4), "胸口被推 4 N"),
         ("push2", "又被碰了一下", (10, 30), 1, 3.0, push(7), "胸口被推 7 N"),
         ("getup", "试着自己爬起来", (10, 31), gmin, gt, getup_, "趴着，用手撑地"),
@@ -254,6 +266,14 @@ class Rec:
     def __call__(self):
         self.body.step(self.sim.m.opt.timestep)
         key = self.body.scene["key"]
+        if key == "walk":
+            h = self.heat.setdefault(key, {})
+            tq = self.sim.torques()
+            for n in self.body.joints:
+                tau = float(tq.get(n, 0.0))
+                h[n] = h.get(n, 0.0) + self.body.k[n] * tau * tau * self.sim.m.opt.timestep
+            if self.sim.fallen():
+                self.up.setdefault("walk_fell", self.body.t_scene)
         if key == "getup":
             d, t = self.sim.d, self.body.t_scene
             ok = d.qpos[2] > 0.2 and self.sim.tilt_deg() < 20
@@ -459,7 +479,7 @@ def write_diary(body, scene_info, results, msgs=()):
         lines.append("- 摔倒后自己爬起来")
     if not results["push2"]["ok"]:
         lines.append("- 被碰到时迈一步接住自己")
-    if results["walk"]["dx_cm"] < 20:
+    if results["walk"]["v_cm_s"] < 2:
         lines.append("- 走快一点（今天每秒还不到 2 厘米）")
     left = questions(results)
     lines += ["", "## 想问育苗人的", ""] + ([f"- {q}" for q in left] or ["- （想问的，育苗人都回答我了。）"]) + [""]
@@ -617,7 +637,8 @@ def morning_report(body, results, changes, queue, msgs=()):
              ] + (["## 今天的起身", "", getup_try_line(results), ""] if (not msgs and GETUP_TAG in ("kneel3", "hands", "rl")) else []) + (["## 你的话", "", "我读到了你写给我的话：", ""] + [f"- {('关于「' + m['question'] + '」：') if m.get('question') else ''}「{m['text']}」" for m in msgs] + ["", "谢谢你。我把它们记在关于你的那一页里了。", ""] + ((["## 我想到的", ""] + [f"{x}" for x in UNDER["report"]] + [getup_try_line(results), ""]) if UNDER else []) if msgs else []) + [
              ] + ((["## 我的身体", ""] + body_change()["report"] + [""]) if body_change() else []) + [
              "## 昨天", "",
-             f"- 我走到了窗边，走了 {results['walk']['dx_cm']:.0f} 厘米，每秒 {results['walk']['v_cm_s']:.1f} 厘米。很慢，但没摔。",
+             f"- 我走到了窗边，走了 {results['walk']['dx_cm']:.0f} 厘米，每秒 {results['walk']['v_cm_s']:.1f} 厘米。" +
+             ("摔了一下。" if results["walk"].get("fell") else "很慢，但没摔。" if results["walk"]["v_cm_s"] < 5 else "这次是迈开步子走的，没摔。"),
              f"- 被人碰了两次，第一次站住了，第二次倒了。" if results["push1"]["ok"] and not results["push2"]["ok"] else
              f"- 被人碰了两次，站住了 {sum(1 for k in ('push1','push2') if results[k]['ok'])} 次。",
              ("- 摔倒以后我试着自己爬起来，" if not results["push2"]["ok"] else "- 我趴到地上练习自己爬起来，") + (f"撑到了骨盆离地 {results['getup']['peak_cm']:.0f} 厘米，还是没站起来，后来被扶起来了。" if not results["getup"]["ok"] else "成功了。"),
@@ -671,7 +692,21 @@ def main():
         d = sim.d
         if key == "walk":
             dx = float(d.qpos[0])
-            results[key] = dict(dx_cm=dx * 100, v_cm_s=dx * 100 / (4 * 2.4))
+            st, sp = body.scene_start[key], body.scene_peak.get(key, {})
+            legs = [n for n in body.joints if n[:2] in ("l_", "r_") and any(b in n for b in ("hip", "knee", "ankle"))]
+            if WALK_TAG == "rl":       # 速度按"指令 15 cm/s 的那几步"算；静步行沿用原来的算法（4 步 × 2.4 秒）
+                walk_s = WALK_RES.get("walk_s") or 1e-9
+            else:
+                walk_s = 4 * 2.4
+            fell_t = rec.up.get("walk_fell")
+            results[key] = dict(dx_cm=dx * 100, v_cm_s=dx * 100 / walk_s, method=WALK_TAG or "static", walk_s=round(walk_s, 2),
+                                sim_s=round(body.t_scene, 2), dy_cm=round(float(d.qpos[1]) * 100, 2),
+                                heading_deg=round(math.degrees(math.atan2(d.xmat[sim.m.body("pelvis").id].reshape(3, 3)[1, 0],
+                                                                          d.xmat[sim.m.body("pelvis").id].reshape(3, 3)[0, 0])), 1),
+                                fell=fell_t is not None, fell_at=None if fell_t is None else round(fell_t, 2),
+                                end_tilt=round(sim.tilt_deg(), 1), detail=dict(WALK_RES),
+                                leg_T={NAMES.get(n, n): [round(st[n], 1), round(sp.get(n, st[n]), 1)] for n in legs},
+                                heat_J={NAMES.get(n, n): round(v, 2) for n, v in sorted(rec.heat.get(key, {}).items(), key=lambda kv: -kv[1])[:6]})
         elif key in ("push1", "push2"):
             results[key] = dict(ok=bool(out))
         elif key == "getup":
