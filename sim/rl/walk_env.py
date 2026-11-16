@@ -38,7 +38,7 @@ NOISE = dict(grav=0.03, gyro=0.2, q=0.02, qd=1.0)
 
 
 class Walk(Env):
-    def __init__(self, xml_path, n_frames=10, noise=True, upper=False, push_max=PUSH_MAX, smooth=False, effort_w=0.02):
+    def __init__(self, xml_path, n_frames=10, noise=True, upper=False, push_max=PUSH_MAX, smooth=False, effort_w=0.02, stop_w=0.0):
         """upper=True（第 2 轮）：上身（腰、脖子、手臂）每 2 秒被指挥到一个随机姿势，策略看不到也管不了，腿要照样走。"""
         # smooth=True（第 3 轮）：一半的局里上身不是每 2 秒跳一次，而是连续地来回动（每个关节一条正弦，0.2–1.2 Hz），
         # 更接近 VR 里头和手连续跟着人动的样子。
@@ -46,6 +46,9 @@ class Walk(Env):
         # effort_w："费力"（各电机出力占上限的比例的平方，取平均）的扣分系数。发热和出力的平方成正比。
         # 第 1、2 轮是 0.02。第 2 轮的策略在数字花然里脚踝侧摆到 71 °C（第 1 轮约 49 °C），第 3 轮加到 0.08。
         self.effort_w = float(effort_w)
+        # stop_w：指令为零时"脚和身体还在动"的扣分系数（两只脚水平速度的平方和 + 身体水平速度的平方）。
+        # 第 3 轮的策略不热了，但停下后一直小步挪（约 1 cm/s）；第 3 轮续练（w3b）加这一项，前三轮是 0。
+        self.stop_w = float(stop_w)
         self.mj = mujoco.MjModel.from_xml_path(xml_path)
         self.mx = mjx.put_model(self.mj)
         self.n_frames = n_frames
@@ -238,8 +241,9 @@ class Walk(Env):
         dq = s["q"] - self.leg_default
         pose = jnp.sum(self.pose_w * dq ** 2)
         still = (1.0 - moving) * (jnp.mean(dq ** 2) + 0.01 * jnp.mean(s["qd"] ** 2))
+        stop = (1.0 - moving) * (jnp.sum(fv ** 2) + jnp.sum(s["v"][:2] ** 2))
         reward = (1.5 * r_lin + 0.8 * r_ang + 1.0 * r_step + 0.2
-                  - 2.0 * tilt - 0.02 * wob - 100.0 * dz - 5.0 * slip - 0.05 * rate - self.effort_w * effort - 0.3 * pose - 1.0 * still)
+                  - 2.0 * tilt - 0.02 * wob - 100.0 * dz - 5.0 * slip - 0.05 * rate - self.effort_w * effort - 0.3 * pose - 1.0 * still - self.stop_w * stop)
         bad = jnp.any(jnp.isnan(d.qpos)) | jnp.any(jnp.isnan(d.qvel))
         fell = (s["z"] < FALL_Z) | (s["up"] < math.cos(math.radians(FALL_DEG)))
         done = bad | fell

@@ -118,6 +118,10 @@ def run(job):
     fg = [m.geom("l_foot").id, m.geom("r_foot").id]
     lifts = []
     reflex_until = -1
+    # 每个小步记腿上 12 个关节实际转速（|qvel|）和两个膝关节受的扭矩（qfrc_actuator，绳驱膝是两根线合起来的扭矩）的最大值，
+    # 分"正常"和"被推"（被推开始到之后 1 秒）两份：被推的瞬间可能会超
+    kdof = np.array([va[W.LEGS.index("l_knee")], va[W.LEGS.index("r_knee")]])
+    peak = {"normal": [0.0, "", 0.0], "push": [0.0, "", 0.0]}       # [最大转速, 哪个关节, 膝盖最大扭矩]
     _lo = np.array([W.UPPER[n][0] for n in W.UPPER]); _hi = np.array([W.UPPER[n][1] for n in W.UPPER])
     _u = np.random.default_rng(seed * 7919 + int(friction * 100) + 1).uniform(size=(4, len(W.UPPER)))
     _amp = _u[1] * 0.5 * (_hi - _lo)
@@ -157,10 +161,16 @@ def run(job):
         pose.update(upose)
         pose.update({n: float(v) for n, v in zip(W.LEGS, want)})
         pushing = bool(push_n) and 0 <= t - t_push < 10
+        pk = peak["push" if push_n and 0 <= t - t_push < int(1.0 / W.DT) else "normal"]
         for _ in range(n_sub):
             sim.set_targets(pose)
             d.xfrc_applied[chest, 0:2] = [push_n * math.cos(ang), push_n * math.sin(ang)] if pushing else [0.0, 0.0]
             sim.step()
+            qv = np.abs(d.qvel[va])
+            i = int(np.argmax(qv))
+            if qv[i] > pk[0]:
+                pk[0], pk[1] = float(qv[i]), W.LEGS[i]
+            pk[2] = max(pk[2], float(np.max(np.abs(d.qfrc_actuator[kdof]))))
         last = a
         lifts.append(max(d.geom_xpos[fg[0], 2], d.geom_xpos[fg[1], 2]) - W.FOOT_HALF)
         xs.append(d.qpos[0:2].copy())
@@ -193,7 +203,10 @@ def run(job):
     return dict(test=name, friction=friction, seed=seed, ok=fell_at is None, fell_at=fell_at,
                 push_at=round(t_push * W.DT, 1) if push_n else None, segs=segs,
                 lift_cm=round(float(np.percentile(lifts, 95)) * 100, 2),      # 抬得较高那只脚的脚掌中心离地（95% 分位）
-                heading_deg=round(math.degrees(float(yaws[-1] - yaws[0])), 1))
+                heading_deg=round(math.degrees(float(yaws[-1] - yaws[0])), 1),
+                # 腿上关节实际转速的最大值（rad/s，哪个关节）和膝盖扭矩的最大值（N·m）；"push" = 被推开始后 1 秒内（只有推的项目才有）
+                qvel_max={k: [round(v[0], 2), v[1]] for k, v in peak.items() if k == "normal" or push_n},
+                knee_Nm_max={k: round(v[2], 3) for k, v in peak.items() if k == "normal" or push_n})
 
 
 def main():
@@ -232,9 +245,15 @@ def main():
             if n != "原地转":
                 parts.append(f"朝向偏 {np.mean([abs(r['heading_deg']) for r in rs]):.0f}°")
             print(f"  {n}  摩擦 {f}：{ok}/{len(rs)} 没摔  " + "  ".join(parts) + (f"  摔：{fails}" if fails else ""))
+    for k in ("normal", "push"):
+        got = [(r["qvel_max"][k], r["knee_Nm_max"][k], r["test"]) for r in res if k in r.get("qvel_max", {})]
+        if got:
+            q = max(got, key=lambda g: g[0][0])
+            kn = max(got, key=lambda g: g[1])
+            print(f"{'正常' if k == 'normal' else '被推后 1 秒内'}：腿上关节最大转速 {q[0][0]} rad/s（{q[0][1]}，{q[2]}），膝盖最大扭矩 {kn[1]} N·m（{kn[2]}）")
     out = ("eval_walk_" + os.path.basename(path).replace(".npz", "") + ("_simple" if simple else "") + ("_quick" if quick else "")
            + ("_hold" if opts["hold"] else "") + ("_upper" if opts["upper"] else "") + ("_smooth" if opts["smooth"] else "") + ("_reflex" if opts["reflex"] else "") + (f"_{only}" if only else "") + ".json")
-    json.dump(dict(policy=os.path.basename(path), body="simple" if simple else "full", trials=trials, opts=opts, runs=res),
+    json.dump(dict(policy=os.path.basename(path), body="simple" if simple else "full", mujoco=mujoco.__version__, trials=trials, opts=opts, runs=res),
               open(os.path.join(HERE, out), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 
