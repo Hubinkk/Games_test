@@ -74,6 +74,10 @@ V3 = [
     # 脚从 6 cm 加长到 7.5 cm（往后加，脚尖不动）：髋轴前移后，站着时重心到了脚跟边缘
     ('<geom name="l_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006"', '<geom name="l_foot" type="box" pos="0.0045 0 -0.034" size="0.0375 0.022 0.006"', 1),
     ('<geom name="r_foot" type="box" pos="0.012 0 -0.034" size="0.03 0.022 0.006"', '<geom name="r_foot" type="box" pos="0.0045 0 -0.034" size="0.0375 0.022 0.006"', 1),
+    # 头（头发）的摩擦按 0.7：育苗人 2026-11-16 决定，头发以柔滑的材质为主；这是设计目标值，实物还没量。
+    # priority=1：MuJoCo 两个面接触时默认取较大的摩擦，设了 priority 以后头和别的面接触直接用头自己的摩擦。
+    ('<geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.32"',
+     '<geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.32" priority="1" friction="0.7 0.02 0.001"', 1),
     ('  <equality>\n', '  <equality>\n    <joint joint1="waist_pitch2" joint2="waist_pitch" polycoef="0 1 0 0 0"/>\n', 1),
 ]
 

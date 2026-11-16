@@ -497,6 +497,84 @@ def append_table_row(path, header_marker, row):
     open(path, "w", encoding="utf-8").write(s)
 
 
+# 练习队列里的每一条对应哪张技能卡片（过关标准写在卡片里，队列里不写目标；2026-11-16，办法 A）
+QUEUE_SKILL = {"摔倒后自己爬起来": "起身", "被碰到时迈一步": "走路", "走快一点": "走路"}
+
+
+def queue_skill(text):
+    if text in QUEUE_SKILL:
+        return QUEUE_SKILL[text]
+    return "起身" if ("起身" in text or "爬起" in text or "站起" in text) else "走路" if ("走" in text or "迈" in text) else ""
+
+
+# ---------------- 本地的练习结果（practice-results/，本地的 night_practice.py 写；办法 A） ----------------
+PRACTICE_DIR = os.path.join(ROOT, "practice-results")
+
+
+def read_practice():
+    """读最新的一份本地练习结果。只是资料：用它更新队列、技能卡片和报告，不执行里面的任何东西。
+    云端自己再判一次：每一条回归测试都过了才算"练成了"；有"没量"的算"没量完"；技能卡片要求发热测试而结果里没有，也算"没量完"。"""
+    if not os.path.isdir(PRACTICE_DIR):
+        return None
+    files = sorted(f for f in os.listdir(PRACTICE_DIR) if f.endswith(".json"))
+    if not files:
+        return None
+    data = json.load(open(os.path.join(PRACTICE_DIR, files[-1]), encoding="utf-8"))
+    out = []
+    for it in data.get("items", []):
+        checks = it.get("checks", [])
+        failed = [c["name"] for c in checks if c.get("ok") is False]
+        unmeasured = [c["name"] for c in checks if c.get("ok") is None]
+        if not any(("发热" in c.get("name", "") or "°C" in c.get("name", "")) for c in checks):
+            unmeasured.append("发热（连续做 10 分钟，任何电机不超过 70 °C）")
+        local = it.get("status", "")
+        if failed or local == "还没过关":
+            status = "还没过关"
+        elif local == "练成了" and not unmeasured:
+            status = "练成了"
+        elif local == "练成了":
+            status = "没量完"
+        else:
+            status = local or "没有结果"
+        out.append(dict(text=it.get("text", ""), skill=it.get("skill", ""), local_status=local, status=status,
+                        failed=failed, unmeasured=unmeasured, caveat=it.get("caveat", ""), numbers=it.get("numbers", {}),
+                        policy=it.get("policy", ""), body=it.get("body", ""), mujoco=it.get("mujoco", "")))
+    return dict(file=files[-1], day=data.get("day", files[-1][:-5]), items=out)
+
+
+def used_today(skill):
+    """这项技能白天用的是不是本地练出来的那一版。"""
+    return (skill == "起身" and GETUP_TAG == "rl") or (skill == "走路" and WALK_TAG == "rl")
+
+
+def practice_lines(pr):
+    """给报告和日记用的句子，以及队列里每一条要加的备注。只报新的、或状态变了的。"""
+    seen_p = os.path.join(MEM, "练习结果已读.json")
+    seen = json.load(open(seen_p, encoding="utf-8")) if os.path.exists(seen_p) else {}
+    lines, notes = [], {}
+    for it in pr["items"]:
+        key = it["text"]
+        note = f"本地 {pr['day']}：{it['status']}"
+        if it["status"] == "练成了" and not used_today(it["skill"]):
+            note += "，白天还没用上"
+        notes[key] = (it["status"], note)
+        if seen.get(key) == [pr["file"], it["status"]]:
+            continue
+        seen[key] = [pr["file"], it["status"]]
+        s = f"「{it['text']}」（{it['skill'] or '没有对应的技能'}）：在育苗人的电脑上练过，结果是**{it['status']}**。"
+        if it["status"] == "练成了":
+            s += "我白天还没用上它。" if not used_today(it["skill"]) else "今天白天用的就是它。"
+        if it["failed"]:
+            s += "没过的：" + "、".join(it["failed"]) + "。"
+        if it["unmeasured"]:
+            s += "还没量的：" + "、".join(it["unmeasured"]) + "。"
+        if it["caveat"]:
+            s += "要注意：" + it["caveat"]
+        lines.append(s)
+    json.dump(seen, open(seen_p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    return lines, notes
+
+
 def sleep(body, results):
     """第一版的睡眠整理：用简单规则更新记忆。返回改动列表。"""
     changes = []
@@ -552,11 +630,29 @@ def sleep(body, results):
         queue.append("被碰到时迈一步")
     if results["walk"]["v_cm_s"] < 5:
         queue.append("走快一点")
-    p = os.path.join(OUT, "练习队列.md")
-    open(p, "w", encoding="utf-8").write("# 练习队列\n\n夜里要练的动作。强化学习接上之前，只排队、不重练（路线图第 2 阶段）。\n\n" +
-                                         "\n".join(f"- [ ] {q}（来自 {DAY} 的日记）" for q in queue) + "\n")
+    write_queue(queue, f"来自 {DAY} 的日记")
     changes.append("练习队列：" + "、".join(queue))
     return changes, queue
+
+
+PRACTICE_NOTES = {}
+
+
+def queue_line(q, src):
+    st, note = PRACTICE_NOTES.get(q, ("", ""))
+    box = "x" if st == "练成了" else " "
+    sk = queue_skill(q)
+    inner = "；".join(x for x in ((f"技能：{sk}" if sk else ""), src, note) if x)
+    return f"- [{box}] {q}（{inner}）"
+
+
+def write_queue(queue, src, extra=()):
+    """练习队列。每一条：她想练什么（原话）＋对应的技能卡片＋来源＋本地最近的结果。过关标准在技能卡片里。
+    练成了的打勾（[x]）；本地的 night_practice.py 只取括号前的原话去对配方。"""
+    p = os.path.join(OUT, "练习队列.md")
+    body = [queue_line(q, src) for q in queue] + [queue_line(q, s2) for q, s2 in extra]
+    open(p, "w", encoding="utf-8").write("# 练习队列\n\n夜里要练的动作。练习在育苗人的电脑上做（本地会话），结果写在 practice-results/，"
+                                         "睡眠时读回来；过关标准在 memory/skills/ 的技能卡片里。\n\n" + "\n".join(body) + "\n")
 
 
 def getup_try_line(results):
@@ -629,6 +725,27 @@ def getup_heat_line(body):
     return f"- 爬起来的时候用了很大的力，{who}都太热了（最高 {hot[0][1]:.0f} °C），关节自己减了力保护。手臂和脖子的电机比腿小，撑地很费劲。"
 
 
+PRACTICE_REPORT = []
+
+
+def update_skill_cards(pr):
+    """技能卡片的"夜里的练习"表：每份新的结果加一行（同一行不重复加）。"""
+    for it in pr["items"]:
+        if not it["skill"]:
+            continue
+        p = os.path.join(MEM, "skills", f"{it['skill']}.md")
+        if not os.path.exists(p):
+            continue
+        s = open(p, encoding="utf-8").read()
+        if "## 夜里的练习" not in s:
+            s = s.rstrip("\n") + "\n\n## 夜里的练习\n\n在育苗人的电脑上练（本地会话），结果来自 practice-results/。\n\n| 结果的日期 | 练的是 | 本地判的 | 我判的 | 没过的 / 还没量的 |\n|---|---|---|---|---|\n"
+        miss = "、".join(it["failed"] + it["unmeasured"]) or "—"
+        row = f"| {pr['day']} | {it['text']} | {it['local_status']} | {it['status']} | {miss} |"
+        if row not in s:
+            s = s.rstrip("\n") + "\n" + row + "\n"
+        open(p, "w", encoding="utf-8").write(s)
+
+
 def morning_report(body, results, changes, queue, msgs=()):
     hot_n, hot_T = max(body.peak_T.items(), key=lambda kv: kv[1])
     lines = ["---", "类型: 早上的报告", f"日期: {NEXT}", "写的人: 花然", "给: 育苗人", "---", "",
@@ -647,7 +764,8 @@ def morning_report(body, results, changes, queue, msgs=()):
              f"- 傍晚还剩 {body.battery()*100:.0f}% 的电。", "",
              "## 夜里", "",
              "我整理了记忆，改了这些地方：", ""] + [f"- {c}" for c in changes] + [
-             "", "我还不能在夜里真正重练动作（要等强化学习接上），所以先把想练的排好了：", ""] + [f"- {q}" for q in queue] + [
+             ""] + ((["在育苗人的电脑上练过的：", ""] + [f"- {x}" for x in PRACTICE_REPORT] + [""]) if PRACTICE_REPORT else []) + [
+             "接下来想练的（标准写在技能卡片里）：", ""] + [f"- {q}（{queue_skill(q) or '还没有对应的技能'}）" for q in queue] + [
              "", "## 想问你的", ""] + [f"- {q}" for q in still_ask(msgs)] + ["",
              "今天也请多关照。", "", "花然", ""]
     os.makedirs(os.path.join(OUT, "reports"), exist_ok=True)
@@ -737,13 +855,23 @@ def main():
     msgs = read_inbox()
     diary = write_diary(body, info, results, msgs)
     remember_messages(msgs)
+    PR = read_practice()
+    pr_lines = []
+    if PR:
+        pr_lines, notes = practice_lines(PR)
+        PRACTICE_NOTES.update(notes)
     changes, queue = sleep(body, results)
+    extra = []
     for q in reversed((UNDER or {}).get("queue", [])):
         if q not in queue:
             queue.insert(0, q)
-            qp = os.path.join(OUT, "练习队列.md")
-            if os.path.exists(qp) and q not in open(qp, encoding="utf-8").read():
-                open(qp, "a", encoding="utf-8").write(f"- {q}（{DAY}，读了育苗人的话以后加的）\n")
+            extra.append((q, f"{DAY}，读了育苗人的话以后加的"))
+    if extra:
+        write_queue([q for q in queue if q not in dict(extra)], f"来自 {DAY} 的日记", extra)
+    if PR:
+        changes.append(f"读了本地的练习结果（practice-results/{PR['file']}）" + ("" if pr_lines else "：和上次一样，没有新的"))
+        update_skill_cards(PR)
+    PRACTICE_REPORT[:] = pr_lines
     bc = body_change()
     if bc:
         hp = os.path.join(MEM, "body", "history.md")
