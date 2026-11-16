@@ -39,6 +39,7 @@ header p{margin:6px 0 0;color:var(--ink-2);max-width:78ch}
 #label{left:12px;top:10px}
 #pushtag{right:12px;top:10px;color:var(--warn);border-color:var(--warn);display:none}
 #felltag{right:12px;top:46px;color:var(--bad);border-color:var(--bad);display:none}
+#uppertag{left:12px;top:46px;color:var(--calm);border-color:var(--calm);display:none}
 #nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink-2)}
 .ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .ctl button{font:inherit;font-size:13px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer;min-width:4.2em}
@@ -82,13 +83,14 @@ footer{font-size:12px;color:var(--ink-2);max-width:92ch}
 <div class="wrap">
   <header>
     <h1>花然学会的走路</h1>
-    <p>这是 MuJoCo 物理仿真的逐帧回放，不是实物。走路靠的是强化学习练出来的策略（<code>sim/rl/walk_policy.npz</code>）：它只看身体自己感觉得到的东西（重力方向、转动速度、腿上 12 个关节的角度和速度），按"往前、侧移、转向"的指令控制腿上 12 个电机，每 20 毫秒一次。还不好的地方：<b>走不直</b>，叫它直走也会慢慢偏；<b>手臂、腰和脖子是固定的</b>，只有腿在动。拖动画面可以转视角，滚轮或双指缩放；镜头跟着身体走，地上的细线每格 10 厘米、粗线每格 1 米。</p>
+    <p>这是 MuJoCo 物理仿真的逐帧回放，不是实物。走路靠的是强化学习练出来的策略（<code>sim/rl/walk_policy.npz</code>，第 2 轮：训练时上身被随意摆动、推力到 12 N）：它只看身体自己感觉得到的东西（重力方向、转动速度、腿上 12 个关节的角度和速度），按"往前、侧移、转向"的指令控制腿上 12 个电机，每 20 毫秒一次。外面套了两层简单的控制：<b>朝向控制</b>（走偏了就补一点转向，所以能走直）和<b>"去那里"</b>（给地上一个点，它自己转过去、走过去、停住；地上的圈就是目标，到了变绿）。后半段上身被随意摆动，模拟以后在 VR 里头和手跟着人动、腿自己走。拖动画面可以转视角，滚轮或双指缩放；镜头跟着身体走，地上的细线每格 10 厘米、粗线每格 1 米。</p>
   </header>
   <main class="grid">
     <div class="left">
       <section class="viewer" id="viewer" aria-label="走路的仿真回放">
         <div class="tag" id="label">—</div>
-        <div class="tag" id="pushtag">胸口被推 5 N</div>
+        <div class="tag" id="pushtag">胸口被推</div>
+        <div class="tag" id="uppertag">上身被外面指挥着动</div>
         <div class="tag" id="felltag">摔倒了</div>
       </section>
       <div class="ctl">
@@ -100,11 +102,11 @@ footer{font-size:12px;color:var(--ink-2);max-width:92ch}
         <span class="t" id="time">0.0 / 0.0 s</span>
         <button id="speed" aria-label="播放速度">1×</button>
       </div>
-      <div class="legend"><span style="--c:color-mix(in srgb,var(--calm) 55%,transparent)">在走或转</span><span style="--c:var(--rule)">停着</span><span style="--c:var(--warn)">被推</span><span style="--c:var(--bad)" id="fell-legend" hidden>摔倒</span><span style="--c:var(--trail)">地上的线：走过的路</span></div>
+      <div class="legend"><span style="--c:color-mix(in srgb,var(--calm) 55%,transparent)">在走或转</span><span style="--c:var(--rule)">停着</span><span style="--c:var(--warn)">被推</span><span style="--c:var(--bad)" id="fell-legend" hidden>摔倒</span><span style="--c:var(--trail)">地上的线：走过的路</span><span style="--c:var(--warn)">圈：要去的点</span><span style="--c:var(--ok)">绿圈：到了</span></div>
     </div>
     <aside class="side">
       <div class="card">
-        <div class="eyebrow">此刻：指令 → 实际（实际是 1 秒的滑动平均）</div>
+        <div class="eyebrow">此刻：给策略的指令（含朝向修正）→ 实际（1 秒的滑动平均）</div>
         <div class="vel">
           <span></span><span class="h">指令</span><span class="h">实际</span>
           <span>前进</span><b class="cmd" id="c0">0</b><b id="a0">0</b>
@@ -125,15 +127,16 @@ footer{font-size:12px;color:var(--ink-2);max-width:92ch}
       <div class="card">
         <div class="eyebrow">还不好的地方</div>
         <ul class="weak">
-          <li>走不直：它感觉不到自己朝哪个方向，叫它直走也会慢慢偏；要靠上一层"看着方向给转向指令"来修，还没做。</li>
-          <li>手臂、腰、脖子固定在站姿，没有摆臂。</li>
-          <li>停下以后脚下还会轻轻挪一点。</li>
-          <li>只在平地、一种地面（摩擦 1.0）上走；这一段只录了一次。</li>
+          <li>走直是靠外面那层朝向控制修的，策略自己仍感觉不到朝哪个方向；实物上朝向要靠 IMU 的陀螺积分（会慢慢漂，没算进去）。</li>
+          <li>手臂是被外面指挥着动（随机姿势，模拟 VR 里人的手），不是它自己走路时摆臂；其余段落手臂固定在站姿。</li>
+          <li>后退偏慢：指令 8 cm/s，实际约 6.4。</li>
+          <li>"去那里"用的是仿真里的真值当"自己在哪"；实物上位置要靠外面看它（头显或相机），还没做。</li>
+          <li>停下以后脚下还会轻轻挪一点；只在平地、一种地面（摩擦 1.0）上走；这一段只录了一次。</li>
         </ul>
       </div>
     </aside>
   </main>
-  <footer>数据来自 <code>sim/walk_replay.py</code>（完整身体：所有部位会碰撞，膝盖用线拉，10 rad/s 转速上限，自动配平关掉）。起始姿势、节拍起点和推的方向由固定的种子 0 决定，第一次录的就是这一段，没有挑。检验的统计数字见 <code>wiki/灵活度.md</code> 的"用强化学习学会走路"。</footer>
+  <footer>数据来自 <code>sim/walk_replay.py</code>（完整身体：所有部位会碰撞，膝盖用线拉，10 rad/s 转速上限，自动配平关掉）。起始姿势、节拍起点、推的方向和上身的姿势由固定的种子 0 决定，第一次录的就是这一段，没有挑。检验的统计数字见 <code>wiki/灵活度.md</code> 的"用强化学习学会走路"和"走路之后"。</footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -153,29 +156,32 @@ const fellFrame=D.fell_at!=null?Math.min(N-1,Math.round(D.fell_at*FPS)):-1;
 
 // 时间轴下面的分段条和标记
 const total=N/FPS;
-$('#strip').innerHTML=D.segs.map(s=>{const go=s.cmd.some(v=>v!==0);return `<i class="${go?'go':'stop'}" style="left:${s.t0/total*100}%;width:${(s.t1-s.t0)/total*100}%" title="${s.name}"></i>`;}).join('')
-  +`<span class="mark" style="left:${D.push.t/total*100}%;background:var(--warn)" title="被推"></span>`
+const PU=D.pushes||[],GO=D.goals||[];
+$('#strip').innerHTML=D.segs.map(s=>{const go=s.cmd==null||s.cmd.some(v=>v!==0);return `<i class="${go?'go':'stop'}" style="left:${s.t0/total*100}%;width:${(s.t1-s.t0)/total*100}%" title="${s.name}"></i>`;}).join('')
+  +PU.map(p=>`<span class="mark" style="left:${p.t/total*100}%;background:var(--warn)" title="被推 ${p.N} N"></span>`).join('')
+  +GO.filter(g=>g.t_arrive!=null).map(g=>`<span class="mark" style="left:${g.t_arrive/total*100}%;background:var(--ok)" title="到了：${g.name}"></span>`).join('')
   +(fellFrame>=0?`<span class="mark" style="left:${fellFrame/N*100}%;background:var(--bad)" title="摔倒"></span>`:'');
 if(fellFrame>=0)$('#fell-legend').hidden=false;
 
 // 总结
-const rel=D.push.rel_deg;
-const relTxt=rel==null?'':(Math.abs(rel)<30?'从背后往前推':Math.abs(rel)>150?'从正前方往后推':(rel>0?'往它的左':'往它的右')+(Math.abs(rel)>100?'后方':Math.abs(rel)<80?'前方':'边')+'推');
+const relTxt=rel=>rel==null?'':(Math.abs(rel)<30?'从背后往前推':Math.abs(rel)>150?'从正前方往后推':(rel>0?'往它的左':'往它的右')+(Math.abs(rel)>100?'后方':Math.abs(rel)<80?'前方':'边')+'推');
 $('#summary').innerHTML=`<div class="eyebrow">这一段的结果</div>
  <div class="stat"><div><b class="${D.fell_at==null?'okc':'badc'}">${D.fell_at==null?'全程没摔':D.fell_at.toFixed(1)+' 秒摔了'}</b><span>${D.fell_at==null?'约 '+Math.round(total)+' 秒':(D.fell_reason||'')}</span></div>
- <div><b>${(cum[N-1]/1000).toFixed(2)} m</b><span>一共走过的路</span></div></div>
- <p class="note">第 ${D.push.t.toFixed(1)} 秒（快走的第 3 秒）胸口被水平推了一下：${D.push.N} N、${D.push.dur} 秒，${relTxt}（相对它面对的方向 ${rel==null?'—':fmt(rel,0)+'°'}）。${D.fell_at==null?'没有摔。':''}</p>`;
+ <div><b>${(cum[N-1]/1000).toFixed(2)} m</b><span>一共走过的路</span></div>
+ <div><b>${GO.filter(g=>g.reached).length} / ${GO.length}</b><span>"去那里"到了</span></div></div>
+ ${PU.map(p=>`<p class="note">第 ${p.t.toFixed(1)} 秒（${D.segs[p.seg].name}）胸口被水平推了一下：${p.N} N、${p.dur} 秒，${relTxt(p.rel_deg)}（相对它面对的方向 ${p.rel_deg==null?'—':fmt(p.rel_deg,0)+'°'}）。</p>`).join('')}
+ ${GO.map(g=>`<p class="note">${g.name}：${g.reached?`用 ${g.took} 秒到了（离目标 5 cm 以内）`:'没到'}，这一段结束时离目标 ${g.err_end_cm} cm。</p>`).join('')}`;
 
 // 各段表格
-$('#segs').innerHTML=D.segs.map((s,i)=>{const a=s.act_mean;
-  return `<tr class="seg" data-i="${i}"><td class="n">${s.t0.toFixed(0)}–${s.t1.toFixed(0)} s</td><td>${s.name}</td><td class="n">${fmt(a[0],1)} / ${fmt(a[1],1)} cm/s<br>${fmt(a[2],2)} rad/s</td></tr>`;}).join('');
+$('#segs').innerHTML=D.segs.map((s,i)=>{const a=s.act_mean;const g=s.goal!=null?GO[s.goal]:null;
+  return `<tr class="seg" data-i="${i}"><td class="n">${s.t0.toFixed(0)}–${s.t1.toFixed(0)} s</td><td>${s.name}${g?`<br><span class="${g.reached?'okc':'badc'}">${g.reached?g.took+' 秒到了':'没到'}</span>`:''}</td><td class="n">${g?`最后离目标<br>${g.err_end_cm} cm`:`${fmt(a[0],1)} / ${fmt(a[1],1)} cm/s<br>${fmt(a[2],2)} rad/s`}</td></tr>`;}).join('');
 $('#segs').addEventListener('click',e=>{const r=e.target.closest('tr.seg');if(!r)return;P.i=Math.min(N-1,Math.round(D.segs[+r.dataset.i].t0*FPS));P.playing=true;$('#play').textContent='暂停';show(P.i);});
 
 // 三维
 const viewer=$('#viewer');const T=window.THREE;let renderer=null;
 try{if(T)renderer=new T.WebGLRenderer({antialias:true});}catch(e){}
 if(!renderer)viewer.insertAdjacentHTML('beforeend','<div id="nogl">这个浏览器无法显示三维画面，右边的数字仍然可以查看。</div>');
-let scene,camera,root,meshes=[],floor,gridCanvas,gridTex,trail,trailGeo,arrow,startDot;
+let scene,camera,root,meshes=[],floor,gridCanvas,gridTex,trail,trailGeo,arrow,startDot,rings=[];
 function mergeGeos(gs){const pos=[],nor=[],idx=[];let off=0;
   gs.forEach(g=>{const p=g.attributes.position,n=g.attributes.normal;for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));nor.push(n.getX(i),n.getY(i),n.getZ(i));}
     if(g.index)for(let i=0;i<g.index.count;i++)idx.push(g.index.getX(i)+off);else for(let i=0;i<p.count;i++)idx.push(i+off);off+=p.count;});
@@ -210,26 +216,34 @@ if(renderer){
   trailGeo=new T.BufferGeometry();const tp=new Float32Array(N*3);FR.forEach((f,i)=>{const v=W(f.p[0],f.p[1],2);tp[3*i]=v.x;tp[3*i+1]=v.y;tp[3*i+2]=v.z;});
   trailGeo.setAttribute('position',new T.BufferAttribute(tp,3));trailGeo.setDrawRange(0,1);
   trail=new T.Line(trailGeo,new T.LineBasicMaterial());scene.add(trail);
-  const pd=D.push.dir_deg*Math.PI/180;
-  arrow=new T.ArrowHelper(W(Math.cos(pd),Math.sin(pd),0).normalize(),new T.Vector3(),180,0xc07a12,50,30);arrow.visible=false;scene.add(arrow);
+  arrow=new T.ArrowHelper(new T.Vector3(1,0,0),new T.Vector3(),180,0xc07a12,50,30);arrow.visible=false;scene.add(arrow);
+  // "去那里"的目标：地上一个圈（半径 5 cm 内算到了）
+  GO.forEach(g=>{const r=new T.Mesh(new T.RingGeometry(40,58,40),new T.MeshBasicMaterial({side:T.DoubleSide,transparent:true}));
+    r.rotation.x=-Math.PI/2;r.position.copy(W(g.x,g.y,2.5));r.visible=false;scene.add(r);rings.push(r);});
 }
+const goF=GO.map(g=>({a:Math.round(g.t0*FPS),b:g.t_arrive!=null?Math.round(g.t_arrive*FPS):Infinity}));
 function theme(){if(!renderer)return;
   renderer.setClearColor(new T.Color(css('--stage')||'#dfe3e8'));
   const x=gridCanvas.getContext('2d'),S=512;x.fillStyle=css('--stage')||'#dfe3e8';x.fillRect(0,0,S,S);
   x.strokeStyle=css('--grid');x.lineWidth=2;x.beginPath();for(let k=1;k<10;k++){const p=k*S/10;x.moveTo(p,0);x.lineTo(p,S);x.moveTo(0,p);x.lineTo(S,p);}x.stroke();
   x.strokeStyle=css('--grid-2');x.lineWidth=6;x.strokeRect(0,0,S,S);gridTex.needsUpdate=true;
   trail.material.color.set(css('--trail'));startDot.material.color.set(css('--trail'));
-  const w=new T.Color(css('--warn'));arrow.setColor(w);}
+  const w=new T.Color(css('--warn'));arrow.setColor(w);
+  rings.forEach(r=>r.userData.c={go:new T.Color(css('--warn')),ok:new T.Color(css('--ok'))});show(P.i);}
 
 const P={i:0,playing:true,speed:1,acc:0};
 let segOn=-1;
 function show(i){const f=FR[i];if(!f)return;
   if(renderer){f.g.forEach((g,k)=>{const m=meshes[k];if(!m)return;m.position.set(g[0],g[1],g[2]);m.quaternion.set(g[4],g[5],g[6],g[3]);});
     trailGeo.setDrawRange(0,i+1);
-    const near=FR.slice(Math.max(0,i-Math.round(.4*FPS)),i+1).some(x=>x.push);
-    arrow.visible=near;if(near){const pd=D.push.dir_deg*Math.PI/180;const c=W(f.p[0],f.p[1],330);arrow.position.copy(c.sub(W(Math.cos(pd)*230,Math.sin(pd)*230,0)));}}
+    const nf=FR.slice(Math.max(0,i-Math.round(.4*FPS)),i+1).filter(x=>x.push>=0).pop();
+    arrow.visible=!!nf;if(nf){const pd=PU[nf.push].dir_deg*Math.PI/180;const dv=W(Math.cos(pd),Math.sin(pd),0).normalize();arrow.setDirection(dv);
+      const c=W(f.p[0],f.p[1],330);arrow.position.copy(c.sub(W(Math.cos(pd)*230,Math.sin(pd)*230,0)));}
+    rings.forEach((r,k)=>{r.visible=i>=goF[k].a;const ok=i>=goF[k].b;const c=r.userData.c;if(c)r.material.color.copy(ok?c.ok:c.go);
+      r.material.opacity=(f.seg===GO[k].seg||!ok)?1:.45;});}
   const s=D.segs[f.seg];$('#label').textContent=s?s.name:'—';
-  $('#pushtag').style.display=f.push?'block':'none';
+  $('#pushtag').style.display=f.push>=0?'block':'none';if(f.push>=0)$('#pushtag').textContent=`胸口被推 ${PU[f.push].N} N`;
+  $('#uppertag').style.display=s&&s.upper?'block':'none';
   $('#felltag').style.display=(fellFrame>=0&&i>=fellFrame)?'block':'none';
   ['c','a'].forEach(k=>{const v=k==='c'?f.cmd:f.act;
     $('#'+k+'0').innerHTML=fmt(v[0],1)+'<span class="u">cm/s</span>';$('#'+k+'1').innerHTML=fmt(v[1],1)+'<span class="u">cm/s</span>';$('#'+k+'2').innerHTML=fmt(v[2],2)+'<span class="u">rad/s</span>';});

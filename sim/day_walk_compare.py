@@ -4,7 +4,8 @@
 用法：
     python day_walk_compare.py [--day=2026-11-14]      # 写 day_walk_compare.json
 
-两次都用 day.py 的 --out= 写到临时目录（从现在的 digital-huaran/ 复制一份记忆接着过），不动网页数据，不带 --main。
+另跑一次学会的走路 + 第一版交回方式（rl_freeze，环境变量 WALK_HANDOFF=freeze）作对照。
+每次都用 day.py 的 --out= 写到临时目录（从现在的 digital-huaran/ 复制一份记忆接着过），不动网页数据，不带 --main。
 对比：摔没摔、走这一段用时、走了多远、走完的朝向偏差、腿上各电机走路期间的最高温度和这一天的最高温度、后面的场景是否照常。
 
 关于温度（要看清楚记法）：day.py 里每个场景代表一段真实时长，"走到窗边"按 10 分钟算，热量按"真实时长 / 仿真时长"的倍数累计。
@@ -33,8 +34,9 @@ def load_js(p):
 def one(tag, base):
     out = os.path.join(base, tag)
     shutil.rmtree(out, ignore_errors=True)
-    args = [sys.executable, "day.py", f"--day={DAY}", "--getup=rl", f"--out={out}"] + (["--walk=rl"] if tag == "rl" else [])
-    r = subprocess.run(args, cwd=HERE, capture_output=True, text=True)
+    args = [sys.executable, "day.py", f"--day={DAY}", "--getup=rl", f"--out={out}"] + (["--walk=rl"] if tag.startswith("rl") else [])
+    env = dict(os.environ, WALK_HANDOFF="freeze" if tag == "rl_freeze" else "mix")
+    r = subprocess.run(args, cwd=HERE, capture_output=True, text=True, env=env)
     if r.returncode != 0:
         return dict(method=tag, crashed=True, stderr=r.stderr[-3000:])
     data = load_js(os.path.join(out, "digital_huaran_day.js"))
@@ -101,9 +103,11 @@ def continuous_heat():
 def main():
     base = os.path.join(tempfile.gettempdir(), "huaran_walk_compare")
     os.makedirs(base, exist_ok=True)
-    res = {"day": DAY, "note": "仿真（mujoco 3.17，地面摩擦 1.0，整体模型）；两次起身都用 --getup=rl",
+    res = {"day": DAY, "note": "仿真（mujoco 3.17，地面摩擦 1.0，整体模型）；起身都用 --getup=rl；走路策略 sim/rl/walk_policy.npz = 第 2 轮（walk_policy_w2_81M）",
+           "runs_note": "static = 手写静步行；rl = 学会的走路，交回时策略继续跑、目标姿势按比例混进平时站姿（walk_rl.HANDOFF='mix'，默认）；"
+                        "rl_freeze = 第一版交回（策略停下、目标角过渡），第 2 轮策略这样会在交回 0.57 秒时摔倒",
            "thresholds": {"有点热": 55, "太热": 70, "过热保护（自动减力）": 80},
-           "runs": [one(t, base) for t in ("static", "rl")]}
+           "runs": [one(t, base) for t in ("static", "rl", "rl_freeze")]}
     res["continuous_walk_heat"] = continuous_heat()
     json.dump(res, open(os.path.join(HERE, "day_walk_compare.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     for r in res["runs"]:

@@ -11,7 +11,9 @@
 一段的顺序：
   1. 指令 15 cm/s 往前走，直到骨盆沿 x 走出 dist（默认 11.2 cm = 手写静步行在一天里那一段实际走出的距离）
   2. 指令 0 站 2 秒（策略还在控制）
-  3. 1 秒内把目标角从策略最后给的姿势平滑过渡到 day.py 平时站着的姿势（stand_pose + 平衡控制），打开自动配平
+  3. 交回（打开自动配平）：1 秒里策略继续跑（指令 0），它给的目标姿势按比例混进 day.py 平时站着的姿势（stand_pose + 平衡控制），
+     比例从 0 平滑升到 1。第一版（"freeze"）是策略停下、目标角从它最后的姿势过渡过去：第 1 轮策略可以，
+     第 2 轮策略站着时姿势左右不对称、要一直调（髋侧 0.26、两膝 0.13 和 0.59 弧度），一停就倒（0.57 秒，过渡 1–3 秒都一样）
   4. 交回后再站 2 秒，确认没摔
 
 用法（单独跑一次）：
@@ -35,6 +37,7 @@ STATIC_DX = 0.112                # 手写静步行（walk.walk(sim, b, 4, 0.03, 
 V_CMD = 0.15
 STAND_S, BLEND_S, HOLD_S = 2.0, 1.0, 2.0
 MAX_WALK_S = 15.0
+HANDOFF = os.environ.get("WALK_HANDOFF", "mix")   # 交回方式，见 run()；day_walk_compare.py 用环境变量另跑一次 "freeze" 对照
 _POL = None
 
 
@@ -88,8 +91,8 @@ class Walker:
         up = d.xmat[self.pel].reshape(3, 3)[2, 2]
         return d.qpos[2] < W.FALL_Z or up < math.cos(math.radians(W.FALL_DEG)) or not np.all(np.isfinite(d.qpos))
 
-    def step(self, cmd, on_substep=None):
-        """策略走 20 ms。cmd = (前进 m/s, 侧移 m/s, 转向 rad/s)。"""
+    def step(self, cmd, on_substep=None, mix=None):
+        """策略走 20 ms。cmd = (前进 m/s, 侧移 m/s, 转向 rad/s)。mix(pose) 不为空时，每个小步把策略的目标姿势交给它改一下再发出去（交回时用）。"""
         sim, d = self.sim, self.sim.d
         cmd = np.array(cmd, dtype=float)
         if cmd.any():                       # 朝向控制（eval_walk.py 的 hold）
@@ -107,7 +110,7 @@ class Walker:
         pose.update({n: float(v) for n, v in zip(W.LEGS, want)})
         self.pose = pose
         for _ in range(self.n_sub):
-            sim.set_targets(pose)
+            sim.set_targets(mix(pose) if mix else pose)
             sim.step()
             if on_substep:
                 on_substep()
@@ -120,8 +123,11 @@ class Walker:
             self.fell_at = round(self.t * W.DT, 2)
 
 
-def run(sim, bal=None, dist=STATIC_DX, v=V_CMD, reset=True):
-    """走 dist 米再站住、交回。返回结果字典（时间都是仿真秒）。"""
+def run(sim, bal=None, dist=STATIC_DX, v=V_CMD, reset=True, handoff=None):
+    """走 dist 米再站住、交回。返回结果字典（时间都是仿真秒）。
+    handoff："mix"（默认，HANDOFF）= 交回的 1 秒里策略还在跑，它的目标姿势按比例混进平时的站姿；
+             "freeze" = 2026-11-16 第一版：策略停下，目标角从它最后的姿势过渡到平时的站姿（第 2 轮策略这样会在 0.57 秒摔倒）。"""
+    handoff = handoff or HANDOFF
     from balance import Balance
     from figure_test import stand_pose
     d = sim.d
@@ -146,13 +152,29 @@ def run(sim, bal=None, dist=STATIC_DX, v=V_CMD, reset=True):
     bal.prev = None
     if w.trim is not None:
         w.trim.enabled = True
-    p_from = dict(w.pose)
     dt = sim.m.opt.timestep
     handoff_fell = None
     t_h = 0.0
-    n_blend, n_hold = int(round(BLEND_S / dt)), int(round(HOLD_S / dt))
+    if handoff == "mix":
+        # 策略继续跑（指令 0），它的目标姿势和平时的站姿按 a 混合，a 在 BLEND_S 秒里从 0 平滑升到 1
+        nb = int(round(BLEND_S / W.DT))
+        for k in range(nb):
+            a = _smooth((k + 1) / nb)
+
+            def mix(pose, a=a):
+                p_to = bal.adjust(stand_pose())
+                return {n: pose.get(n, 0.0) + (p_to.get(n, 0.0) - pose.get(n, 0.0)) * a for n in set(pose) | set(p_to)}
+            w.step((0.0, 0.0, 0.0), mix=mix)
+            t_h += W.DT
+            if handoff_fell is None and (sim.fallen() or w.fallen()):
+                handoff_fell = round(t_h, 2)
+        p_from, n_blend = {}, 0
+    else:
+        p_from = dict(w.pose)
+        n_blend = int(round(BLEND_S / dt))
+    n_hold = int(round(HOLD_S / dt))
     for k in range(n_blend + n_hold):
-        a = _smooth(k / n_blend)
+        a = _smooth(k / n_blend) if n_blend else 1.0
         p_to = bal.adjust(stand_pose())
         keys = set(p_from) | set(p_to)
         sim.set_targets({n: p_from.get(n, 0.0) + (p_to.get(n, 0.0) - p_from.get(n, 0.0)) * a for n in keys})
