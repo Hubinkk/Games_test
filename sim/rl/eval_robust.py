@@ -24,7 +24,11 @@
                       策略看到的观测也镜像、给出的动作再镜像回来（策略以为自己在转左）。见 mirror_lr.py
     --trace           每 0.1 秒记一行（脖子目标/实际/出力、身体横滚、头着地点），写进结果
     （2026-11-17）--face 时另记"压到眼睛范围"：压力 > 0.5 N、着地点离某只眼睛中心 < 17.7°（定义和 ../head_contact.py 一样），
-                      每次的 eye_s（秒）、eye_peak_N（最大力）、eye_slide_cm（压着眼睛时在地上拖的距离）、eye_nearest_deg（着地点离眼睛最近几度）
+                      每次的 eye_s（秒）、eye_peak_N（最大力）、eye_slide_cm（压着眼睛时在地上拖的距离）、eye_nearest_deg（着地点离眼睛最近几度）；
+                      另分两段：eye_drop_*（落地那一下：默认起法的开头 0.15 秒，或 --start=turned 时的静置）和 eye_after_*（落地以后）
+    --start=turned    （2026-11-17，方案 A）起始姿势里头本来就偏向一边（neck_yaw ±1.3、neck_pitch 0.4、neck_low 0.3，跟着转向的那一边），
+                      参考动作开头 0.15 秒的过渡也换成这个角；起身前先按起始姿势静置 0.5 秒落稳（不算进起身的时间和脸着地比例）。
+                      不给时和原来一样
 """
 import json
 import math
@@ -42,6 +46,8 @@ FRICTIONS = (0.6, 0.8, 1.0, 1.2, 1.5)
 NECK = dict(neck_yaw=1.3, neck_pitch=0.4, neck_low=0.3) if "--neck=turn" in sys.argv else None      # 见 ../head_contact.py
 NECK_VARY = dict(neck_yaw=0.6, neck_pitch=0.3, neck_low=0.3, neck_roll=0.2)                         # --vary：脖子起始角随机的范围（±弧度）
 ROLL_VARY = 0.08
+DROP_S = 0.15        # 默认起法里"从 6 cm 高落下的那一下"按开头 0.15 秒算（落地的最大力都在 0.07–0.12 秒）
+SETTLE_S = 0.5       # --start=turned：起身前静置的时间
 
 
 def arg(name, default):
@@ -86,6 +92,16 @@ def run(args):
     d.qpos[0:3] = [0, 0, 0.06]
     d.qpos[3:7] = [math.cos(math.pi / 4), 0, math.sin(math.pi / 4), 0]
     d.qpos[qa] = np.clip(d.qpos[qa] + rng.uniform(-0.05, 0.05, len(qa)), lo, hi)
+    start = opt.get("start")
+    if start == "turned":                     # --start=turned：头本来就偏向一边（转头的角度），参考开头的 0.15 秒过渡也换成这个角
+        sgn = -1.0 if side == "R" else 1.0
+        turned = {"neck_yaw": 1.3 * sgn, "neck_pitch": 0.4, "neck_low": 0.3}
+        t_in = ref.get("turn", {}).get("t_in", 0.15)
+        for n, v in turned.items():
+            i = names.index(n)
+            d.qpos[qa[i]] = np.clip(d.qpos[qa[i]] + v, lo[i], hi[i])
+            k = int(round(t_in / ref["dt"])) + 1
+            q_ref[:k, i] = v
     if opt.get("vary"):                       # 另用一个随机数，不改变原来那几个随机数的顺序
         r2 = np.random.default_rng(10_000 + seed)
         for n, w in NECK_VARY.items():
@@ -102,6 +118,8 @@ def run(args):
     n_sub = int(round(ref["dt"] / m.opt.timestep))
     last, target = np.zeros(len(names)), np.zeros(len(names))
     wi = names.index("waist_pitch")
+    if start == "turned":
+        target = d.qpos[qa].copy()            # 目标角从起始姿势开始（否则头会先被拉回正中）
     t_push = int(rng.uniform(4.0, 16.0) / ref["dt"]) if push_on else -1
     ang = rng.uniform(0, 2 * math.pi)
     stood_at, fell_at = None, None
@@ -117,6 +135,58 @@ def run(args):
         n_eye, eye_peak, eye_slide, eye_near, eye_peak_t = 0, 0.0, 0.0, 180.0, None
         eye_bins = np.zeros(200)                 # 压到眼睛的时间按 0.1 秒分段（秒）
         v6 = np.zeros(6)
+        # 分两段记（2026-11-17）："落地"= 默认起法的开头 DROP_S 秒（从 6 cm 高落下的那一下）或 --start=turned 时起身前静置的 SETTLE_S 秒；
+        # "落地以后"= 其余（起身本身）
+        ph_stat = {p: dict(on=0, face=0, eye=0, peak=0.0, peak_t=None, slide=0.0) for p in ("drop", "after")}
+
+    def rec(phase, t_rel, main):
+        nonlocal n_on, n_face, n_eye, eye_peak, eye_peak_t, eye_slide, eye_near
+        for c in range(d.ncon):
+            con = d.contact[c]
+            if {int(con.geom1), int(con.geom2)} != {hg_, fl}:
+                continue
+            mujoco.mj_contactForce(m, d, c, f6)
+            if f6[0] <= 0.5:
+                continue
+            u = d.xmat[hb].reshape(3, 3).T @ (con.pos - d.geom_xpos[hg_])
+            un = u / max(np.linalg.norm(u), 1e-9)
+            st = ph_stat[phase]
+            st["on"] += 1
+            is_face = un[0] > math.cos(math.radians(45))
+            st["face"] += int(is_face)
+            if main:
+                n_on += 1
+                if is_face:
+                    n_face += 1
+                    face_bins[min(int(t_rel / 0.5), 39)] += m.opt.timestep
+            eye_ang = min(math.degrees(math.acos(float(np.clip(un @ e, -1, 1)))) for e in EYE)   # 别叫 ang：ang 是推的方向
+            if main:
+                eye_near = min(eye_near, eye_ang)
+            if eye_ang < EYE_HALF_DEG:
+                mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_GEOM, hg_, v6, 0)
+                vp = v6[3:] + np.cross(v6[:3], con.pos - d.geom_xpos[hg_])
+                sl = float(np.linalg.norm(vp[:2])) * m.opt.timestep
+                st["eye"] += 1
+                st["slide"] += sl
+                if f6[0] > st["peak"]:
+                    st["peak"], st["peak_t"] = float(f6[0]), float(t_rel)
+                if main:
+                    n_eye += 1
+                    eye_bins[min(int(t_rel / 0.1), 199)] += m.opt.timestep
+                    if f6[0] > eye_peak:
+                        eye_peak, eye_peak_t = float(f6[0]), float(t_rel)
+                    eye_slide += sl
+
+    t_main0 = 0.0
+    if start == "turned":                     # 起身前先按起始姿势静置 SETTLE_S 秒，让身体落稳（这一段算"落地"，不算起身）
+        pose0 = {n: float(v) for n, v in zip(names, target)}
+        pose0["waist_pitch"] = 2.0 * float(target[wi])
+        for _ in range(int(round(SETTLE_S / m.opt.timestep))):
+            sim.set_targets(pose0)
+            sim.step()
+            if face:
+                rec("drop", d.time, False)
+        t_main0 = float(d.time)
     trace = [] if opt.get("trace") else None
     if trace is not None:
         ny = names.index("neck_yaw")
@@ -141,27 +211,8 @@ def run(args):
             d.xfrc_applied[chest, 0:2] = [push_n * math.cos(ang), push_n * math.sin(ang)] if pushing else [0.0, 0.0]
             sim.step()
             if face:
-                for c in range(d.ncon):
-                    con = d.contact[c]
-                    if {int(con.geom1), int(con.geom2)} == {hg_, fl}:
-                        mujoco.mj_contactForce(m, d, c, f6)
-                        if f6[0] > 0.5:
-                            u = d.xmat[hb].reshape(3, 3).T @ (con.pos - d.geom_xpos[hg_])
-                            n_on += 1
-                            if u[0] / max(np.linalg.norm(u), 1e-9) > math.cos(math.radians(45)):
-                                n_face += 1
-                                face_bins[min(int(d.time / 0.5), 39)] += m.opt.timestep
-                            un = u / max(np.linalg.norm(u), 1e-9)
-                            eye_ang = min(math.degrees(math.acos(float(np.clip(un @ e, -1, 1)))) for e in EYE)   # 别叫 ang：ang 是推的方向
-                            eye_near = min(eye_near, eye_ang)
-                            if eye_ang < EYE_HALF_DEG:
-                                mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_GEOM, hg_, v6, 0)
-                                vp = v6[3:] + np.cross(v6[:3], con.pos - d.geom_xpos[hg_])
-                                n_eye += 1
-                                eye_bins[min(int(d.time / 0.1), 199)] += m.opt.timestep
-                                if f6[0] > eye_peak:
-                                    eye_peak, eye_peak_t = float(f6[0]), float(d.time)
-                                eye_slide += float(np.linalg.norm(vp[:2])) * m.opt.timestep
+                t_rel = float(d.time) - t_main0
+                rec("drop" if (start != "turned" and t_rel < DROP_S) else "after", t_rel, True)
         last = a
         if trace is not None and t % 5 == 4 and t < 200:
             R = d.xmat[pel].reshape(3, 3)
@@ -204,6 +255,12 @@ def run(args):
                    eye_peak_t=None if eye_peak_t is None else round(eye_peak_t, 3), eye_slide_cm=round(eye_slide * 100, 2),
                    eye_nearest_deg=round(eye_near),
                    eye_when={f"{i * 0.1:.1f}": round(float(v), 3) for i, v in enumerate(eye_bins) if v > 0})
+        for p, st in ph_stat.items():          # 分两段：drop = 落地那一下（或静置），after = 落地以后（起身本身）
+            out.update({f"eye_{p}_s": round(st["eye"] * m.opt.timestep, 3), f"eye_{p}_peak_N": round(st["peak"], 1),
+                        f"eye_{p}_slide_cm": round(st["slide"] * 100, 2), f"face_{p}_s": round(st["face"] * m.opt.timestep, 3),
+                        f"head_{p}_s": round(st["on"] * m.opt.timestep, 3)})
+    if start:
+        out.update(start=start)
     return out
 
 
@@ -216,8 +273,8 @@ def main():
     procs = arg("procs", 10)
     sides = list(arg("side", "LR")) if arg("ref", "") == "turn" else [None]
     opt = dict(push=arg("push", 3.0), vary="--vary" in sys.argv, face="--face" in sys.argv or arg("ref", "") == "turn",
-               mirror="--mirror" in sys.argv, trace="--trace" in sys.argv)
-    new = any(a.split("=")[0] in ("--ref", "--side", "--push", "--vary", "--face", "--out", "--mirror", "--trace") for a in sys.argv)
+               mirror="--mirror" in sys.argv, trace="--trace" in sys.argv, start=arg("start", "") or None)
+    new = any(a.split("=")[0] in ("--ref", "--side", "--push", "--vary", "--face", "--out", "--mirror", "--trace", "--start") for a in sys.argv)
     if not new:
         jobs = [(path, f, s, push_on) + ((head,) if head is not None else ()) for f in frics for s in range(trials)]
     else:

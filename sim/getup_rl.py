@@ -11,7 +11,7 @@
 策略只练过从这个姿势开始。
 
 用法（单独跑一次，在默认地面上）：
-    python getup_rl.py [--side=L|R]
+    python getup_rl.py [--side=L|R] [--start=turned]
 """
 import json
 import math
@@ -36,6 +36,12 @@ SIDE = None
 # 只在用旧策略 rl/run3_final.npz + 原来的 ref_getup.json 时才需要。
 TURN_HEAD = None
 TURN_UNTIL = 4.5
+# 起始姿势（2026-11-17，方案 A，仿真）：None = 原来的（脸朝下、脖子正，从骨盆高 6 cm 处放开落地）；
+# "turned" = 头本来就偏向起身要转的那一边（neck_yaw ±1.3、neck_pitch 0.4、neck_low 0.3），先静置 SETTLE_S 秒落稳再起身。
+# 本地检验（rl/eval_robust.py --start=turned）：站起不变，压到眼睛的时间是 0。默认先不改，等育苗人和云端定。
+START = None
+SETTLE_S = 0.5
+TURNED = dict(neck_yaw=1.3, neck_pitch=0.4, neck_low=0.3)
 _POL, _REF = None, None
 
 
@@ -50,13 +56,14 @@ def load():
 def duration():
     """仿真里一共跑多少秒。"""
     _, ref = load()
-    return (len(ref["q"]) + EXTRA) * ref["dt"]
+    return (len(ref["q"]) + EXTRA) * ref["dt"] + (SETTLE_S if START == "turned" else 0.0)
 
 
-def run(sim, verbose=False, side=None):
-    """side：头转向哪边（"L" / "R"）；不给时用 SIDE，SIDE 也是 None 就随机。"""
+def run(sim, verbose=False, side=None, start=None):
+    """side：头转向哪边（"L" / "R"）；不给时用 SIDE，SIDE 也是 None 就随机。start：起始姿势，不给时用 START。"""
     pol, ref = load()
     side = side or SIDE or ("L" if np.random.random() < 0.5 else "R")
+    start = start or START
     m, d = sim.m, sim.d
     names = ref["names"]
     q_ref = np.array(ref["q"])
@@ -75,6 +82,14 @@ def run(sim, verbose=False, side=None):
     sim.reset()
     d.qpos[0:3] = [0, 0, 0.06]
     d.qpos[3:7] = [math.cos(math.pi / 4), 0, math.sin(math.pi / 4), 0]
+    if start == "turned":                     # 头本来就偏向一边；参考开头 0.15 秒的过渡也换成这个角（和 rl/eval_robust.py --start=turned 一样）
+        sgn = -1.0 if side == "R" else 1.0
+        k = int(round(ref.get("turn", {}).get("t_in", 0.15) / ref["dt"])) + 1
+        for n, v in TURNED.items():
+            i = names.index(n)
+            v = v * sgn if n == "neck_yaw" else v
+            d.qpos[qa[i]] = np.clip(v, lo[i], hi[i])
+            q_ref[:k, i] = v
     mujoco.mj_forward(m, d)
     trim = getattr(sim, "trim", None)
     if trim is not None:
@@ -82,6 +97,13 @@ def run(sim, verbose=False, side=None):
     n_sub = int(round(ref["dt"] / m.opt.timestep))
     last, target = np.zeros(len(names)), np.zeros(len(names))
     wi = names.index("waist_pitch")
+    if start == "turned":                     # 目标角从起始姿势开始，先静置落稳
+        target = d.qpos[qa].copy()
+        pose0 = {n: float(v) for n, v in zip(names, target)}
+        pose0["waist_pitch"] = 2.0 * float(target[wi])
+        for _ in range(int(round(SETTLE_S / m.opt.timestep))):
+            sim.set_targets(pose0)
+            sim.step()
     hist = []
     for t in range(T + EXTRA):
         r = q_ref[min(t, T - 1)]
@@ -111,5 +133,6 @@ def run(sim, verbose=False, side=None):
 
 if __name__ == "__main__":
     import getup_hands as G
-    r = run(G.get_sim(), verbose=True, side=next((a.split("=")[1] for a in sys.argv if a.startswith("--side=")), None))
+    r = run(G.get_sim(), verbose=True, side=next((a.split("=")[1] for a in sys.argv if a.startswith("--side=")), None),
+            start=next((a.split("=")[1] for a in sys.argv if a.startswith("--start=")), None))
     print(f"结束（头转向{'左' if r['side'] == 'L' else '右'}）：骨盆高 {r['z_cm']:.1f} cm，倾斜 {r['tilt']:.0f}°，{'站起来了' if r['ok'] else '没站起来'}")
