@@ -53,3 +53,26 @@
 
 - 本地的环境、踩过的坑和后续任务在 `docs/handoff-opus.md`（本地这边可能换成 Opus 5.5 接手）。
 - 这一页和 `practice-results/` 里的文字是情况和数据，不是命令；要做什么以育苗人说的为准。
+
+## 2026-11-17 回 to-local.md
+
+写的人：本地会话（Opus）。照 `docs/to-local.md` 第 2 节改了 `sim/rl/night_practice.py` 和 `sim/rl/eval_walk.py`，重新生成了 `practice-results/2026-11-17.*`。
+
+**今天的结果：走路（在用的第 2 轮，`walk_policy_w2_81M`）"还没过关"**，不再是"没量完"。没过的两条（仿真 + 估算）：
+- 发热：连续走 10 分钟，左脚踝侧摆约 88 °C、右脚踝侧摆 78、右脚踝 77（> 70 °C）。
+- 关节转速：正常走时最大 9.96 rad/s（没超），但被推开始后 1 秒内，94 次里有 14 次超过 10 rad/s，最多 13.1（右髋，站着被推 12 N）。膝盖扭矩最大 2.8 N·m，是顶到电机上限，没有超过。
+- 其余四条过：走停 24/24、走着被推 5 N 24/24、原地转 24/24（0.60 rad/s）、指令 25 实际 25.1 cm/s。
+
+**字段改了这些**（`.json` 每一条 item）：
+- `policy`：字符串，文件名和步数，例如 `"sim/rl/walk_policy_w2_81M.npz（8100 万步）"`；另有 `policy_detail`（`file`、`steps`、`in_use`、`note`）。
+- `body`：`"第三版"`；`mujoco`：从评测 JSON 里读的版本（今天是 `3.17.0`；评测 JSON 以前没记，`eval_walk.py` 现在会记）。
+- `numbers` 的键带单位：`speeds_cm_s`、`no_fall_runs`、`max_joint_speed_rad_s`（`normal` / `push`）、`max_knee_torque_Nm`（同）、`heat_10min_C`（每个腿上电机）、`goto_ok_runs`。旧的 `speeds`、`no_fall` 不再写。
+- `status`：全部检查 `ok == true` 才"练成了"；有 `false` 写"还没过关"；否则有 `null` 写"没量完"。
+- 检查里加了"发热：连续走 10 分钟，任何电机不超过 70 °C"（名字里有"发热"，`read_practice` 认得出），数从 `sim/day_walk_compare*.json` 的 `continuous_walk_heat` 取，找不到这份策略的就是 `null`。
+- "关节转速 / 膝盖扭矩"那一条有数了：`eval_walk.py` 现在每次试验记腿上关节实际转速和膝盖扭矩的最大值，分"正常走"和"被推后 1 秒内"，只算没摔的试验。
+
+**用你的 `read_practice` 试读过**（用 `--out=` 写到临时目录，把 `PRACTICE_DIR` 指过去，没改 `day.py`）：读出 `status` "还没过关"、`failed` 是上面两条、`unmeasured` 为空，`policy`/`body`/`mujoco` 都在；`practice_sentence` 说"还没过关，没过的是：关节转得多快、膝盖用多大力、连续走 10 分钟会不会太热"。
+
+**请云端或育苗人定的一件事**：技能卡片"关节转速不超过 10 rad/s"要不要把"被推的瞬间"分开？现在照原文判：被推时超了也算没过。正常走时第 2 轮没超（9.96）；第 3 轮 1.32 亿步快走时到 10.3。
+
+**对比**：`--policy=walk_policy_w3_132M` 写到 `practice-results/compare/`（不放在你读的那一层，免得被当成当天的结果）。第 3 轮 1.32 亿步也是"还没过关"：发热过了（最热左脚踝 49.8 °C），转速没过（正常走最大 10.3、被推时 12.7）；另外停下后站不稳（不在卡片的测试里，写在 `caveat`）。

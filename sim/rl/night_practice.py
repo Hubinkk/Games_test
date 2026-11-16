@@ -4,6 +4,12 @@
     python night_practice.py                 # 读队列 → 对照已有的评测结果 → 写一份"练习结果"
     python night_practice.py --queue=路径    # 换一份队列（默认 ../../digital-huaran/练习队列.md）
     python night_practice.py --day=2026-11-17
+    python night_practice.py --policy=walk_policy_w3_132M   # 对别的走路策略出同样的结果，写到 practice-results/compare/（默认是白天在用的 WALK_IN_USE）
+    python night_practice.py --out=/tmp/x                   # 写到别的目录（试读用）
+
+每一条结果带 policy（文件名、步数）、body、mujoco（从评测 JSON 取）；status：全部检查 ok == true 才"练成了"，有 false 是"还没过关"，
+否则有 null 是"没量完"。走路的检查照技能卡片 digital-huaran/memory/skills/走路.md 的回归测试，包括关节转速 / 膝盖扭矩
+（eval_walk.py 记的最大值）和发热（sim/day_walk_compare*.json 的 continuous_walk_heat，连续走 10 分钟任何电机 ≤ 70 °C）。
 
 这一版做什么、不做什么：
   - 只读 digital-huaran/练习队列.md，不改 digital-huaran/ 里的任何东西（那边归云端，见 docs/next-local.md）。
@@ -52,11 +58,55 @@ def mean(xs):
     return sum(xs) / len(xs) if xs else None
 
 
-def walk_check():
-    """对照 robot-memory/skills/走路.md 的回归测试和"目标 20 cm/s 以上"，看现在在用的走路策略（walk_policy.npz）。"""
-    d = load(f"eval_walk_{WALK_IN_USE}_hold.json")
+def policy_info(name):
+    """策略的文件名和训练步数（从名字里的 '81M' 读出来）。"""
+    m = re.search(r"_(\d+)M$", name)
+    return dict(file=f"sim/rl/{name}.npz", steps=int(m.group(1)) * 1_000_000 if m else None,
+                in_use=name == WALK_IN_USE, note="白天在用的 walk_policy.npz 是它的副本" if name == WALK_IN_USE else "不是白天在用的那份")
+
+
+def mujoco_version(*jsons):
+    """评测 JSON 里记的 mujoco 版本；没有就看运行这个脚本的环境里装的是哪个版本；都没有返回 None。"""
+    for j in jsons:
+        if j and j.get("mujoco"):
+            return j["mujoco"]
+    try:
+        import mujoco
+        return mujoco.__version__ + "（运行 night_practice.py 的环境，评测 JSON 里没记）"
+    except ImportError:
+        return None
+
+
+HEAT_LIMIT = 70.0          # 身体地图"太热"那条线；技能卡片的回归测试：连续走 10 分钟任何电机不超过它
+
+
+def heat_result(name):
+    """连续走 10 分钟的电机温度：从 sim/day_walk_compare*.json 的 continuous_walk_heat 取（day.py 的热模型，估算）。
+    sim/day_walk_compare_<策略>.json 是用 --policy= 算的；sim/day_walk_compare.json 是用 walk_policy.npz 算的，只有它的说明里写着这份策略时才算数。"""
+    sim_dir = os.path.join(HERE, "..")
+    for fn in (f"day_walk_compare_{name}.json", "day_walk_compare.json"):
+        p = os.path.join(sim_dir, fn)
+        if not os.path.exists(p):
+            continue
+        d = json.load(open(p, encoding="utf-8"))
+        if fn == "day_walk_compare.json" and name not in d.get("note", ""):
+            continue
+        rl = (d.get("continuous_walk_heat") or {}).get("rl")
+        if not rl or not rl.get("joints"):
+            continue
+        return dict(file=f"sim/{fn}", walked_cm=rl.get("dist_cm"), fell=rl.get("fell"),
+                    T_10min={j: v["T_10min"] for j, v in rl["joints"].items()},
+                    T_steady={j: v["T_steady"] for j, v in rl["joints"].items()})
+    return None
+
+
+def walk_check(name=None):
+    """对照技能卡片 digital-huaran/memory/skills/走路.md 的回归测试，看一份走路策略（默认是白天在用的 WALK_IN_USE）。"""
+    name = name or WALK_IN_USE
+    d = load(f"eval_walk_{name}_hold.json")
+    meta = dict(policy=policy_info(name), body="第三版", mujoco=mujoco_version(d))
     if d is None:
-        return dict(ok=None, lines=[f"没有找到评测结果 eval_walk_{WALK_IN_USE}_hold.json：先跑 eval_walk.py {WALK_IN_USE}.npz --hold"], numbers={})
+        return dict(ok=None, lines=[f"没有找到评测结果 eval_walk_{name}_hold.json：先跑 eval_walk.py {name}.npz --hold"], numbers={}, **meta)
     runs = d["runs"]
 
     def tally(prefix):
@@ -94,20 +144,66 @@ def walk_check():
         ("原地转身 90°", t_all > 0 and t_ok == t_all and bool(turn) and mean(turn) > 0.2,
          f"原地转 {t_ok}/{t_all}" + (f"，转速 {mean(turn):.2f} rad/s，转 90° 约 {1.571 / mean(turn):.1f} 秒" if turn else "")),
         ("走到 20 cm/s 以上（技能卡片 v2 的目标）", v_fast is not None and v_fast >= 20, f"最快的指令 {fast} cm/s，实际 {v_fast:.1f} cm/s" if v_fast else "没有数"),
-        ("关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m", None,
-         "目标角每秒最多变 10 rad、电机扭矩上限沿用模型里的，这两条是写死的；但实际关节转速评测里没有记录，所以算\"没量\""),
     ]
-    g = load(f"eval_goto_{WALK_IN_USE}.json")
+    numbers = dict(speeds_cm_s={str(c): round(mean(v), 1) for c, v in speeds.items()}, no_fall_runs=[n_ok, n_all])
+
+    # 关节转速、膝盖扭矩：eval_walk.py 每次试验记的最大值（2026-11-17 起才有）。只算没摔的试验（摔倒时的数没有意义，摔的另算在上面）
+    stand = [r for r in runs if r["ok"] and "qvel_max" in r]
+    if not stand:
+        checks.append(("关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m", None,
+                       f"评测结果里没有记录关节转速和膝盖扭矩：用新的 eval_walk.py 重跑 {name}.npz --hold"))
+    else:
+        parts, ok_sk = [], True
+        numbers["max_joint_speed_rad_s"], numbers["max_knee_torque_Nm"] = {}, {}
+        for k, label in (("normal", "正常走（没在被推）"), ("push", "被推开始后 1 秒内")):
+            rs = [r for r in stand if k in r["qvel_max"]]
+            if not rs:
+                continue
+            q = max(rs, key=lambda r: r["qvel_max"][k][0])
+            kn = max(rs, key=lambda r: r["knee_Nm_max"][k])
+            qv, kv = q["qvel_max"][k][0], kn["knee_Nm_max"][k]
+            numbers["max_joint_speed_rad_s"][k] = qv
+            numbers["max_knee_torque_Nm"][k] = kv
+            over_q = [r for r in rs if r["qvel_max"][k][0] > 10.0]
+            over_k = [r for r in rs if r["knee_Nm_max"][k] > 2.8]
+            ok_sk = ok_sk and not over_q and not over_k
+            s = f"{label}：转速最大 {qv} rad/s（{q['qvel_max'][k][1]}，{q['test']}），膝盖扭矩最大 {kv} N·m（{kn['test']}）"
+            if over_q:
+                tests = sorted({r["test"] for r in over_q})
+                s += f"；转速超过 10 的有 {len(over_q)}/{len(rs)} 次（{'、'.join(tests)}），最多超 {qv - 10:.1f} rad/s"
+            if over_k:
+                tests = sorted({r["test"] for r in over_k})
+                s += f"；膝盖超过 2.8 的有 {len(over_k)}/{len(rs)} 次（{'、'.join(tests)}），最多超 {kv - 2.8:.2f} N·m"
+            parts.append(s)
+        checks.append(("关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m", ok_sk,
+                       "；".join(parts) + f"。只算没摔的 {len(stand)} 次，每个小步（0.5 ms）都看。"))
+
+    # 发热：连续走 10 分钟，任何电机不超过 70 °C
+    h = heat_result(name)
+    if h is None:
+        checks.append((f"发热：连续走 10 分钟，任何电机不超过 {HEAT_LIMIT:.0f} °C", None,
+                       f"没有找到这份策略的发热结果：先跑 cd sim && python day_walk_compare.py --policy={name}.npz"))
+    else:
+        hot = max(h["T_10min"].items(), key=lambda kv: kv[1])
+        over = {j: t for j, t in h["T_10min"].items() if t > HEAT_LIMIT}
+        numbers["heat_10min_C"] = h["T_10min"]
+        checks.append((f"发热：连续走 10 分钟，任何电机不超过 {HEAT_LIMIT:.0f} °C", not over,
+                       f"按 day.py 的热模型估算（{h['file']}，连续走了 {h['walked_cm']} cm 量扭矩）：最热的是{hot[0]} {hot[1]} °C"
+                       + (f"；超过 {HEAT_LIMIT:.0f} °C 的：" + "、".join(f"{j} {t} °C" for j, t in over.items()) if over else "")
+                       + "。只算了腿上 12 个电机（走路时上身不动）；热阻和时间常数是估算的，发热测试做完要重算"))
+    g = load(f"eval_goto_{name}.json")
     if g:
         ok = sum(1 for r in g["runs"] if r["ok"])
         lines.append(f"走到指定的点（1 m 外 8 个方向）：{ok}/{len(g['runs'])}。")
-    ok = all(c[1] for c in checks if c[1] is not None)
-    return dict(ok=ok, lines=lines, checks=checks,
-                numbers=dict(speeds={str(c): round(mean(v), 1) for c, v in speeds.items()}, no_fall=[n_ok, n_all]),
-                caveat="发热没算在这里：这份策略连续走 10 分钟，脚踝侧摆估算会超过 80 °C（sim/day_walk_compare.json，wiki/灵活度.md）。"
-                       "所以 day.py 默认还没换成它。",
+        numbers["goto_ok_runs"] = [ok, len(g["runs"])]
+    oks = [c[1] for c in checks]
+    ok = False if False in oks else (None if None in oks else True)
+    caveat = "" if name == WALK_IN_USE else f"这份不是白天在用的策略（白天在用 {WALK_IN_USE}），这里只是对比。"
+    if name == "walk_policy_w3_132M":
+        caveat += "第 3 轮验收时停下以后站不稳（停下后最后 2 秒还挪 1.5–2.4 cm），所以没换上（wiki/灵活度.md 第 6 条）。"
+    return dict(ok=ok, lines=lines, checks=checks, numbers=numbers, caveat=caveat, **meta,
                 train="cd sim/rl && .venv/bin/python train_walk.py --tag=<新名字> --upper --smooth --push=12 --effort=0.08 --steps=150000000 --envs=4096"
-                      "（约 2 小时 10 分钟显卡；练完用 eval_walk.py <策略> --hold 和 eval_goto.py 验收）")
+                      "（约 2 小时 10 分钟显卡；练完用 eval_walk.py <策略> --hold、eval_goto.py 和 ../day_walk_compare.py --policy= 验收）")
 
 
 # 现在在用的走路策略（walk_policy.npz 是它的副本）。换了策略要改这里：评测结果的文件名跟着策略的名字走。
@@ -119,14 +215,23 @@ RECIPES = [
 ]
 
 
+def status_of(ok):
+    """全部检查 ok == true 才"练成了"；有 false 是"还没过关"；否则有 null 是"没量完"。"""
+    return "练成了" if ok is True else ("还没过关" if ok is False else "没量完")
+
+
 def main():
     day = arg("day", datetime.date.today().isoformat())
     qpath = arg("queue", os.path.join(ROOT, "digital-huaran", "练习队列.md"))
+    pol = arg("policy", "").replace(".npz", "") or None          # --policy=walk_policy_w3_132M：对别的策略出同样的结果
     queue = read_queue(qpath)
-    out_dir = os.path.join(ROOT, "practice-results")
+    # 默认写 practice-results/<日期>.md/.json（云端 day.py 读这里最新的 .json）。
+    # 对比别的策略时写到 practice-results/compare/，免得云端把对比当成当天的结果读走。--out= 可以换目录（试读用）
+    out_dir = arg("out", os.path.join(ROOT, "practice-results", "compare") if pol and pol != WALK_IN_USE else os.path.join(ROOT, "practice-results"))
+    stem = day if not pol or pol == WALK_IN_USE else f"{day}_{pol}"
     os.makedirs(out_dir, exist_ok=True)
-    md = [f"# 练习结果 {day}", "",
-          f"由 `sim/rl/night_practice.py` 生成。队列读自 `{os.path.relpath(qpath, ROOT)}`（只读，没有改它）。数字都是仿真里的。", ""]
+    md = [f"# 练习结果 {day}" + (f"（对比：{pol}）" if pol and pol != WALK_IN_USE else ""), "",
+          f"由 `sim/rl/night_practice.py` 生成。队列读自 `{os.path.relpath(qpath, ROOT)}`（只读，没有改它）。数字都是仿真里的；温度是估算。", ""]
     result = dict(day=day, queue=os.path.relpath(qpath, ROOT), items=[])
     if not queue:
         md.append("队列是空的（或者没找到文件）。")
@@ -144,25 +249,33 @@ def main():
             result["items"].append(dict(text=text, status="没有配方"))
             continue
         skill, fn = rec[1], rec[2]
-        r = cache.setdefault(skill, fn())
-        status = "没有评测结果" if r["ok"] is None else ("练成了" if r["ok"] else "还没过关")
+        if skill not in cache:
+            cache[skill] = fn(pol) if skill == "走路" else fn()
+        r = cache[skill]
+        status = status_of(r["ok"])
         md.append(f"**{status}**（技能：{skill}）")
         md.append("")
+        if r.get("policy"):
+            p = r["policy"]
+            md.append(f"- 策略：`{p['file']}`" + (f"（{p['steps'] // 10000} 万步）" if p.get("steps") else "") + f"，{p['note']}；身体：{r.get('body')}；mujoco {r.get('mujoco')}。")
         md += ["- " + s for s in r["lines"]]
         for name, ok, note in r.get("checks", []):
             md.append(f"- {'没量' if ok is None else ('过' if ok else '没过')}：{name}。{note}")
         if r.get("caveat"):
             md.append(f"- 要注意：{r['caveat']}")
-        if not r["ok"] and r.get("train"):
+        if r["ok"] is not True and r.get("train"):
             md.append(f"- 要练的话：`{r['train']}`")
         md.append("")
-        result["items"].append(dict(text=text, source=src, skill=skill, status=status, numbers=r.get("numbers", {}),
+        p = r.get("policy")
+        result["items"].append(dict(text=text, source=src, skill=skill, status=status,
+                                    policy=(p["file"] + (f"（{p['steps'] // 10000} 万步）" if p.get("steps") else "")) if p else None,
+                                    policy_detail=p, body=r.get("body"), mujoco=r.get("mujoco"), numbers=r.get("numbers", {}),
                                     checks=[dict(name=n, ok=o, note=t) for n, o, t in r.get("checks", [])], caveat=r.get("caveat", "")))
     md += ["## 给云端的话", "",
            "- 这份结果没有写进 `digital-huaran/`。要不要勾掉队列、要不要更新技能卡片（`走路.md` 的 v2 现在还写着\"待训练\"），由云端和育苗人定。",
            "- \"练成了\"只说明过了技能卡片上的回归测试，不等于可以当默认用：看每一条下面的\"要注意\"。", ""]
-    open(os.path.join(out_dir, f"{day}.md"), "w", encoding="utf-8", newline="\n").write("\n".join(md))
-    json.dump(result, open(os.path.join(out_dir, f"{day}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    open(os.path.join(out_dir, f"{stem}.md"), "w", encoding="utf-8", newline="\n").write("\n".join(md))
+    json.dump(result, open(os.path.join(out_dir, f"{stem}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print("\n".join(md))
 
 
