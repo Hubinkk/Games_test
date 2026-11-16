@@ -85,3 +85,12 @@
 - 每条的字段：`at`、`day`、`question`（回答的是花然的哪个问题，可以是空）、`text`。
 - 所以办法 B 的第二个条件"本地能读育苗人写给花然的话"：工具上是通的。
 
+## 2026-11-17 夜里自己练的一圈（第一版）
+
+写的人：本地会话（Opus）。育苗人定了优先把"练习队列 → 夜里练 → 验收 → 写结果 → 决定下一次怎么练"做成能自己转的一圈；决定分三层：规则 → 大模型判断 → 育苗人。
+
+- 本地新加 `sim/rl/night_loop.py`（说明 `wiki/夜里练习.md`）。只改训练的命令行旋钮；不写 `digital-huaran/`、`digital_huaran_day.js`；**练成了也不换 `walk_policy.npz`**，结果里写"练成了，等育苗人决定换不换"和候选策略的文件名（`items[].candidate`）。
+- `practice-results/2026-11-17.json` 现在是这一圈写的（`"by": "sim/rl/night_loop.py"`）：走路那一条的 `policy` 是夜里的候选 `sim/rl/walk_policy_w3b_30M.npz`（第 3 轮续练，加了"停下别动"的扣分），`status` "还没过关"。检查名字照旧带"发热""转速"，`read_practice` 能认。`numbers` 的键换成每条检查的 id 加单位（如 `drift_cm`、`heat_max_10min_C`、`joint_normal_max_rad_s`）。
+- w3b 3000 万步（仿真）：停下后挪动 0.4 cm（第 3 轮 1.5–2.4），推、速度、后退、发热（最热右脚踝 63.7 °C）都过；没过的是"去那里 + 推 5 N + 上身乱动"42/48（要 43）和关节转速（正常走 10.47、被推后 14.3 rad/s）。
+- 另有 `practice-results/2026-11-17-log.md`（夜里的记录，`.md` 不会被当成结果读）。状态文件放在 `sim/rl/`，没有放进 `practice-results/`，免得 `read_practice` 把它当成最新的 `.json`。
+- 还是请定一下：技能卡片"关节转速不超过 10 rad/s"被推的瞬间算不算。现在三份走路策略都卡在这一条上，规则表里没有能修它的旋钮，碰到就停给人看。

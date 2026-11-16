@@ -1,0 +1,117 @@
+{
+ "day": "2026-11-17",
+ "attempts": [
+  {
+   "n": 1,
+   "tag": "w3b",
+   "knobs": {
+    "effort": 0.08,
+    "stop": 20.0,
+    "push": 12.0,
+    "lr": 0.0002
+   },
+   "init": "（之前已经练完的）",
+   "phase": "accepted",
+   "rules": [],
+   "why": "作为第 1 次尝试",
+   "copies": [
+    "walk_policy_w3b_30M",
+    "walk_policy_w3b_40M",
+    "walk_policy_w3b_50M"
+   ],
+   "best": "walk_policy_w3b_30M",
+   "checks": {
+    "no_fall_basic": {
+     "ok": true,
+     "value": 0,
+     "note": "摔 0/360 次",
+     "falls": 0
+    },
+    "speed15": {
+     "ok": true,
+     "value": 14.27,
+     "note": "实际 14.3–14.7 cm/s（每种地面、每种上身设置的平均）",
+     "slow": false,
+     "lo": 14.27,
+     "hi": 14.71
+    },
+    "back8": {
+     "ok": true,
+     "value": 8.35,
+     "note": "后退 8.3–9.5 cm/s"
+    },
+    "drift": {
+     "ok": true,
+     "value": 1.57,
+     "note": "停下后最后 2 秒挪 hold 0.4 cm，upper 1.3 cm，smooth 1.6 cm（每种地面平均里最大的）"
+    },
+    "stand_push8": {
+     "ok": true,
+     "value": 0,
+     "note": "72/72 没摔",
+     "falls": 0
+    },
+    "stand_push12": {
+     "ok": true,
+     "value": 1,
+     "note": "23/24 没摔",
+     "falls": 1
+    },
+    "walk_push12": {
+     "ok": true,
+     "value": 0,
+     "note": "24/24 没摔",
+     "falls": 0
+    },
+    "turn": {
+     "ok": true,
+     "value": 0,
+     "note": "原地转 72/72，转速最小 0.58 rad/s"
+    },
+    "fast20": {
+     "ok": true,
+     "value": 22.79,
+     "note": "指令 25 实际 22.8–23.1 cm/s"
+    },
+    "joint_normal": {
+     "ok": false,
+     "value": 10.47,
+     "note": "转速最大 10.47 rad/s（r_knee，快走），膝盖最大 2.8 N·m；超的 20/575 次（快走、走+推12N、走+推5N、走+推8N、走停）"
+    },
+    "joint_push": {
+     "ok": false,
+     "value": 14.31,
+     "note": "转速最大 14.31 rad/s（r_hip_pitch，站+推12N），膝盖最大 2.8 N·m；超的 25/287 次（站+推12N、站+推8N、走+推12N、走+推5N）"
+    },
+    "goto": {
+     "ok": true,
+     "value": 0,
+     "note": "48/48 到了并停住",
+     "drift_cause": false,
+     "falls": 0
+    },
+    "goto_push5": {
+     "ok": true,
+     "value": 0,
+     "note": "48/48 到了并停住",
+     "drift_cause": false,
+     "falls": 0
+    },
+    "goto_push5_upper": {
+     "ok": false,
+     "value": 6,
+     "note": "42/48 到了并停住；没成的 6 次里摔 0 次，其余是停不住（离目标 0.4–5.2 cm）",
+     "drift_cause": true,
+     "falls": 0
+    },
+    "heat": {
+     "ok": true,
+     "value": 63.7,
+     "note": "连续走 10 分钟最热的是右脚踝 63.7 °C（day.py 热模型，估算，只算腿上 12 个电机）"
+    }
+   },
+   "accept_minutes": 23.0
+  }
+ ],
+ "stop": "尝试次数用完（1 次）。下一次本来会这样改：\n规则 stop（goto_push5_upper 没过）：停下后挪动没过，或\"去那里\"没过而且是停不住（没摔、离目标不远但还在挪）→ 指令为零时动的扣分从 0 到 20，再不过加倍；stop 20.0 → 40.0\n没有规则管的没过项（这次不动，留给人看）：joint_normal、joint_push"
+}
