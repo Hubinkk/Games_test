@@ -1,0 +1,272 @@
+<title>花然学会的走路</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 版式：左边是回放画面和时间轴（主角），右边是"指令 → 实际"、被推的提示和各段的平均 */
+:root{
+  --paper:#eceef0; --panel:#f7f8f9; --stage:#dfe3e8; --ink:#1c2430; --ink-2:#5a6474; --rule:#cdd3da;
+  --grid:#b9c1cb; --grid-2:#8f99a6; --trail:#4a5fa8;
+  --calm:#4a5fa8; --ok:#23897c; --bad:#cf3b3d; --warn:#c07a12;
+  --f-display:"Noto Serif SC","Songti SC",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --grid:#2c3542; --grid-2:#4a5566; --trail:#93a6ec;
+  --calm:#93a6ec; --ok:#4cc2b2; --bad:#ff6a6a; --warn:#f0b14a; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --panel:#161c25; --stage:#1b222d; --ink:#e3e7ee; --ink-2:#98a3b4; --rule:#29323f;
+  --grid:#2c3542; --grid-2:#4a5566; --trail:#93a6ec;
+  --calm:#93a6ec; --ok:#4cc2b2; --bad:#ff6a6a; --warn:#f0b14a; color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px}
+header h1{font-family:var(--f-display);font-size:28px;margin:0;letter-spacing:.04em;line-height:1.25}
+header p{margin:6px 0 0;color:var(--ink-2);max-width:78ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.left{display:flex;flex-direction:column;gap:8px;min-width:0}
+.viewer{position:relative;background:var(--stage);border:1px solid var(--rule);border-radius:14px;overflow:hidden;height:min(64vh,620px);min-height:360px;touch-action:none;cursor:grab}
+.viewer.drag{cursor:grabbing}
+.viewer canvas{display:block;width:100%;height:100%}
+.tag{position:absolute;font-size:14px;font-weight:500;background:color-mix(in srgb,var(--panel) 88%,transparent);border:1px solid var(--rule);border-radius:8px;padding:3px 10px}
+#label{left:12px;top:10px}
+#pushtag{right:12px;top:10px;color:var(--warn);border-color:var(--warn);display:none}
+#felltag{right:12px;top:46px;color:var(--bad);border-color:var(--bad);display:none}
+#nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink-2)}
+.ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ctl button{font:inherit;font-size:13px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer;min-width:4.2em}
+.track{position:relative;flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:3px}
+.track input{width:100%;accent-color:var(--calm);margin:0}
+.strip{position:relative;height:8px;border-radius:4px;overflow:hidden;background:var(--rule)}
+.strip i{position:absolute;top:0;bottom:0;border-right:1px solid var(--panel)}
+.strip i.go{background:color-mix(in srgb,var(--calm) 55%,transparent)}
+.strip i.stop{background:transparent}
+.mark{position:absolute;top:-2px;width:3px;height:12px;border-radius:1px}
+.ctl .t{font-family:var(--f-data);font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;min-width:7.5em}
+button:focus-visible,input:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.legend{font-size:12px;color:var(--ink-2);display:flex;gap:14px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:10px;height:6px;border-radius:2px;margin-right:5px;vertical-align:middle;background:var(--c)}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--ink-2)}
+.vel{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);gap:4px 14px;align-items:baseline}
+.vel .h{font-size:12px;color:var(--ink-2)}
+.vel b{font-family:var(--f-data);font-size:20px;font-weight:500;font-variant-numeric:tabular-nums}
+.vel b.cmd{color:var(--ink-2)}
+.vel .u{font-size:11px;color:var(--ink-2);font-family:var(--f-data);margin-left:3px}
+.stat{display:flex;gap:18px;flex-wrap:wrap}
+.stat div{display:flex;flex-direction:column}
+.stat b{font-family:var(--f-data);font-size:18px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--ink-2)}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{text-align:left;padding:4px 6px;border-top:1px solid var(--rule);vertical-align:top}
+th{font-weight:500;color:var(--ink-2);font-size:12px;border-top:0}
+td.n{font-family:var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.seg{cursor:pointer}
+tr.seg:hover td{background:color-mix(in srgb,var(--calm) 8%,transparent)}
+tr.seg.on td{background:color-mix(in srgb,var(--calm) 16%,transparent)}
+.tw{overflow-x:auto}
+.note{margin:0;color:var(--ink-2);font-size:13px}
+.okc{color:var(--ok);font-weight:500}.badc{color:var(--bad);font-weight:500}
+ul.weak{margin:0;padding-left:1.2em;color:var(--ink-2);font-size:13px}
+footer{font-size:12px;color:var(--ink-2);max-width:92ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>花然学会的走路</h1>
+    <p>这是 MuJoCo 物理仿真的逐帧回放，不是实物。走路靠的是强化学习练出来的策略（<code>sim/rl/walk_policy.npz</code>）：它只看身体自己感觉得到的东西（重力方向、转动速度、腿上 12 个关节的角度和速度），按"往前、侧移、转向"的指令控制腿上 12 个电机，每 20 毫秒一次。还不好的地方：<b>走不直</b>，叫它直走也会慢慢偏；<b>手臂、腰和脖子是固定的</b>，只有腿在动。拖动画面可以转视角，滚轮或双指缩放；镜头跟着身体走，地上的细线每格 10 厘米、粗线每格 1 米。</p>
+  </header>
+  <main class="grid">
+    <div class="left">
+      <section class="viewer" id="viewer" aria-label="走路的仿真回放">
+        <div class="tag" id="label">—</div>
+        <div class="tag" id="pushtag">胸口被推 5 N</div>
+        <div class="tag" id="felltag">摔倒了</div>
+      </section>
+      <div class="ctl">
+        <button id="play">暂停</button>
+        <div class="track">
+          <input type="range" id="scrub" min="0" max="0" step="1" value="0" aria-label="时间轴">
+          <div class="strip" id="strip"></div>
+        </div>
+        <span class="t" id="time">0.0 / 0.0 s</span>
+        <button id="speed" aria-label="播放速度">1×</button>
+      </div>
+      <div class="legend"><span style="--c:color-mix(in srgb,var(--calm) 55%,transparent)">在走或转</span><span style="--c:var(--rule)">停着</span><span style="--c:var(--warn)">被推</span><span style="--c:var(--bad)" id="fell-legend" hidden>摔倒</span><span style="--c:var(--trail)">地上的线：走过的路</span></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <div class="eyebrow">此刻：指令 → 实际（实际是 1 秒的滑动平均）</div>
+        <div class="vel">
+          <span></span><span class="h">指令</span><span class="h">实际</span>
+          <span>前进</span><b class="cmd" id="c0">0</b><b id="a0">0</b>
+          <span>侧移（左为正）</span><b class="cmd" id="c1">0</b><b id="a1">0</b>
+          <span>转向（左为正）</span><b class="cmd" id="c2">0</b><b id="a2">0</b>
+        </div>
+        <div class="stat">
+          <div><b id="path">0.00 m</b><span>走过的路</span></div>
+          <div><b id="away">0.00 m</b><span>离起点</span></div>
+          <div><b id="tilt">0°</b><span>躯干倾斜</span></div>
+        </div>
+      </div>
+      <div class="card" id="summary"></div>
+      <div class="card">
+        <div class="eyebrow">每一段（去掉开头 1.5 秒的平均；点一行跳过去）</div>
+        <div class="tw"><table><thead><tr><th>时间</th><th>指令</th><th>实际平均</th></tr></thead><tbody id="segs"></tbody></table></div>
+      </div>
+      <div class="card">
+        <div class="eyebrow">还不好的地方</div>
+        <ul class="weak">
+          <li>走不直：它感觉不到自己朝哪个方向，叫它直走也会慢慢偏；要靠上一层"看着方向给转向指令"来修，还没做。</li>
+          <li>手臂、腰、脖子固定在站姿，没有摆臂。</li>
+          <li>停下以后脚下还会轻轻挪一点。</li>
+          <li>只在平地、一种地面（摩擦 1.0）上走；这一段只录了一次。</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+  <footer>数据来自 <code>sim/walk_replay.py</code>（完整身体：所有部位会碰撞，膝盖用线拉，10 rad/s 转速上限，自动配平关掉）。起始姿势、节拍起点和推的方向由固定的种子 0 决定，第一次录的就是这一段，没有挑。检验的统计数字见 <code>wiki/灵活度.md</code> 的"用强化学习学会走路"。</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="walk_frames.js"></script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const D=window.WALK;
+if(!D){$('#viewer').insertAdjacentHTML('beforeend','<div id="nogl">仿真数据没有加载成功，请刷新页面。</div>');return;}
+const FR=D.frames,FPS=D.fps||30,N=FR.length;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt=(v,d)=>(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(d);
+
+// 累计路程（骨盆在地面上的投影）
+const cum=[0];for(let i=1;i<N;i++){const a=FR[i-1].p,b=FR[i].p;cum.push(cum[i-1]+Math.hypot(b[0]-a[0],b[1]-a[1]));}
+const fellFrame=D.fell_at!=null?Math.min(N-1,Math.round(D.fell_at*FPS)):-1;
+
+// 时间轴下面的分段条和标记
+const total=N/FPS;
+$('#strip').innerHTML=D.segs.map(s=>{const go=s.cmd.some(v=>v!==0);return `<i class="${go?'go':'stop'}" style="left:${s.t0/total*100}%;width:${(s.t1-s.t0)/total*100}%" title="${s.name}"></i>`;}).join('')
+  +`<span class="mark" style="left:${D.push.t/total*100}%;background:var(--warn)" title="被推"></span>`
+  +(fellFrame>=0?`<span class="mark" style="left:${fellFrame/N*100}%;background:var(--bad)" title="摔倒"></span>`:'');
+if(fellFrame>=0)$('#fell-legend').hidden=false;
+
+// 总结
+const rel=D.push.rel_deg;
+const relTxt=rel==null?'':(Math.abs(rel)<30?'从背后往前推':Math.abs(rel)>150?'从正前方往后推':(rel>0?'往它的左':'往它的右')+(Math.abs(rel)>100?'后方':Math.abs(rel)<80?'前方':'边')+'推');
+$('#summary').innerHTML=`<div class="eyebrow">这一段的结果</div>
+ <div class="stat"><div><b class="${D.fell_at==null?'okc':'badc'}">${D.fell_at==null?'全程没摔':D.fell_at.toFixed(1)+' 秒摔了'}</b><span>${D.fell_at==null?'约 '+Math.round(total)+' 秒':(D.fell_reason||'')}</span></div>
+ <div><b>${(cum[N-1]/1000).toFixed(2)} m</b><span>一共走过的路</span></div></div>
+ <p class="note">第 ${D.push.t.toFixed(1)} 秒（快走的第 3 秒）胸口被水平推了一下：${D.push.N} N、${D.push.dur} 秒，${relTxt}（相对它面对的方向 ${rel==null?'—':fmt(rel,0)+'°'}）。${D.fell_at==null?'没有摔。':''}</p>`;
+
+// 各段表格
+$('#segs').innerHTML=D.segs.map((s,i)=>{const a=s.act_mean;
+  return `<tr class="seg" data-i="${i}"><td class="n">${s.t0.toFixed(0)}–${s.t1.toFixed(0)} s</td><td>${s.name}</td><td class="n">${fmt(a[0],1)} / ${fmt(a[1],1)} cm/s<br>${fmt(a[2],2)} rad/s</td></tr>`;}).join('');
+$('#segs').addEventListener('click',e=>{const r=e.target.closest('tr.seg');if(!r)return;P.i=Math.min(N-1,Math.round(D.segs[+r.dataset.i].t0*FPS));P.playing=true;$('#play').textContent='暂停';show(P.i);});
+
+// 三维
+const viewer=$('#viewer');const T=window.THREE;let renderer=null;
+try{if(T)renderer=new T.WebGLRenderer({antialias:true});}catch(e){}
+if(!renderer)viewer.insertAdjacentHTML('beforeend','<div id="nogl">这个浏览器无法显示三维画面，右边的数字仍然可以查看。</div>');
+let scene,camera,root,meshes=[],floor,gridCanvas,gridTex,trail,trailGeo,arrow,startDot;
+function mergeGeos(gs){const pos=[],nor=[],idx=[];let off=0;
+  gs.forEach(g=>{const p=g.attributes.position,n=g.attributes.normal;for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));nor.push(n.getX(i),n.getY(i),n.getZ(i));}
+    if(g.index)for(let i=0;i<g.index.count;i++)idx.push(g.index.getX(i)+off);else for(let i=0;i<p.count;i++)idx.push(i+off);off+=p.count;});
+  const out=new T.BufferGeometry();out.setAttribute('position',new T.Float32BufferAttribute(pos,3));out.setAttribute('normal',new T.Float32BufferAttribute(nor,3));out.setIndex(idx);return out;}
+// MuJoCo（x 前, y 左, z 上，毫米）→ three（x, z, −y）
+const W=(x,y,z)=>new T.Vector3(x,z,-y);
+if(renderer){
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));viewer.prepend(renderer.domElement);
+  scene=new T.Scene();camera=new T.PerspectiveCamera(32,1,5,40000);
+  scene.add(new T.HemisphereLight(0xffffff,0x8a90a0,.95));const dl=new T.DirectionalLight(0xffffff,.7);dl.position.set(300,800,500);scene.add(dl);
+  root=new T.Group();root.rotation.x=-Math.PI/2;scene.add(root);
+  D.geoms.forEach(g=>{let geo;const s=g.size;
+    if(g.type===0){meshes.push(null);return;}           // 地面另外画（更大、带网格）
+    else if(g.type===2)geo=new T.SphereGeometry(s[0],22,16);
+    else if(g.type===3){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],18);geo.rotateX(Math.PI/2);
+      const a=new T.SphereGeometry(s[0],16,12);a.translate(0,0,s[1]);const b=new T.SphereGeometry(s[0],16,12);b.translate(0,0,-s[1]);geo=mergeGeos([geo,a,b]);}
+    else if(g.type===5){geo=new T.CylinderGeometry(s[0],s[0],2*s[1],24);geo.rotateX(Math.PI/2);}
+    else if(g.type===6)geo=new T.BoxGeometry(2*s[0],2*s[1],2*s[2]);
+    else if(g.type===4){geo=new T.SphereGeometry(1,22,16);geo.scale(s[0],s[1],s[2]);}
+    else{meshes.push(null);return;}
+    const mat=new T.MeshStandardMaterial({color:new T.Color(g.rgba[0],g.rgba[1],g.rgba[2]),roughness:.6,transparent:g.rgba[3]<1,opacity:g.rgba[3]<1?Math.max(.15,g.rgba[3]):1});
+    if(g.name.endsWith('pulley'))mat.color.setHex(0xd2961c);
+    const m=new T.Mesh(geo,mat);root.add(m);meshes.push(m);});
+  // 地面：12 m 见方；细网格 10 cm，粗网格 1 m
+  // 网格画在贴图上（一张图 = 1 m 见方，10 cm 一条细线，边上一条粗线），比画几百条长线稳当
+  gridCanvas=document.createElement('canvas');gridCanvas.width=gridCanvas.height=512;
+  gridTex=new T.CanvasTexture(gridCanvas);gridTex.wrapS=gridTex.wrapT=T.RepeatWrapping;gridTex.repeat.set(12,12);
+  gridTex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+  floor=new T.Mesh(new T.PlaneGeometry(12000,12000),new T.MeshBasicMaterial({map:gridTex}));floor.rotation.x=-Math.PI/2;
+  floor.position.set(0,-.5,0);scene.add(floor);
+  startDot=new T.Mesh(new T.RingGeometry(28,40,32),new T.MeshBasicMaterial({side:T.DoubleSide}));startDot.rotation.x=-Math.PI/2;startDot.position.copy(W(FR[0].p[0],FR[0].p[1],1.5));scene.add(startDot);
+  trailGeo=new T.BufferGeometry();const tp=new Float32Array(N*3);FR.forEach((f,i)=>{const v=W(f.p[0],f.p[1],2);tp[3*i]=v.x;tp[3*i+1]=v.y;tp[3*i+2]=v.z;});
+  trailGeo.setAttribute('position',new T.BufferAttribute(tp,3));trailGeo.setDrawRange(0,1);
+  trail=new T.Line(trailGeo,new T.LineBasicMaterial());scene.add(trail);
+  const pd=D.push.dir_deg*Math.PI/180;
+  arrow=new T.ArrowHelper(W(Math.cos(pd),Math.sin(pd),0).normalize(),new T.Vector3(),180,0xc07a12,50,30);arrow.visible=false;scene.add(arrow);
+}
+function theme(){if(!renderer)return;
+  renderer.setClearColor(new T.Color(css('--stage')||'#dfe3e8'));
+  const x=gridCanvas.getContext('2d'),S=512;x.fillStyle=css('--stage')||'#dfe3e8';x.fillRect(0,0,S,S);
+  x.strokeStyle=css('--grid');x.lineWidth=2;x.beginPath();for(let k=1;k<10;k++){const p=k*S/10;x.moveTo(p,0);x.lineTo(p,S);x.moveTo(0,p);x.lineTo(S,p);}x.stroke();
+  x.strokeStyle=css('--grid-2');x.lineWidth=6;x.strokeRect(0,0,S,S);gridTex.needsUpdate=true;
+  trail.material.color.set(css('--trail'));startDot.material.color.set(css('--trail'));
+  const w=new T.Color(css('--warn'));arrow.setColor(w);}
+
+const P={i:0,playing:true,speed:1,acc:0};
+let segOn=-1;
+function show(i){const f=FR[i];if(!f)return;
+  if(renderer){f.g.forEach((g,k)=>{const m=meshes[k];if(!m)return;m.position.set(g[0],g[1],g[2]);m.quaternion.set(g[4],g[5],g[6],g[3]);});
+    trailGeo.setDrawRange(0,i+1);
+    const near=FR.slice(Math.max(0,i-Math.round(.4*FPS)),i+1).some(x=>x.push);
+    arrow.visible=near;if(near){const pd=D.push.dir_deg*Math.PI/180;const c=W(f.p[0],f.p[1],330);arrow.position.copy(c.sub(W(Math.cos(pd)*230,Math.sin(pd)*230,0)));}}
+  const s=D.segs[f.seg];$('#label').textContent=s?s.name:'—';
+  $('#pushtag').style.display=f.push?'block':'none';
+  $('#felltag').style.display=(fellFrame>=0&&i>=fellFrame)?'block':'none';
+  ['c','a'].forEach(k=>{const v=k==='c'?f.cmd:f.act;
+    $('#'+k+'0').innerHTML=fmt(v[0],1)+'<span class="u">cm/s</span>';$('#'+k+'1').innerHTML=fmt(v[1],1)+'<span class="u">cm/s</span>';$('#'+k+'2').innerHTML=fmt(v[2],2)+'<span class="u">rad/s</span>';});
+  $('#path').textContent=(cum[i]/1000).toFixed(2)+' m';
+  $('#away').textContent=(Math.hypot(f.p[0]-FR[0].p[0],f.p[1]-FR[0].p[1])/1000).toFixed(2)+' m';
+  $('#tilt').textContent=f.tilt.toFixed(1)+'°';
+  if(f.seg!==segOn){segOn=f.seg;[...$('#segs').children].forEach((r,k)=>r.classList.toggle('on',k===segOn));}
+  $('#scrub').value=i;$('#time').textContent=`${(i/FPS).toFixed(1)} / ${total.toFixed(1)} s`;}
+$('#scrub').max=N-1;
+$('#play').addEventListener('click',()=>{P.playing=!P.playing;$('#play').textContent=P.playing?'暂停':'播放';if(P.playing&&P.i>=N-1)P.i=0;});
+$('#scrub').addEventListener('input',e=>{P.i=+e.target.value;P.playing=false;$('#play').textContent='播放';show(P.i);});
+const SPEEDS=[.25,.5,1,2];$('#speed').addEventListener('click',()=>{P.speed=SPEEDS[(SPEEDS.indexOf(P.speed)+1)%4];$('#speed').textContent=P.speed+'×';});
+
+// 镜头：围着骨盆转，跟着走（平滑跟随）
+const cam={az:.75,el:.32,dist:1900,gaz:.75,gel:.32,gdist:1900,tx:FR[0].p[0],tz:-FR[0].p[1]};
+function updCam(dt){const k=Math.min(1,dt*5);cam.az+=(cam.gaz-cam.az)*k;cam.el+=(cam.gel-cam.el)*k;cam.dist+=(cam.gdist-cam.dist)*k;
+  const f=FR[P.i];if(f){const kk=Math.min(1,dt*4);cam.tx+=(f.p[0]-cam.tx)*kk;cam.tz+=(-f.p[1]-cam.tz)*kk;}
+  const tgt=new T.Vector3(cam.tx,230,cam.tz);
+  camera.position.set(tgt.x+cam.dist*Math.cos(cam.el)*Math.sin(cam.az),tgt.y+cam.dist*Math.sin(cam.el),tgt.z+cam.dist*Math.cos(cam.el)*Math.cos(cam.az));camera.lookAt(tgt);}
+if(renderer){const el=renderer.domElement,pt=new Map();let mv=0,p0=0;
+  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);mv=0;if(pt.size===2){const [a,b]=[...pt.values()];p0=Math.hypot(a[0]-b[0],a[1]-b[1]);}});
+  el.addEventListener('pointermove',e=>{if(!pt.has(e.pointerId))return;const p=pt.get(e.pointerId),dx=e.clientX-p[0],dy=e.clientY-p[1];pt.set(e.pointerId,[e.clientX,e.clientY]);mv+=Math.abs(dx)+Math.abs(dy);
+    if(pt.size===2){const [a,b]=[...pt.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(p0)cam.gdist=Math.min(9000,Math.max(300,cam.gdist*p0/d));p0=d;}
+    else if(mv>3){viewer.classList.add('drag');cam.gaz-=dx*.008;cam.gel=Math.max(.02,Math.min(1.45,cam.gel+dy*.006));}});
+  const up=e=>{pt.delete(e.pointerId);if(pt.size<2)p0=0;viewer.classList.remove('drag');};
+  el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',e=>{e.preventDefault();cam.gdist=Math.min(9000,Math.max(300,cam.gdist*(1+e.deltaY*.0012)));},{passive:false});
+  new ResizeObserver(()=>{const w=viewer.clientWidth,h=viewer.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}).observe(viewer);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);
+  new MutationObserver(theme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});theme();}
+let last=performance.now();
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;
+  if(P.playing){P.acc+=dt*FPS*P.speed;while(P.acc>=1){P.acc-=1;P.i++;}if(P.i>=N){P.i=0;cam.tx=FR[0].p[0];cam.tz=-FR[0].p[1];}show(P.i);}
+  if(renderer){updCam(dt);renderer.render(scene,camera);}
+  requestAnimationFrame(frame);}
+const h0=/t=([\d.]+)/.exec(location.hash);               // 地址后面加 #t=20 可以从第 20 秒开始
+if(h0){P.i=Math.min(N-1,Math.round(+h0[1]*FPS));cam.tx=FR[P.i].p[0];cam.tz=-FR[P.i].p[1];}
+show(P.i);requestAnimationFrame(frame);
+})();
+</script>
