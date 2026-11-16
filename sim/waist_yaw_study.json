@@ -1,0 +1,592 @@
+{
+ "note": "仿真（mujoco 3.17，整体模型 figure55_full.xml，CPU）；温度是 day.py 热模型的估算",
+ "joint": {
+  "range_deg": [
+   -45.8,
+   45.8
+  ],
+  "forcerange_Nm": [
+   -1.5,
+   1.5
+  ],
+  "kp": 8.0,
+  "armature": 0.0045,
+  "parent": "abdomen",
+  "total_mass_kg": 3.344
+ },
+ "arm_forward_shoulder_pitch": -1.5499999999999998,
+ "effort": [
+  {
+   "yaw_cmd_deg": 0.0,
+   "yaw_got_deg": -0.0,
+   "arm": null,
+   "ramp_s": 1.5,
+   "fell_at": null,
+   "peak_waist_yaw_Nm": 0.0,
+   "peak_ankle_roll_Nm": 0.0,
+   "hold": {
+    "waist_yaw": {
+     "rms_Nm": 0.0,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_roll": {
+     "rms_Nm": 0.0,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "r_ankle_roll": {
+     "rms_Nm": 0.0,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_pitch": {
+     "rms_Nm": 0.054,
+     "limit_Nm": 1.5,
+     "T_10min": 25.2,
+     "T_steady": 25.3
+    },
+    "r_ankle_pitch": {
+     "rms_Nm": 0.054,
+     "limit_Nm": 1.5,
+     "T_10min": 25.2,
+     "T_steady": 25.3
+    },
+    "waist_pitch": {
+     "rms_Nm": 0.199,
+     "limit_Nm": 2.0,
+     "T_10min": 26.7,
+     "T_steady": 26.9
+    },
+    "l_shoulder_pitch": {
+     "rms_Nm": 0.032,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    },
+    "r_shoulder_pitch": {
+     "rms_Nm": 0.032,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    }
+   },
+   "tilt_end": 0.1
+  },
+  {
+   "yaw_cmd_deg": 45.0,
+   "yaw_got_deg": 45.0,
+   "arm": null,
+   "ramp_s": 1.5,
+   "fell_at": null,
+   "peak_waist_yaw_Nm": 0.039,
+   "peak_ankle_roll_Nm": 0.013,
+   "hold": {
+    "waist_yaw": {
+     "rms_Nm": 0.002,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_roll": {
+     "rms_Nm": 0.012,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "r_ankle_roll": {
+     "rms_Nm": 0.011,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_pitch": {
+     "rms_Nm": 0.063,
+     "limit_Nm": 1.5,
+     "T_10min": 25.3,
+     "T_steady": 25.3
+    },
+    "r_ankle_pitch": {
+     "rms_Nm": 0.076,
+     "limit_Nm": 1.5,
+     "T_10min": 25.4,
+     "T_steady": 25.5
+    },
+    "waist_pitch": {
+     "rms_Nm": 0.201,
+     "limit_Nm": 2.0,
+     "T_10min": 26.7,
+     "T_steady": 26.9
+    },
+    "l_shoulder_pitch": {
+     "rms_Nm": 0.032,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    },
+    "r_shoulder_pitch": {
+     "rms_Nm": 0.032,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    }
+   },
+   "tilt_end": 0.2
+  },
+  {
+   "yaw_cmd_deg": -45.0,
+   "yaw_got_deg": -45.0,
+   "arm": null,
+   "ramp_s": 1.5,
+   "fell_at": null,
+   "peak_waist_yaw_Nm": 0.039,
+   "peak_ankle_roll_Nm": 0.013,
+   "hold": {
+    "waist_yaw": {
+     "rms_Nm": 0.002,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_roll": {
+     "rms_Nm": 0.011,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "r_ankle_roll": {
+     "rms_Nm": 0.012,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_pitch": {
+     "rms_Nm": 0.076,
+     "limit_Nm": 1.5,
+     "T_10min": 25.4,
+     "T_steady": 25.5
+    },
+    "r_ankle_pitch": {
+     "rms_Nm": 0.063,
+     "limit_Nm": 1.5,
+     "T_10min": 25.3,
+     "T_steady": 25.3
+    },
+    "waist_pitch": {
+     "rms_Nm": 0.201,
+     "limit_Nm": 2.0,
+     "T_10min": 26.7,
+     "T_steady": 26.9
+    },
+    "l_shoulder_pitch": {
+     "rms_Nm": 0.032,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    },
+    "r_shoulder_pitch": {
+     "rms_Nm": 0.032,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    }
+   },
+   "tilt_end": 0.2
+  },
+  {
+   "yaw_cmd_deg": 45.0,
+   "yaw_got_deg": 45.0,
+   "arm": "l",
+   "ramp_s": 1.5,
+   "fell_at": null,
+   "peak_waist_yaw_Nm": 0.039,
+   "peak_ankle_roll_Nm": 0.034,
+   "hold": {
+    "waist_yaw": {
+     "rms_Nm": 0.001,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_roll": {
+     "rms_Nm": 0.032,
+     "limit_Nm": 1.5,
+     "T_10min": 25.1,
+     "T_steady": 25.1
+    },
+    "r_ankle_roll": {
+     "rms_Nm": 0.023,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_pitch": {
+     "rms_Nm": 0.006,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "r_ankle_pitch": {
+     "rms_Nm": 0.024,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.1
+    },
+    "waist_pitch": {
+     "rms_Nm": 0.654,
+     "limit_Nm": 2.0,
+     "T_10min": 42.9,
+     "T_steady": 45.7
+    },
+    "l_shoulder_pitch": {
+     "rms_Nm": 0.14,
+     "limit_Nm": 1.0,
+     "T_10min": 28.7,
+     "T_steady": 28.8
+    },
+    "r_shoulder_pitch": {
+     "rms_Nm": 0.04,
+     "limit_Nm": 1.0,
+     "T_10min": 25.3,
+     "T_steady": 25.3
+    }
+   },
+   "tilt_end": 0.1
+  },
+  {
+   "yaw_cmd_deg": 45.0,
+   "yaw_got_deg": 45.0,
+   "arm": "r",
+   "ramp_s": 1.5,
+   "fell_at": null,
+   "peak_waist_yaw_Nm": 0.041,
+   "peak_ankle_roll_Nm": 0.039,
+   "hold": {
+    "waist_yaw": {
+     "rms_Nm": 0.001,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_roll": {
+     "rms_Nm": 0.036,
+     "limit_Nm": 1.5,
+     "T_10min": 25.1,
+     "T_steady": 25.1
+    },
+    "r_ankle_roll": {
+     "rms_Nm": 0.026,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.1
+    },
+    "l_ankle_pitch": {
+     "rms_Nm": 0.005,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "r_ankle_pitch": {
+     "rms_Nm": 0.036,
+     "limit_Nm": 1.5,
+     "T_10min": 25.1,
+     "T_steady": 25.1
+    },
+    "waist_pitch": {
+     "rms_Nm": 0.655,
+     "limit_Nm": 2.0,
+     "T_10min": 43.0,
+     "T_steady": 45.8
+    },
+    "l_shoulder_pitch": {
+     "rms_Nm": 0.04,
+     "limit_Nm": 1.0,
+     "T_10min": 25.3,
+     "T_steady": 25.3
+    },
+    "r_shoulder_pitch": {
+     "rms_Nm": 0.14,
+     "limit_Nm": 1.0,
+     "T_10min": 28.7,
+     "T_steady": 28.8
+    }
+   },
+   "tilt_end": 0.1
+  },
+  {
+   "yaw_cmd_deg": 0.0,
+   "yaw_got_deg": -0.0,
+   "arm": "l",
+   "ramp_s": 1.5,
+   "fell_at": null,
+   "peak_waist_yaw_Nm": 0.001,
+   "peak_ankle_roll_Nm": 0.01,
+   "hold": {
+    "waist_yaw": {
+     "rms_Nm": 0.0,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_roll": {
+     "rms_Nm": 0.002,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "r_ankle_roll": {
+     "rms_Nm": 0.002,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_pitch": {
+     "rms_Nm": 0.003,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "r_ankle_pitch": {
+     "rms_Nm": 0.005,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "waist_pitch": {
+     "rms_Nm": 0.564,
+     "limit_Nm": 2.0,
+     "T_10min": 38.3,
+     "T_steady": 40.4
+    },
+    "l_shoulder_pitch": {
+     "rms_Nm": 0.143,
+     "limit_Nm": 1.0,
+     "T_10min": 28.9,
+     "T_steady": 29.0
+    },
+    "r_shoulder_pitch": {
+     "rms_Nm": 0.033,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    }
+   },
+   "tilt_end": 0.1
+  },
+  {
+   "yaw_cmd_deg": 45.0,
+   "yaw_got_deg": 45.0,
+   "arm": null,
+   "ramp_s": 0.5,
+   "fell_at": null,
+   "peak_waist_yaw_Nm": 0.175,
+   "peak_ankle_roll_Nm": 0.028,
+   "hold": {
+    "waist_yaw": {
+     "rms_Nm": 0.012,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_roll": {
+     "rms_Nm": 0.013,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "r_ankle_roll": {
+     "rms_Nm": 0.012,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_pitch": {
+     "rms_Nm": 0.066,
+     "limit_Nm": 1.5,
+     "T_10min": 25.3,
+     "T_steady": 25.4
+    },
+    "r_ankle_pitch": {
+     "rms_Nm": 0.077,
+     "limit_Nm": 1.5,
+     "T_10min": 25.4,
+     "T_steady": 25.5
+    },
+    "waist_pitch": {
+     "rms_Nm": 0.204,
+     "limit_Nm": 2.0,
+     "T_10min": 26.7,
+     "T_steady": 27.0
+    },
+    "l_shoulder_pitch": {
+     "rms_Nm": 0.031,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    },
+    "r_shoulder_pitch": {
+     "rms_Nm": 0.033,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    }
+   },
+   "tilt_end": 0.2
+  },
+  {
+   "yaw_cmd_deg": 45.0,
+   "yaw_got_deg": 45.0,
+   "arm": null,
+   "ramp_s": 0.25,
+   "fell_at": null,
+   "peak_waist_yaw_Nm": 0.5,
+   "peak_ankle_roll_Nm": 0.035,
+   "hold": {
+    "waist_yaw": {
+     "rms_Nm": 0.051,
+     "limit_Nm": 1.5,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    },
+    "l_ankle_roll": {
+     "rms_Nm": 0.014,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "r_ankle_roll": {
+     "rms_Nm": 0.013,
+     "limit_Nm": 1.5,
+     "T_10min": 25.0,
+     "T_steady": 25.0
+    },
+    "l_ankle_pitch": {
+     "rms_Nm": 0.066,
+     "limit_Nm": 1.5,
+     "T_10min": 25.3,
+     "T_steady": 25.4
+    },
+    "r_ankle_pitch": {
+     "rms_Nm": 0.077,
+     "limit_Nm": 1.5,
+     "T_10min": 25.4,
+     "T_steady": 25.5
+    },
+    "waist_pitch": {
+     "rms_Nm": 0.202,
+     "limit_Nm": 2.0,
+     "T_10min": 26.7,
+     "T_steady": 27.0
+    },
+    "l_shoulder_pitch": {
+     "rms_Nm": 0.032,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    },
+    "r_shoulder_pitch": {
+     "rms_Nm": 0.034,
+     "limit_Nm": 1.0,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    }
+   },
+   "tilt_end": 0.2
+  },
+  {
+   "yaw_cmd_deg": 45.0,
+   "yaw_got_deg": 45.0,
+   "arm": "r",
+   "ramp_s": 0.25,
+   "fell_at": null,
+   "peak_waist_yaw_Nm": 0.629,
+   "peak_ankle_roll_Nm": 0.077,
+   "hold": {
+    "waist_yaw": {
+     "rms_Nm": 0.065,
+     "limit_Nm": 1.5,
+     "T_10min": 25.3,
+     "T_steady": 25.4
+    },
+    "l_ankle_roll": {
+     "rms_Nm": 0.041,
+     "limit_Nm": 1.5,
+     "T_10min": 25.1,
+     "T_steady": 25.1
+    },
+    "r_ankle_roll": {
+     "rms_Nm": 0.028,
+     "limit_Nm": 1.5,
+     "T_10min": 25.1,
+     "T_steady": 25.1
+    },
+    "l_ankle_pitch": {
+     "rms_Nm": 0.03,
+     "limit_Nm": 1.5,
+     "T_10min": 25.1,
+     "T_steady": 25.1
+    },
+    "r_ankle_pitch": {
+     "rms_Nm": 0.048,
+     "limit_Nm": 1.5,
+     "T_10min": 25.2,
+     "T_steady": 25.2
+    },
+    "waist_pitch": {
+     "rms_Nm": 0.664,
+     "limit_Nm": 2.0,
+     "T_10min": 43.5,
+     "T_steady": 46.4
+    },
+    "l_shoulder_pitch": {
+     "rms_Nm": 0.039,
+     "limit_Nm": 1.0,
+     "T_10min": 25.3,
+     "T_steady": 25.3
+    },
+    "r_shoulder_pitch": {
+     "rms_Nm": 0.141,
+     "limit_Nm": 1.0,
+     "T_10min": 28.8,
+     "T_steady": 28.8
+    }
+   },
+   "tilt_end": 0.1
+  }
+ ],
+ "reach": {
+  "锁住": {
+   "samples": 200000,
+   "balanced": 199904,
+   "cells": 6549,
+   "volume_cm3": 52392,
+   "sectors_cm3": {
+    "前": 16152,
+    "侧": 21240,
+    "侧后": 11888,
+    "后": 3112
+   },
+   "farthest_back_cm": 19.1,
+   "farthest_side_cm": 23.7
+  },
+  "能转±45°": {
+   "samples": 200000,
+   "balanced": 199969,
+   "cells": 7567,
+   "volume_cm3": 60536,
+   "sectors_cm3": {
+    "前": 17664,
+    "侧": 23096,
+    "侧后": 13848,
+    "后": 5928
+   },
+   "farthest_back_cm": 22.8,
+   "farthest_side_cm": 26.0
+  },
+  "只有能转时才够得到": 8504,
+  "只有锁住时才够得到": 360
+ }
+}
