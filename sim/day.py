@@ -542,6 +542,49 @@ def read_practice():
     return dict(file=files[-1], day=data.get("day", files[-1][:-5]), items=out)
 
 
+def plain(text):
+    """本地写的说明是给工程看的：去掉括号里的文件名、提到程序的句子，留下花然自己能说的话。"""
+    import re
+    text = re.sub(r"（[^（）]*[/.][^（）]*）", "", text)
+    parts = [x for x in re.split(r"(?<=。)", text) if x.strip() and not re.search(r"[a-z_]+\.(py|json|md)|day\.py|默认", x)]
+    text = "".join(parts).strip()
+    for k, v in (("发热没算在这里：", ""), ("这份策略", "这种走法"), ("脚踝侧摆估算", "脚踝估计"), ("估算", "估计")):
+        text = text.replace(k, v)
+    return text
+
+
+def plain_check(name):
+    if "发热" in name or "°C" in name:
+        return "连续走 10 分钟会不会太热"
+    if "转速" in name or "扭矩" in name:
+        return "关节转得多快、膝盖用多大力"
+    return name
+
+
+def practice_sentence(it):
+    """花然自己的话：练了什么、练得怎么样、还差什么。"""
+    sp = it["numbers"].get("speeds") or it["numbers"].get("speeds_cm_s") or {}
+    s = f"「{it['text']}」：在育苗人的电脑上练过了。"
+    if sp:
+        top = max(sp.items(), key=lambda kv: float(kv[0]))
+        s += f"练出来的走法能走到每秒 {float(top[1]):.0f} 厘米（我白天走路每秒只有 1 厘米多）。"
+    st = it["status"]
+    if st == "练成了":
+        s += "所有的检查都过了，算**练成了**。" + ("但我白天还没用上它，要育苗人决定什么时候换。" if not used_today(it["skill"]) else "今天白天用的就是它。")
+    elif st == "没量完":
+        s += "但还不能算练成，有几样还没量：" + "、".join(plain_check(x) for x in it["unmeasured"]) + "。"
+    elif st == "还没过关":
+        s += "还没过关，没过的是：" + "、".join(plain_check(x) for x in it["failed"]) + "。"
+    else:
+        s += f"结果是：{st}。"
+    c = plain(it["caveat"])
+    if c:
+        s += "练的人还说：" + c
+    if st != "练成了" or not used_today(it["skill"]):
+        s += "所以我白天还是用原来的走法。" if it["skill"] == "走路" else ""
+    return s
+
+
 def used_today(skill):
     """这项技能白天用的是不是本地练出来的那一版。"""
     return (skill == "起身" and GETUP_TAG == "rl") or (skill == "走路" and WALK_TAG == "rl")
@@ -561,16 +604,7 @@ def practice_lines(pr):
         if seen.get(key) == [pr["file"], it["status"]]:
             continue
         seen[key] = [pr["file"], it["status"]]
-        s = f"「{it['text']}」（{it['skill'] or '没有对应的技能'}）：在育苗人的电脑上练过，结果是**{it['status']}**。"
-        if it["status"] == "练成了":
-            s += "我白天还没用上它。" if not used_today(it["skill"]) else "今天白天用的就是它。"
-        if it["failed"]:
-            s += "没过的：" + "、".join(it["failed"]) + "。"
-        if it["unmeasured"]:
-            s += "还没量的：" + "、".join(it["unmeasured"]) + "。"
-        if it["caveat"]:
-            s += "要注意：" + it["caveat"]
-        lines.append(s)
+        lines.append(practice_sentence(it))
     json.dump(seen, open(seen_p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return lines, notes
 
@@ -600,7 +634,7 @@ def sleep(body, results):
     if row not in s:
         s = s.rstrip("\n") + "\n" + row + "\n"
     open(p, "w", encoding="utf-8").write(s)
-    changes.append("技能·起身：加了一条失败的尝试记录")
+    changes.append("技能·起身：加了一条尝试记录（" + ("成功" if results["getup"]["ok"] else "失败") + "）")
     # 身体史：过热
     p = os.path.join(MEM, "body", "history.md")
     s = open(p, encoding="utf-8").read()
