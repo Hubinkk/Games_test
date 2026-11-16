@@ -46,7 +46,7 @@
               <body name="head" pos="0 0 0.006">
                 <joint name="neck_pitch" axis="0 1 0" range="-0.7 0.6" class="small" />
                 <joint name="neck_roll" axis="1 0 0" range="-0.45 0.45" class="small" />
-                <geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.32" rgba="0.95 0.85 0.79 1" />
+                <geom name="head" type="sphere" pos="0 0 0.044" size="0.046" mass="0.32" priority="1" friction="0.7 0.02 0.001" rgba="0.95 0.85 0.79 1" />
                 <geom class="vis" type="ellipsoid" pos="-0.008 0 0.05" size="0.05 0.051 0.048" rgba="0.72 0.7 0.85 1" />
                 <geom class="vis" type="ellipsoid" pos="0.041 0.016 0.037" size="0.004 0.008 0.01" rgba="0.45 0.38 0.8 1" />
                 <geom class="vis" type="ellipsoid" pos="0.041 -0.016 0.037" size="0.004 0.008 0.01" rgba="0.45 0.38 0.8 1" />

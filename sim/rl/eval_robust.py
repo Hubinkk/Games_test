@@ -23,6 +23,8 @@
     --mirror          转右时不用 ref_getup_turnR.json，而是把"转左"整条左右镜像：参考动作镜像（l/r 对调、横滚/偏航取反），
                       策略看到的观测也镜像、给出的动作再镜像回来（策略以为自己在转左）。见 mirror_lr.py
     --trace           每 0.1 秒记一行（脖子目标/实际/出力、身体横滚、头着地点），写进结果
+    （2026-11-17）--face 时另记"压到眼睛范围"：压力 > 0.5 N、着地点离某只眼睛中心 < 17.7°（定义和 ../head_contact.py 一样），
+                      每次的 eye_s（秒）、eye_peak_N（最大力）、eye_slide_cm（压着眼睛时在地上拖的距离）、eye_nearest_deg（着地点离眼睛最近几度）
 """
 import json
 import math
@@ -110,6 +112,11 @@ def run(args):
         f6 = np.zeros(6)
         n_on, n_face = 0, 0
         face_bins = np.zeros(40)                 # 脸着地的时间按 0.5 秒分段（秒）
+        # 压到眼睛范围（2026-11-17 加，定义照搬 ../head_contact.py）：压力 > 0.5 N、着地点离某只眼睛中心 < EYE_HALF_DEG（17.7°）
+        from head_contact import EYE, EYE_HALF_DEG
+        n_eye, eye_peak, eye_slide, eye_near, eye_peak_t = 0, 0.0, 0.0, 180.0, None
+        eye_bins = np.zeros(200)                 # 压到眼睛的时间按 0.1 秒分段（秒）
+        v6 = np.zeros(6)
     trace = [] if opt.get("trace") else None
     if trace is not None:
         ny = names.index("neck_yaw")
@@ -144,6 +151,17 @@ def run(args):
                             if u[0] / max(np.linalg.norm(u), 1e-9) > math.cos(math.radians(45)):
                                 n_face += 1
                                 face_bins[min(int(d.time / 0.5), 39)] += m.opt.timestep
+                            un = u / max(np.linalg.norm(u), 1e-9)
+                            eye_ang = min(math.degrees(math.acos(float(np.clip(un @ e, -1, 1)))) for e in EYE)   # 别叫 ang：ang 是推的方向
+                            eye_near = min(eye_near, eye_ang)
+                            if eye_ang < EYE_HALF_DEG:
+                                mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_GEOM, hg_, v6, 0)
+                                vp = v6[3:] + np.cross(v6[:3], con.pos - d.geom_xpos[hg_])
+                                n_eye += 1
+                                eye_bins[min(int(d.time / 0.1), 199)] += m.opt.timestep
+                                if f6[0] > eye_peak:
+                                    eye_peak, eye_peak_t = float(f6[0]), float(d.time)
+                                eye_slide += float(np.linalg.norm(vp[:2])) * m.opt.timestep
         last = a
         if trace is not None and t % 5 == 4 and t < 200:
             R = d.xmat[pel].reshape(3, 3)
@@ -181,7 +199,11 @@ def run(args):
     if face:
         out.update(head_contact_s=round(n_on * m.opt.timestep, 2), face_s=round(n_face * m.opt.timestep, 3),
                    face_share=round(n_face / max(n_on, 1), 3),
-                   face_when={f"{i * 0.5:g}": round(float(v), 2) for i, v in enumerate(face_bins) if v > 0})
+                   face_when={f"{i * 0.5:g}": round(float(v), 2) for i, v in enumerate(face_bins) if v > 0},
+                   eye_s=round(n_eye * m.opt.timestep, 3), eye_peak_N=round(eye_peak, 1),
+                   eye_peak_t=None if eye_peak_t is None else round(eye_peak_t, 3), eye_slide_cm=round(eye_slide * 100, 2),
+                   eye_nearest_deg=round(eye_near),
+                   eye_when={f"{i * 0.1:.1f}": round(float(v), 3) for i, v in enumerate(eye_bins) if v > 0})
     return out
 
 
@@ -214,6 +236,9 @@ def main():
             if rs and "face_share" in rs[0]:
                 on = sum(r["head_contact_s"] for r in rs)
                 fs = f"  头着地 {on / len(rs):.2f} 秒/次，落在脸上 {sum(r['face_s'] for r in rs) / max(on, 1e-9):.1%}（最多的一次 {max(r['face_share'] for r in rs):.0%}）"
+                fs += (f"  压到眼睛 {sum(r['eye_s'] for r in rs) / len(rs):.3f} 秒/次（最多 {max(r['eye_s'] for r in rs):.3f}），"
+                       f"最大力 平均 {sum(r['eye_peak_N'] for r in rs) / len(rs):.1f} N、最坏 {max(r['eye_peak_N'] for r in rs):.1f} N，"
+                       f"{sum(r['eye_s'] > 0 for r in rs)}/{len(rs)} 次压到")
             print((f"转向{'左' if sd == 'L' else '右'}、" if sd else "") + f"地面摩擦 {f}" + (f"、头 {head}" if head is not None else "")
                   + f"：{ok}/{len(rs)} 次站起来" + fs + (f"  失败：{fails}" if fails else ""), flush=True)
     print(f"合计 {total}/{len(res)}（起始姿势随机偏 ±0.05 弧度" + ("，脖子和身体也随机偏" if opt["vary"] else "")
