@@ -7,10 +7,10 @@
    "source": "技能：走路；来自 2026-11-16 的日记；本地 2026-11-17：没量完",
    "skill": "走路",
    "status": "还没过关",
-   "policy": "sim/rl/walk_policy_w3b_30M.npz（3000 万步）",
+   "policy": "sim/rl/walk_policy_n1117b_51M.npz（5100 万步）",
    "policy_detail": {
-    "file": "sim/rl/walk_policy_w3b_30M.npz",
-    "steps": 30000000,
+    "file": "sim/rl/walk_policy_n1117b_51M.npz",
+    "steps": 51000000,
     "in_use": false,
     "note": "夜里练出来的候选，没有换上"
    },
@@ -18,20 +18,20 @@
    "mujoco": "3.17.0",
    "numbers": {
     "no_fall_basic_falls": 0,
-    "speed15_cm_s": 14.27,
-    "back8_cm_s": 8.35,
-    "drift_cm": 1.57,
+    "speed15_cm_s": 14.33,
+    "back8_cm_s": 7.35,
+    "drift_cm": 0.97,
     "stand_push8_falls": 0,
-    "stand_push12_falls": 1,
+    "stand_push12_falls": 3,
     "walk_push12_falls": 0,
     "turn_falls": 0,
-    "fast20_cm_s": 22.79,
-    "joint_normal_max_rad_s": 10.47,
-    "joint_push_max_rad_s": 14.31,
+    "fast20_cm_s": 23.86,
+    "joint_normal_max_rad_s": 10.22,
+    "joint_push_max_rad_s": 16.78,
     "goto_failed_runs": 0,
     "goto_push5_failed_runs": 0,
-    "goto_push5_upper_failed_runs": 6,
-    "heat_max_10min_C": 63.7
+    "goto_push5_upper_failed_runs": 5,
+    "heat_max_10min_C": 68.9
    },
    "checks": [
     {
@@ -47,12 +47,12 @@
     {
      "name": "后退指令 8 cm/s 实际 ≥ 7",
      "ok": true,
-     "note": "后退 8.3–9.5 cm/s"
+     "note": "后退 7.4–8.2 cm/s"
     },
     {
      "name": "停下后最后 2 秒挪动平均 < 1 cm（上身动时 < 2 cm）",
      "ok": true,
-     "note": "停下后最后 2 秒挪 hold 0.4 cm，upper 1.3 cm，smooth 1.6 cm（每种地面平均里最大的）"
+     "note": "停下后最后 2 秒挪 hold 0.1 cm，upper 1.0 cm，smooth 0.6 cm（每种地面平均里最大的）"
     },
     {
      "name": "站着被推 8 N 全过",
@@ -62,7 +62,7 @@
     {
      "name": "站着被推 12 N 过一半以上",
      "ok": true,
-     "note": "23/24 没摔"
+     "note": "21/24 没摔"
     },
     {
      "name": "走着被推 12 N 过一半以上",
@@ -81,13 +81,13 @@
     },
     {
      "name": "\"去那里\"推 5 N + 上身随意摆 ≥ 43/48",
-     "ok": false,
-     "note": "42/48 到了并停住；没成的 6 次里摔 0 次，其余是停不住（离目标 0.4–5.2 cm）"
+     "ok": true,
+     "note": "43/48 到了并停住；没成的 5 次里摔 0 次，其余是停不住（离目标 1.9–8.1 cm）"
     },
     {
      "name": "发热：连续走 10 分钟，任何电机不超过 70 °C",
      "ok": true,
-     "note": "连续走 10 分钟最热的是右脚踝 63.7 °C（day.py 热模型，估算，只算腿上 12 个电机）"
+     "note": "连续走 10 分钟最热的是右脚踝 68.9 °C（day.py 热模型，估算，只算腿上 12 个电机）"
     },
     {
      "name": "原地转身 90°（原地转不摔、转速 > 0.2 rad/s）",
@@ -97,24 +97,24 @@
     {
      "name": "走到 20 cm/s 以上（快走实际）",
      "ok": true,
-     "note": "指令 25 实际 22.8–23.1 cm/s"
+     "note": "指令 25 实际 23.9–24.2 cm/s"
     },
     {
      "name": "关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m（正常走）",
      "ok": false,
-     "note": "转速最大 10.47 rad/s（r_knee，快走），膝盖最大 2.8 N·m；超的 20/575 次（快走、走+推12N、走+推5N、走+推8N、走停）"
+     "note": "转速最大 10.22 rad/s（r_knee，快走），膝盖最大 2.8 N·m；超的 6/573 次（快走、走停）"
     },
     {
      "name": "关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m（被推后 1 秒内）",
      "ok": false,
-     "note": "转速最大 14.31 rad/s（r_hip_pitch，站+推12N），膝盖最大 2.8 N·m；超的 25/287 次（站+推12N、站+推8N、走+推12N、走+推5N）"
+     "note": "转速最大 16.78 rad/s（l_hip_pitch，站+推12N），膝盖最大 2.8 N·m；超的 21/285 次（站+推12N、站+推8N、走+推12N、走+推5N）"
     }
    ],
-   "caveat": "这是夜里练出来的候选（第 1 次尝试，旋钮 {'effort': 0.08, 'stop': 20.0, 'push': 12.0, 'lr': 0.0002}），白天在用的 walk_policy.npz 没有换。这一夜停在：尝试次数用完（1 次）。下一次本来会这样改：\n规则 stop（goto_push5_upper 没过）：停下后挪动没过，或\"去那里\"没过而且是停不住（没摔、离目标不远但还在挪）→ 指令为零时动的扣分从 0 到 20，再不过加倍；stop 20.0 → 40.0\n没有规则管的没过项（这次不动，留给人看）：joint_normal、joint_push",
-   "candidate": "sim/rl/walk_policy_w3b_30M.npz",
+   "caveat": "这是夜里练出来的候选（第 2 次尝试，旋钮 {'effort': 0.08, 'stop': 40.0, 'push': 12.0, 'lr': 0.0002}），白天在用的 walk_policy.npz 没有换。这一夜停在：没有对应的规则，交给人：没过的是 关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m（正常走）、关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m（被推后 1 秒内）",
+   "candidate": "sim/rl/walk_policy_n1117b_51M.npz",
    "night_loop": {
-    "attempts": 1,
-    "stop": "尝试次数用完（1 次）。下一次本来会这样改：\n规则 stop（goto_push5_upper 没过）：停下后挪动没过，或\"去那里\"没过而且是停不住（没摔、离目标不远但还在挪）→ 指令为零时动的扣分从 0 到 20，再不过加倍；stop 20.0 → 40.0\n没有规则管的没过项（这次不动，留给人看）：joint_normal、joint_push",
+    "attempts": 2,
+    "stop": "没有对应的规则，交给人：没过的是 关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m（正常走）、关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m（被推后 1 秒内）",
     "log": "practice-results/2026-11-17-log.md"
    }
   }

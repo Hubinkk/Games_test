@@ -1,0 +1,146 @@
+[
+ {
+  "steps": 0,
+  "minutes": 3.2,
+  "reward": 51.25,
+  "seconds": 19.9,
+  "err_cm_s": 6.3,
+  "werr": 0.24,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 3440640,
+  "minutes": 8.1,
+  "reward": 52.06,
+  "seconds": 19.9,
+  "err_cm_s": 6.1,
+  "werr": 0.24,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 6881280,
+  "minutes": 11.3,
+  "reward": 51.28,
+  "seconds": 19.9,
+  "err_cm_s": 6.4,
+  "werr": 0.24,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 10321920,
+  "minutes": 14.6,
+  "reward": 51.89,
+  "seconds": 19.9,
+  "err_cm_s": 6.2,
+  "werr": 0.24,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 13762560,
+  "minutes": 17.8,
+  "reward": 51.94,
+  "seconds": 20.0,
+  "err_cm_s": 6.1,
+  "werr": 0.24,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 17203200,
+  "minutes": 21.1,
+  "reward": 51.44,
+  "seconds": 19.7,
+  "err_cm_s": 6.3,
+  "werr": 0.23,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 20643840,
+  "minutes": 24.4,
+  "reward": 52.74,
+  "seconds": 19.9,
+  "err_cm_s": 6.0,
+  "werr": 0.23,
+  "lift_cm": 1.0
+ },
+ {
+  "steps": 24084480,
+  "minutes": 27.7,
+  "reward": 51.92,
+  "seconds": 19.9,
+  "err_cm_s": 6.2,
+  "werr": 0.23,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 27525120,
+  "minutes": 30.9,
+  "reward": 51.31,
+  "seconds": 19.8,
+  "err_cm_s": 6.4,
+  "werr": 0.24,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 30965760,
+  "minutes": 34.2,
+  "reward": 51.83,
+  "seconds": 19.9,
+  "err_cm_s": 6.4,
+  "werr": 0.24,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 34406400,
+  "minutes": 37.5,
+  "reward": 51.89,
+  "seconds": 19.8,
+  "err_cm_s": 6.3,
+  "werr": 0.23,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 37847040,
+  "minutes": 40.8,
+  "reward": 52.71,
+  "seconds": 19.9,
+  "err_cm_s": 6.2,
+  "werr": 0.23,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 41287680,
+  "minutes": 44.1,
+  "reward": 52.03,
+  "seconds": 19.9,
+  "err_cm_s": 6.3,
+  "werr": 0.23,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 44728320,
+  "minutes": 47.4,
+  "reward": 53.0,
+  "seconds": 19.9,
+  "err_cm_s": 6.1,
+  "werr": 0.22,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 48168960,
+  "minutes": 50.7,
+  "reward": 53.2,
+  "seconds": 20.0,
+  "err_cm_s": 6.0,
+  "werr": 0.22,
+  "lift_cm": 0.9
+ },
+ {
+  "steps": 51609600,
+  "minutes": 53.9,
+  "reward": 52.82,
+  "seconds": 20.0,
+  "err_cm_s": 6.1,
+  "werr": 0.22,
+  "lift_cm": 0.9
+ }
+]
