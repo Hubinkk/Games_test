@@ -78,6 +78,7 @@ def mujoco_version(*jsons):
 
 
 HEAT_LIMIT = 70.0          # 身体地图"太热"那条线；技能卡片的回归测试：连续走 10 分钟任何电机不超过它
+PUSH_EXEMPT = "被推后 1 秒内的转速已豁免：外力带动，用户 2026-11-17 决定；只记录，不算不过关"
 
 
 def heat_result(name):
@@ -166,16 +167,20 @@ def walk_check(name=None):
             numbers["max_knee_torque_Nm"][k] = kv
             over_q = [r for r in rs if r["qvel_max"][k][0] > 10.0]
             over_k = [r for r in rs if r["knee_Nm_max"][k] > 2.8]
-            ok_sk = ok_sk and not over_q and not over_k
+            # 被推后 1 秒内的转速只记录、不算不过关（外力带动；用户 2026-11-17 决定）。膝盖扭矩照样算
+            ok_sk = ok_sk and (k == "push" or not over_q) and not over_k
             s = f"{label}：转速最大 {qv} rad/s（{q['qvel_max'][k][1]}，{q['test']}），膝盖扭矩最大 {kv} N·m（{kn['test']}）"
             if over_q:
                 tests = sorted({r["test"] for r in over_q})
                 s += f"；转速超过 10 的有 {len(over_q)}/{len(rs)} 次（{'、'.join(tests)}），最多超 {qv - 10:.1f} rad/s"
+            if k == "push":
+                s += f"（{PUSH_EXEMPT}）"
+                numbers["joint_speed_push_exempt"] = PUSH_EXEMPT
             if over_k:
                 tests = sorted({r["test"] for r in over_k})
                 s += f"；膝盖超过 2.8 的有 {len(over_k)}/{len(rs)} 次（{'、'.join(tests)}），最多超 {kv - 2.8:.2f} N·m"
             parts.append(s)
-        checks.append(("关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m", ok_sk,
+        checks.append(("关节转速不超过 10 rad/s（被推后 1 秒内只记录），膝盖扭矩不超过 2.8 N·m", ok_sk,
                        "；".join(parts) + f"。只算没摔的 {len(stand)} 次，每个小步（0.5 ms）都看。"))
 
     # 发热：连续走 10 分钟，任何电机不超过 70 °C

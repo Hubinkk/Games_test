@@ -1,0 +1,7246 @@
+{
+ "policy": "walk_policy_w2_81M.npz",
+ "body": "full",
+ "mujoco": "3.17.0",
+ "trials": 8,
+ "opts": {
+  "hold": true,
+  "upper": false,
+  "reflex": false,
+  "smooth": true
+ },
+ "runs": [
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1536,
+     "vy": 0.0144,
+     "wz": 0.005
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0074,
+     "vy": -0.0006,
+     "wz": -0.008,
+     "drift_cm": 1.26
+    }
+   ],
+   "lift_cm": 2.47,
+   "heading_deg": -4.6,
+   "qvel_max": {
+    "normal": [
+     9.9,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1602,
+     "vy": -0.0033,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0099,
+     "vy": -0.0067,
+     "wz": -0.06,
+     "drift_cm": 2.88
+    }
+   ],
+   "lift_cm": 2.47,
+   "heading_deg": -19.5,
+   "qvel_max": {
+    "normal": [
+     9.86,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1566,
+     "vy": 0.0059,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0054,
+     "vy": -0.0045,
+     "wz": -0.12,
+     "drift_cm": 1.73
+    }
+   ],
+   "lift_cm": 2.45,
+   "heading_deg": -28.8,
+   "qvel_max": {
+    "normal": [
+     10.03,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1581,
+     "vy": 0.0005,
+     "wz": 0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0018,
+     "vy": -0.0084,
+     "wz": -0.085,
+     "drift_cm": 1.5
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": -18.3,
+   "qvel_max": {
+    "normal": [
+     9.55,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1624,
+     "vy": -0.0,
+     "wz": 0.002
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0066,
+     "vy": 0.0024,
+     "wz": -0.04,
+     "drift_cm": 1.75
+    }
+   ],
+   "lift_cm": 2.44,
+   "heading_deg": -17.4,
+   "qvel_max": {
+    "normal": [
+     9.59,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1734,
+     "vy": -0.0048,
+     "wz": 0.011
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0062,
+     "vy": 0.004,
+     "wz": -0.107,
+     "drift_cm": 1.52
+    }
+   ],
+   "lift_cm": 2.45,
+   "heading_deg": -22.3,
+   "qvel_max": {
+    "normal": [
+     9.84,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1683,
+     "vy": -0.0039,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0091,
+     "vy": -0.0072,
+     "wz": -0.085,
+     "drift_cm": 2.35
+    }
+   ],
+   "lift_cm": 2.44,
+   "heading_deg": -16.0,
+   "qvel_max": {
+    "normal": [
+     9.61,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1527,
+     "vy": 0.0076,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0015,
+     "vy": -0.0006,
+     "wz": -0.044,
+     "drift_cm": 0.23
+    }
+   ],
+   "lift_cm": 2.43,
+   "heading_deg": -17.6,
+   "qvel_max": {
+    "normal": [
+     9.65,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.174,
+     "vy": -0.0012,
+     "wz": -0.021
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.004,
+     "vy": -0.004,
+     "wz": -0.027,
+     "drift_cm": 1.02
+    }
+   ],
+   "lift_cm": 2.4,
+   "heading_deg": 4.0,
+   "qvel_max": {
+    "normal": [
+     10.16,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1695,
+     "vy": 0.003,
+     "wz": 0.009
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0032,
+     "vy": -0.0065,
+     "wz": -0.034,
+     "drift_cm": 2.16
+    }
+   ],
+   "lift_cm": 2.46,
+   "heading_deg": 2.1,
+   "qvel_max": {
+    "normal": [
+     10.4,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1518,
+     "vy": -0.0001,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0009,
+     "vy": -0.0061,
+     "wz": -0.102,
+     "drift_cm": 0.92
+    }
+   ],
+   "lift_cm": 2.42,
+   "heading_deg": -22.2,
+   "qvel_max": {
+    "normal": [
+     9.68,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1514,
+     "vy": 0.0026,
+     "wz": -0.002
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0051,
+     "vy": -0.0002,
+     "wz": -0.074,
+     "drift_cm": 0.87
+    }
+   ],
+   "lift_cm": 2.44,
+   "heading_deg": -17.2,
+   "qvel_max": {
+    "normal": [
+     9.41,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1646,
+     "vy": 0.0015,
+     "wz": -0.0
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0097,
+     "vy": -0.0052,
+     "wz": -0.076,
+     "drift_cm": 1.72
+    }
+   ],
+   "lift_cm": 2.38,
+   "heading_deg": -20.6,
+   "qvel_max": {
+    "normal": [
+     10.15,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1496,
+     "vy": 0.001,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0114,
+     "vy": 0.0007,
+     "wz": -0.034,
+     "drift_cm": 2.36
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": -10.4,
+   "qvel_max": {
+    "normal": [
+     9.5,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.152,
+     "vy": 0.0004,
+     "wz": -0.004
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0011,
+     "vy": -0.0043,
+     "wz": -0.052,
+     "drift_cm": 0.88
+    }
+   ],
+   "lift_cm": 2.44,
+   "heading_deg": -14.7,
+   "qvel_max": {
+    "normal": [
+     9.13,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1505,
+     "vy": 0.0024,
+     "wz": 0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0015,
+     "vy": -0.0033,
+     "wz": -0.062,
+     "drift_cm": 0.46
+    }
+   ],
+   "lift_cm": 2.41,
+   "heading_deg": -20.9,
+   "qvel_max": {
+    "normal": [
+     9.12,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1679,
+     "vy": 0.0063,
+     "wz": 0.002
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0066,
+     "vy": 0.0026,
+     "wz": -0.057,
+     "drift_cm": 0.95
+    }
+   ],
+   "lift_cm": 2.44,
+   "heading_deg": -13.4,
+   "qvel_max": {
+    "normal": [
+     10.63,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1622,
+     "vy": -0.0008,
+     "wz": -0.007
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0009,
+     "vy": -0.0016,
+     "wz": -0.058,
+     "drift_cm": 0.81
+    }
+   ],
+   "lift_cm": 2.38,
+   "heading_deg": -22.2,
+   "qvel_max": {
+    "normal": [
+     10.01,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1598,
+     "vy": 0.0048,
+     "wz": -0.004
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.002,
+     "vy": 0.0025,
+     "wz": -0.046,
+     "drift_cm": 0.76
+    }
+   ],
+   "lift_cm": 2.45,
+   "heading_deg": -20.1,
+   "qvel_max": {
+    "normal": [
+     9.52,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1621,
+     "vy": -0.0027,
+     "wz": 0.001
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0192,
+     "vy": -0.0037,
+     "wz": -0.083,
+     "drift_cm": 4.57
+    }
+   ],
+   "lift_cm": 2.48,
+   "heading_deg": -21.9,
+   "qvel_max": {
+    "normal": [
+     10.1,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1805,
+     "vy": -0.0005,
+     "wz": -0.007
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0342,
+     "vy": 0.0028,
+     "wz": -0.048,
+     "drift_cm": 5.22
+    }
+   ],
+   "lift_cm": 2.43,
+   "heading_deg": -9.1,
+   "qvel_max": {
+    "normal": [
+     10.28,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1524,
+     "vy": -0.0022,
+     "wz": -0.004
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.001,
+     "vy": -0.0011,
+     "wz": -0.076,
+     "drift_cm": 0.9
+    }
+   ],
+   "lift_cm": 2.39,
+   "heading_deg": -20.0,
+   "qvel_max": {
+    "normal": [
+     9.28,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1667,
+     "vy": -0.0014,
+     "wz": -0.005
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0077,
+     "vy": -0.0047,
+     "wz": -0.078,
+     "drift_cm": 2.04
+    }
+   ],
+   "lift_cm": 2.44,
+   "heading_deg": -17.2,
+   "qvel_max": {
+    "normal": [
+     10.48,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走停",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1507,
+     "vy": 0.0029,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0022,
+     "vy": -0.0028,
+     "wz": -0.093,
+     "drift_cm": 0.65
+    }
+   ],
+   "lift_cm": 2.47,
+   "heading_deg": -20.6,
+   "qvel_max": {
+    "normal": [
+     9.34,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1546,
+     "vy": 0.0129,
+     "wz": 0.006
+    }
+   ],
+   "lift_cm": 2.5,
+   "heading_deg": -0.2,
+   "qvel_max": {
+    "normal": [
+     9.9,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.19,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.8,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1718,
+     "vy": -0.0132,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.51,
+   "heading_deg": -1.5,
+   "qvel_max": {
+    "normal": [
+     9.78,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.57,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.5,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1692,
+     "vy": 0.0089,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -3.6,
+   "qvel_max": {
+    "normal": [
+     10.03,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     10.71,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1619,
+     "vy": -0.0067,
+     "wz": 0.004
+    }
+   ],
+   "lift_cm": 2.43,
+   "heading_deg": -1.7,
+   "qvel_max": {
+    "normal": [
+     9.33,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.15,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.8,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1652,
+     "vy": 0.0037,
+     "wz": 0.004
+    }
+   ],
+   "lift_cm": 2.51,
+   "heading_deg": -2.2,
+   "qvel_max": {
+    "normal": [
+     9.59,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.34,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.639
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.6,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1833,
+     "vy": -0.0012,
+     "wz": 0.012
+    }
+   ],
+   "lift_cm": 2.52,
+   "heading_deg": 0.7,
+   "qvel_max": {
+    "normal": [
+     9.66,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.54,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1677,
+     "vy": 0.0004,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.5,
+   "heading_deg": -3.6,
+   "qvel_max": {
+    "normal": [
+     9.61,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.6,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1543,
+     "vy": 0.0173,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.52,
+   "heading_deg": -2.2,
+   "qvel_max": {
+    "normal": [
+     9.65,
+     "r_knee"
+    ],
+    "push": [
+     9.13,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1717,
+     "vy": -0.0024,
+     "wz": -0.02
+    }
+   ],
+   "lift_cm": 2.48,
+   "heading_deg": -4.8,
+   "qvel_max": {
+    "normal": [
+     10.16,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     8.39,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1683,
+     "vy": 0.0122,
+     "wz": 0.008
+    }
+   ],
+   "lift_cm": 2.51,
+   "heading_deg": 4.3,
+   "qvel_max": {
+    "normal": [
+     10.44,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.31,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1487,
+     "vy": 0.0007,
+     "wz": -0.004
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -3.1,
+   "qvel_max": {
+    "normal": [
+     9.68,
+     "l_knee"
+    ],
+    "push": [
+     9.18,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1481,
+     "vy": 0.0059,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.52,
+   "heading_deg": -4.0,
+   "qvel_max": {
+    "normal": [
+     9.34,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.34,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1778,
+     "vy": -0.0107,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.47,
+   "heading_deg": -2.6,
+   "qvel_max": {
+    "normal": [
+     10.15,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.69,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1495,
+     "vy": 0.0077,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.48,
+   "heading_deg": -4.5,
+   "qvel_max": {
+    "normal": [
+     9.5,
+     "l_knee"
+    ],
+    "push": [
+     9.62,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1606,
+     "vy": -0.0026,
+     "wz": -0.005
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -3.3,
+   "qvel_max": {
+    "normal": [
+     9.13,
+     "l_knee"
+    ],
+    "push": [
+     9.79,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1566,
+     "vy": 0.001,
+     "wz": 0.001
+    }
+   ],
+   "lift_cm": 2.45,
+   "heading_deg": -2.1,
+   "qvel_max": {
+    "normal": [
+     8.91,
+     "l_knee"
+    ],
+    "push": [
+     9.83,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1628,
+     "vy": 0.0164,
+     "wz": 0.0
+    }
+   ],
+   "lift_cm": 2.5,
+   "heading_deg": -2.5,
+   "qvel_max": {
+    "normal": [
+     10.63,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     8.45,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1569,
+     "vy": -0.0038,
+     "wz": -0.006
+    }
+   ],
+   "lift_cm": 2.45,
+   "heading_deg": -3.2,
+   "qvel_max": {
+    "normal": [
+     10.01,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     8.79,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1542,
+     "vy": 0.0144,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.52,
+   "heading_deg": -3.0,
+   "qvel_max": {
+    "normal": [
+     9.52,
+     "l_knee"
+    ],
+    "push": [
+     9.05,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1648,
+     "vy": -0.0114,
+     "wz": 0.001
+    }
+   ],
+   "lift_cm": 2.53,
+   "heading_deg": -4.7,
+   "qvel_max": {
+    "normal": [
+     10.1,
+     "r_knee"
+    ],
+    "push": [
+     9.09,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.736
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.5,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1773,
+     "vy": 0.0111,
+     "wz": -0.015
+    }
+   ],
+   "lift_cm": 2.48,
+   "heading_deg": -4.6,
+   "qvel_max": {
+    "normal": [
+     10.41,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.47,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1538,
+     "vy": -0.0121,
+     "wz": -0.004
+    }
+   ],
+   "lift_cm": 2.46,
+   "heading_deg": -3.9,
+   "qvel_max": {
+    "normal": [
+     9.34,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.43,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.5,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1661,
+     "vy": -0.0182,
+     "wz": -0.004
+    }
+   ],
+   "lift_cm": 2.5,
+   "heading_deg": -1.5,
+   "qvel_max": {
+    "normal": [
+     10.48,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.77,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推5N",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1526,
+     "vy": 0.0129,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.51,
+   "heading_deg": -3.6,
+   "qvel_max": {
+    "normal": [
+     9.34,
+     "l_knee"
+    ],
+    "push": [
+     9.72,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2647,
+     "vy": 0.0065,
+     "wz": 0.028
+    }
+   ],
+   "lift_cm": 2.57,
+   "heading_deg": 8.2,
+   "qvel_max": {
+    "normal": [
+     10.19,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2758,
+     "vy": -0.0047,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.62,
+   "heading_deg": -0.3,
+   "qvel_max": {
+    "normal": [
+     9.69,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2704,
+     "vy": 0.0027,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.61,
+   "heading_deg": -0.8,
+   "qvel_max": {
+    "normal": [
+     9.72,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2646,
+     "vy": 0.0002,
+     "wz": -0.024
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -1.9,
+   "qvel_max": {
+    "normal": [
+     10.21,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2754,
+     "vy": -0.0051,
+     "wz": 0.0
+    }
+   ],
+   "lift_cm": 2.57,
+   "heading_deg": -3.4,
+   "qvel_max": {
+    "normal": [
+     9.95,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2831,
+     "vy": -0.0053,
+     "wz": 0.005
+    }
+   ],
+   "lift_cm": 2.58,
+   "heading_deg": -3.9,
+   "qvel_max": {
+    "normal": [
+     9.81,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2764,
+     "vy": -0.0089,
+     "wz": -0.007
+    }
+   ],
+   "lift_cm": 2.53,
+   "heading_deg": -3.9,
+   "qvel_max": {
+    "normal": [
+     9.89,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2556,
+     "vy": 0.0076,
+     "wz": -0.008
+    }
+   ],
+   "lift_cm": 2.52,
+   "heading_deg": -2.0,
+   "qvel_max": {
+    "normal": [
+     9.05,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2811,
+     "vy": -0.0032,
+     "wz": -0.022
+    }
+   ],
+   "lift_cm": 2.53,
+   "heading_deg": 0.2,
+   "qvel_max": {
+    "normal": [
+     10.15,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2685,
+     "vy": -0.0045,
+     "wz": -0.009
+    }
+   ],
+   "lift_cm": 2.53,
+   "heading_deg": -2.0,
+   "qvel_max": {
+    "normal": [
+     9.93,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.251,
+     "vy": -0.0032,
+     "wz": -0.009
+    }
+   ],
+   "lift_cm": 2.53,
+   "heading_deg": -3.6,
+   "qvel_max": {
+    "normal": [
+     9.67,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2616,
+     "vy": 0.0022,
+     "wz": -0.006
+    }
+   ],
+   "lift_cm": 2.61,
+   "heading_deg": -4.1,
+   "qvel_max": {
+    "normal": [
+     9.76,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2762,
+     "vy": -0.0024,
+     "wz": -0.013
+    }
+   ],
+   "lift_cm": 2.59,
+   "heading_deg": -6.3,
+   "qvel_max": {
+    "normal": [
+     9.94,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2468,
+     "vy": -0.0069,
+     "wz": -0.01
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -4.9,
+   "qvel_max": {
+    "normal": [
+     9.28,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2558,
+     "vy": -0.0032,
+     "wz": -0.01
+    }
+   ],
+   "lift_cm": 2.5,
+   "heading_deg": -2.4,
+   "qvel_max": {
+    "normal": [
+     9.34,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2565,
+     "vy": 0.0009,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.5,
+   "heading_deg": -4.4,
+   "qvel_max": {
+    "normal": [
+     9.27,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2685,
+     "vy": 0.0002,
+     "wz": -0.005
+    }
+   ],
+   "lift_cm": 2.58,
+   "heading_deg": -4.5,
+   "qvel_max": {
+    "normal": [
+     10.71,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2626,
+     "vy": -0.0043,
+     "wz": -0.022
+    }
+   ],
+   "lift_cm": 2.5,
+   "heading_deg": -5.7,
+   "qvel_max": {
+    "normal": [
+     9.96,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2609,
+     "vy": -0.0003,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.57,
+   "heading_deg": -3.9,
+   "qvel_max": {
+    "normal": [
+     9.57,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2678,
+     "vy": -0.005,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.6,
+   "heading_deg": -5.9,
+   "qvel_max": {
+    "normal": [
+     10.32,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2846,
+     "vy": -0.0068,
+     "wz": -0.016
+    }
+   ],
+   "lift_cm": 2.54,
+   "heading_deg": -2.4,
+   "qvel_max": {
+    "normal": [
+     10.17,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2479,
+     "vy": -0.0049,
+     "wz": -0.006
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -4.6,
+   "qvel_max": {
+    "normal": [
+     9.09,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2841,
+     "vy": -0.0021,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.58,
+   "heading_deg": 0.1,
+   "qvel_max": {
+    "normal": [
+     9.97,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "快走",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0.25,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.2528,
+     "vy": -0.0,
+     "wz": -0.006
+    }
+   ],
+   "lift_cm": 2.59,
+   "heading_deg": -4.2,
+   "qvel_max": {
+    "normal": [
+     9.27,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.0021,
+     "vy": 0.0023,
+     "wz": 0.641
+    }
+   ],
+   "lift_cm": 2.28,
+   "heading_deg": 212.4,
+   "qvel_max": {
+    "normal": [
+     9.77,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.001,
+     "vy": -0.0058,
+     "wz": 0.598
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": 205.5,
+   "qvel_max": {
+    "normal": [
+     8.46,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.651
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0026,
+     "vy": 0.0043,
+     "wz": 0.596
+    }
+   ],
+   "lift_cm": 2.12,
+   "heading_deg": 202.7,
+   "qvel_max": {
+    "normal": [
+     9.12,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0034,
+     "vy": 0.0003,
+     "wz": 0.604
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": 204.2,
+   "qvel_max": {
+    "normal": [
+     8.92,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0111,
+     "vy": -0.0041,
+     "wz": 0.6
+    }
+   ],
+   "lift_cm": 2.12,
+   "heading_deg": 204.9,
+   "qvel_max": {
+    "normal": [
+     9.55,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0055,
+     "vy": -0.0003,
+     "wz": 0.598
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": 201.7,
+   "qvel_max": {
+    "normal": [
+     8.83,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.011,
+     "vy": -0.0019,
+     "wz": 0.59
+    }
+   ],
+   "lift_cm": 2.12,
+   "heading_deg": 203.0,
+   "qvel_max": {
+    "normal": [
+     9.58,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.008,
+     "vy": 0.0029,
+     "wz": 0.581
+    }
+   ],
+   "lift_cm": 2.21,
+   "heading_deg": 202.8,
+   "qvel_max": {
+    "normal": [
+     8.69,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.025,
+     "vy": 0.0042,
+     "wz": 0.611
+    }
+   ],
+   "lift_cm": 2.1,
+   "heading_deg": 210.5,
+   "qvel_max": {
+    "normal": [
+     10.07,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0056,
+     "vy": -0.0051,
+     "wz": 0.593
+    }
+   ],
+   "lift_cm": 2.18,
+   "heading_deg": 204.1,
+   "qvel_max": {
+    "normal": [
+     9.18,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0062,
+     "vy": -0.0045,
+     "wz": 0.602
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": 202.5,
+   "qvel_max": {
+    "normal": [
+     9.03,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.66
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.0007,
+     "vy": 0.0008,
+     "wz": 0.597
+    }
+   ],
+   "lift_cm": 2.09,
+   "heading_deg": 203.2,
+   "qvel_max": {
+    "normal": [
+     8.6,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.501
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0092,
+     "vy": 0.0033,
+     "wz": 0.599
+    }
+   ],
+   "lift_cm": 2.18,
+   "heading_deg": 203.0,
+   "qvel_max": {
+    "normal": [
+     9.61,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.777
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": -0.0043,
+     "vy": 0.0001,
+     "wz": 0.6
+    }
+   ],
+   "lift_cm": 2.18,
+   "heading_deg": 202.2,
+   "qvel_max": {
+    "normal": [
+     8.77,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0052,
+     "vy": -0.0073,
+     "wz": 0.602
+    }
+   ],
+   "lift_cm": 2.19,
+   "heading_deg": 204.5,
+   "qvel_max": {
+    "normal": [
+     8.71,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.002,
+     "vy": -0.0022,
+     "wz": 0.602
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": 204.7,
+   "qvel_max": {
+    "normal": [
+     9.56,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.666
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0156,
+     "vy": -0.0037,
+     "wz": 0.594
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": 203.1,
+   "qvel_max": {
+    "normal": [
+     9.86,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0056,
+     "vy": -0.0014,
+     "wz": 0.59
+    }
+   ],
+   "lift_cm": 2.16,
+   "heading_deg": 201.2,
+   "qvel_max": {
+    "normal": [
+     9.12,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0092,
+     "vy": -0.0021,
+     "wz": 0.609
+    }
+   ],
+   "lift_cm": 2.17,
+   "heading_deg": 205.3,
+   "qvel_max": {
+    "normal": [
+     8.98,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.004,
+     "vy": -0.0001,
+     "wz": 0.603
+    }
+   ],
+   "lift_cm": 2.19,
+   "heading_deg": 203.1,
+   "qvel_max": {
+    "normal": [
+     9.62,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0203,
+     "vy": -0.0077,
+     "wz": 0.602
+    }
+   ],
+   "lift_cm": 2.19,
+   "heading_deg": 204.1,
+   "qvel_max": {
+    "normal": [
+     9.07,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0002,
+     "vy": -0.006,
+     "wz": 0.594
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": 203.6,
+   "qvel_max": {
+    "normal": [
+     9.06,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0144,
+     "vy": -0.0027,
+     "wz": 0.603
+    }
+   ],
+   "lift_cm": 2.17,
+   "heading_deg": 203.3,
+   "qvel_max": {
+    "normal": [
+     9.4,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "原地转",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0.6
+     ],
+     "done": true,
+     "vx": 0.0044,
+     "vy": 0.0002,
+     "wz": 0.599
+    }
+   ],
+   "lift_cm": 2.11,
+   "heading_deg": 203.7,
+   "qvel_max": {
+    "normal": [
+     9.23,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.776
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0034,
+     "vy": 0.052,
+     "wz": -0.018
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.1365,
+     "vy": -0.0017,
+     "wz": -0.023
+    }
+   ],
+   "lift_cm": 2.19,
+   "heading_deg": -8.0,
+   "qvel_max": {
+    "normal": [
+     9.48,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0003,
+     "vy": 0.0432,
+     "wz": -0.01
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0703,
+     "vy": -0.0081,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": -1.9,
+   "qvel_max": {
+    "normal": [
+     9.77,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.618
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0027,
+     "vy": 0.0542,
+     "wz": -0.009
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0709,
+     "vy": -0.0031,
+     "wz": -0.008
+    }
+   ],
+   "lift_cm": 2.12,
+   "heading_deg": -5.8,
+   "qvel_max": {
+    "normal": [
+     9.0,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.7
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0033,
+     "vy": 0.0489,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0682,
+     "vy": -0.0015,
+     "wz": 0.01
+    }
+   ],
+   "lift_cm": 2.07,
+   "heading_deg": -3.1,
+   "qvel_max": {
+    "normal": [
+     9.34,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0081,
+     "vy": 0.0439,
+     "wz": -0.0
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0692,
+     "vy": -0.007,
+     "wz": -0.0
+    }
+   ],
+   "lift_cm": 2.09,
+   "heading_deg": -2.2,
+   "qvel_max": {
+    "normal": [
+     9.55,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0019,
+     "vy": 0.0475,
+     "wz": 0.009
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.067,
+     "vy": -0.0041,
+     "wz": -0.01
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": -3.1,
+   "qvel_max": {
+    "normal": [
+     9.55,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0114,
+     "vy": 0.0451,
+     "wz": 0.002
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0696,
+     "vy": -0.005,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.08,
+   "heading_deg": -4.7,
+   "qvel_max": {
+    "normal": [
+     9.29,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0106,
+     "vy": 0.0519,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.073,
+     "vy": 0.0011,
+     "wz": -0.003
+    }
+   ],
+   "lift_cm": 2.08,
+   "heading_deg": -3.8,
+   "qvel_max": {
+    "normal": [
+     9.4,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0175,
+     "vy": 0.0508,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0635,
+     "vy": -0.0016,
+     "wz": -0.032
+    }
+   ],
+   "lift_cm": 2.13,
+   "heading_deg": -7.6,
+   "qvel_max": {
+    "normal": [
+     9.72,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0008,
+     "vy": 0.0448,
+     "wz": -0.005
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0656,
+     "vy": -0.0024,
+     "wz": -0.015
+    }
+   ],
+   "lift_cm": 2.15,
+   "heading_deg": -4.1,
+   "qvel_max": {
+    "normal": [
+     9.1,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0043,
+     "vy": 0.0413,
+     "wz": 0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0621,
+     "vy": -0.0035,
+     "wz": -0.006
+    }
+   ],
+   "lift_cm": 2.04,
+   "heading_deg": -4.3,
+   "qvel_max": {
+    "normal": [
+     9.05,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.771
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0018,
+     "vy": 0.0486,
+     "wz": -0.006
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0699,
+     "vy": -0.0078,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.11,
+   "heading_deg": -3.7,
+   "qvel_max": {
+    "normal": [
+     9.22,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.629
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0097,
+     "vy": 0.0497,
+     "wz": 0.012
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0684,
+     "vy": 0.0004,
+     "wz": -0.014
+    }
+   ],
+   "lift_cm": 2.12,
+   "heading_deg": -6.0,
+   "qvel_max": {
+    "normal": [
+     9.82,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0038,
+     "vy": 0.0447,
+     "wz": 0.004
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0681,
+     "vy": -0.0041,
+     "wz": -0.009
+    }
+   ],
+   "lift_cm": 2.11,
+   "heading_deg": -5.3,
+   "qvel_max": {
+    "normal": [
+     9.03,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0017,
+     "vy": 0.0433,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0641,
+     "vy": -0.0044,
+     "wz": -0.004
+    }
+   ],
+   "lift_cm": 2.02,
+   "heading_deg": -4.0,
+   "qvel_max": {
+    "normal": [
+     9.12,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0005,
+     "vy": 0.0473,
+     "wz": -0.001
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0699,
+     "vy": -0.0043,
+     "wz": 0.006
+    }
+   ],
+   "lift_cm": 2.08,
+   "heading_deg": -2.9,
+   "qvel_max": {
+    "normal": [
+     9.27,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.011,
+     "vy": 0.0495,
+     "wz": 0.0
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0639,
+     "vy": -0.0046,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.1,
+   "heading_deg": -4.2,
+   "qvel_max": {
+    "normal": [
+     9.86,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0075,
+     "vy": 0.0425,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0866,
+     "vy": 0.002,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": -0.4,
+   "qvel_max": {
+    "normal": [
+     9.66,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0015,
+     "vy": 0.0477,
+     "wz": -0.007
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.064,
+     "vy": -0.0047,
+     "wz": -0.01
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": -3.7,
+   "qvel_max": {
+    "normal": [
+     9.61,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0026,
+     "vy": 0.0466,
+     "wz": -0.0
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0651,
+     "vy": -0.0034,
+     "wz": 0.004
+    }
+   ],
+   "lift_cm": 2.08,
+   "heading_deg": -4.2,
+   "qvel_max": {
+    "normal": [
+     9.77,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0351,
+     "vy": 0.0387,
+     "wz": -0.006
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0585,
+     "vy": -0.0037,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.17,
+   "heading_deg": -2.8,
+   "qvel_max": {
+    "normal": [
+     9.95,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": -0.0001,
+     "vy": 0.0435,
+     "wz": -0.003
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.068,
+     "vy": -0.0059,
+     "wz": -0.014
+    }
+   ],
+   "lift_cm": 2.01,
+   "heading_deg": -6.8,
+   "qvel_max": {
+    "normal": [
+     9.26,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0114,
+     "vy": 0.0441,
+     "wz": 0.007
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0725,
+     "vy": -0.0053,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.14,
+   "heading_deg": -2.7,
+   "qvel_max": {
+    "normal": [
+     9.37,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "侧移后退",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": null,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0.05,
+      0
+     ],
+     "done": true,
+     "vx": 0.0035,
+     "vy": 0.0471,
+     "wz": -0.005
+    },
+    {
+     "cmd": [
+      -0.08,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0655,
+     "vy": -0.0054,
+     "wz": -0.0
+    }
+   ],
+   "lift_cm": 2.1,
+   "heading_deg": -3.3,
+   "qvel_max": {
+    "normal": [
+     9.32,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8
+   }
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.16,
+     "vy": -0.0095,
+     "wz": -0.021
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -4.9,
+   "qvel_max": {
+    "normal": [
+     10.16,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.11,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1673,
+     "vy": 0.0283,
+     "wz": 0.006
+    }
+   ],
+   "lift_cm": 2.5,
+   "heading_deg": 3.2,
+   "qvel_max": {
+    "normal": [
+     10.31,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.26,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.129,
+     "vy": -0.0036,
+     "wz": -0.004
+    }
+   ],
+   "lift_cm": 2.48,
+   "heading_deg": -3.1,
+   "qvel_max": {
+    "normal": [
+     9.68,
+     "l_knee"
+    ],
+    "push": [
+     9.13,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1418,
+     "vy": 0.0046,
+     "wz": -0.001
+    }
+   ],
+   "lift_cm": 2.56,
+   "heading_deg": -3.8,
+   "qvel_max": {
+    "normal": [
+     9.34,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.36,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1812,
+     "vy": -0.0205,
+     "wz": 0.003
+    }
+   ],
+   "lift_cm": 2.45,
+   "heading_deg": -1.0,
+   "qvel_max": {
+    "normal": [
+     10.15,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.98,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1443,
+     "vy": 0.0251,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -4.8,
+   "qvel_max": {
+    "normal": [
+     9.5,
+     "l_knee"
+    ],
+    "push": [
+     9.69,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1712,
+     "vy": -0.0036,
+     "wz": -0.005
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -3.2,
+   "qvel_max": {
+    "normal": [
+     9.13,
+     "l_knee"
+    ],
+    "push": [
+     10.01,
+     "l_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推8N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1661,
+     "vy": -0.0002,
+     "wz": 0.001
+    }
+   ],
+   "lift_cm": 2.47,
+   "heading_deg": -2.6,
+   "qvel_max": {
+    "normal": [
+     8.93,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.61,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1446,
+     "vy": -0.0092,
+     "wz": -0.019
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -4.2,
+   "qvel_max": {
+    "normal": [
+     10.16,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     10.22,
+     "r_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1565,
+     "vy": 0.0475,
+     "wz": 0.007
+    }
+   ],
+   "lift_cm": 2.51,
+   "heading_deg": 3.9,
+   "qvel_max": {
+    "normal": [
+     10.28,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.35,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1152,
+     "vy": -0.005,
+     "wz": -0.004
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -3.2,
+   "qvel_max": {
+    "normal": [
+     9.68,
+     "l_knee"
+    ],
+    "push": [
+     11.33,
+     "r_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1259,
+     "vy": 0.0127,
+     "wz": 0.0
+    }
+   ],
+   "lift_cm": 2.56,
+   "heading_deg": -3.1,
+   "qvel_max": {
+    "normal": [
+     9.34,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.13,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.207,
+     "vy": -0.0285,
+     "wz": -0.004
+    }
+   ],
+   "lift_cm": 2.49,
+   "heading_deg": -4.3,
+   "qvel_max": {
+    "normal": [
+     10.15,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     10.81,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.131,
+     "vy": 0.0493,
+     "wz": -0.002
+    }
+   ],
+   "lift_cm": 2.53,
+   "heading_deg": -4.6,
+   "qvel_max": {
+    "normal": [
+     9.5,
+     "l_knee"
+    ],
+    "push": [
+     9.63,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1836,
+     "vy": -0.0073,
+     "wz": -0.005
+    }
+   ],
+   "lift_cm": 2.48,
+   "heading_deg": -3.3,
+   "qvel_max": {
+    "normal": [
+     9.13,
+     "l_knee"
+    ],
+    "push": [
+     10.28,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "走+推12N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0.15,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.1823,
+     "vy": -0.0081,
+     "wz": 0.001
+    }
+   ],
+   "lift_cm": 2.47,
+   "heading_deg": -2.1,
+   "qvel_max": {
+    "normal": [
+     8.98,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     11.89,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0187,
+     "vy": -0.0001,
+     "wz": -0.041,
+     "drift_cm": 9.33
+    }
+   ],
+   "lift_cm": 1.66,
+   "heading_deg": -18.3,
+   "qvel_max": {
+    "normal": [
+     8.94,
+     "r_knee"
+    ],
+    "push": [
+     8.52,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.8,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0167,
+     "vy": -0.0114,
+     "wz": -0.091,
+     "drift_cm": 2.39
+    }
+   ],
+   "lift_cm": 1.37,
+   "heading_deg": -39.9,
+   "qvel_max": {
+    "normal": [
+     7.59,
+     "r_knee"
+    ],
+    "push": [
+     9.83,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.011,
+     "vy": 0.0029,
+     "wz": -0.11,
+     "drift_cm": 5.94
+    }
+   ],
+   "lift_cm": 1.43,
+   "heading_deg": -48.1,
+   "qvel_max": {
+    "normal": [
+     7.55,
+     "r_knee"
+    ],
+    "push": [
+     8.5,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.592,
+    "push": 2.595
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0053,
+     "vy": -0.0065,
+     "wz": 0.005,
+     "drift_cm": 0.7
+    }
+   ],
+   "lift_cm": 1.44,
+   "heading_deg": -3.7,
+   "qvel_max": {
+    "normal": [
+     9.1,
+     "r_knee"
+    ],
+    "push": [
+     8.31,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.654
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.8,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0147,
+     "vy": -0.0005,
+     "wz": -0.01,
+     "drift_cm": 1.62
+    }
+   ],
+   "lift_cm": 1.45,
+   "heading_deg": -4.9,
+   "qvel_max": {
+    "normal": [
+     9.49,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.81,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.769,
+    "push": 2.707
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0151,
+     "vy": 0.001,
+     "wz": -0.017,
+     "drift_cm": 2.86
+    }
+   ],
+   "lift_cm": 1.43,
+   "heading_deg": -9.8,
+   "qvel_max": {
+    "normal": [
+     7.1,
+     "r_knee"
+    ],
+    "push": [
+     7.61,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.683
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0007,
+     "vy": 0.0009,
+     "wz": -0.124,
+     "drift_cm": 3.06
+    }
+   ],
+   "lift_cm": 1.43,
+   "heading_deg": -54.9,
+   "qvel_max": {
+    "normal": [
+     8.47,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     8.85,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0091,
+     "vy": 0.0096,
+     "wz": -0.061,
+     "drift_cm": 3.73
+    }
+   ],
+   "lift_cm": 1.59,
+   "heading_deg": -19.4,
+   "qvel_max": {
+    "normal": [
+     8.59,
+     "r_knee"
+    ],
+    "push": [
+     8.6,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.014,
+     "vy": 0.0017,
+     "wz": -0.022,
+     "drift_cm": 1.82
+    }
+   ],
+   "lift_cm": 1.46,
+   "heading_deg": -4.6,
+   "qvel_max": {
+    "normal": [
+     9.52,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     7.75,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.002,
+     "vy": 0.0046,
+     "wz": -0.059,
+     "drift_cm": 1.79
+    }
+   ],
+   "lift_cm": 1.45,
+   "heading_deg": -30.5,
+   "qvel_max": {
+    "normal": [
+     8.21,
+     "l_knee"
+    ],
+    "push": [
+     7.53,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.782
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0133,
+     "vy": -0.0074,
+     "wz": -0.03,
+     "drift_cm": 1.03
+    }
+   ],
+   "lift_cm": 1.43,
+   "heading_deg": -17.0,
+   "qvel_max": {
+    "normal": [
+     8.41,
+     "r_knee"
+    ],
+    "push": [
+     8.59,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0044,
+     "vy": -0.0015,
+     "wz": -0.064,
+     "drift_cm": 0.7
+    }
+   ],
+   "lift_cm": 1.33,
+   "heading_deg": -25.6,
+   "qvel_max": {
+    "normal": [
+     7.81,
+     "r_knee"
+    ],
+    "push": [
+     7.28,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.78,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0203,
+     "vy": -0.0105,
+     "wz": -0.062,
+     "drift_cm": 11.32
+    }
+   ],
+   "lift_cm": 1.43,
+   "heading_deg": -24.6,
+   "qvel_max": {
+    "normal": [
+     9.33,
+     "r_knee"
+    ],
+    "push": [
+     9.55,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.635
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0048,
+     "vy": 0.0123,
+     "wz": -0.073,
+     "drift_cm": 0.44
+    }
+   ],
+   "lift_cm": 1.52,
+   "heading_deg": -35.3,
+   "qvel_max": {
+    "normal": [
+     8.97,
+     "r_knee"
+    ],
+    "push": [
+     9.14,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0081,
+     "vy": -0.0062,
+     "wz": -0.063,
+     "drift_cm": 0.8
+    }
+   ],
+   "lift_cm": 1.36,
+   "heading_deg": -28.0,
+   "qvel_max": {
+    "normal": [
+     7.57,
+     "r_knee"
+    ],
+    "push": [
+     9.56,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.005,
+     "vy": -0.0011,
+     "wz": -0.06,
+     "drift_cm": 0.35
+    }
+   ],
+   "lift_cm": 1.35,
+   "heading_deg": -35.2,
+   "qvel_max": {
+    "normal": [
+     8.63,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.65,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.653
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0007,
+     "vy": 0.0074,
+     "wz": -0.046,
+     "drift_cm": 5.23
+    }
+   ],
+   "lift_cm": 1.54,
+   "heading_deg": -20.6,
+   "qvel_max": {
+    "normal": [
+     8.68,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     8.7,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0,
+     "vy": -0.0011,
+     "wz": -0.033,
+     "drift_cm": 0.65
+    }
+   ],
+   "lift_cm": 1.46,
+   "heading_deg": -20.3,
+   "qvel_max": {
+    "normal": [
+     8.98,
+     "r_knee"
+    ],
+    "push": [
+     9.28,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0107,
+     "vy": 0.0088,
+     "wz": -0.121,
+     "drift_cm": 1.46
+    }
+   ],
+   "lift_cm": 1.46,
+   "heading_deg": -48.7,
+   "qvel_max": {
+    "normal": [
+     9.15,
+     "r_knee"
+    ],
+    "push": [
+     9.13,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.009,
+     "vy": -0.0086,
+     "wz": -0.046,
+     "drift_cm": 2.04
+    }
+   ],
+   "lift_cm": 1.41,
+   "heading_deg": -25.8,
+   "qvel_max": {
+    "normal": [
+     9.07,
+     "r_knee"
+    ],
+    "push": [
+     7.8,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0168,
+     "vy": -0.0006,
+     "wz": -0.146,
+     "drift_cm": 8.58
+    }
+   ],
+   "lift_cm": 1.52,
+   "heading_deg": -60.4,
+   "qvel_max": {
+    "normal": [
+     9.08,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     8.94,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0019,
+     "vy": -0.0129,
+     "wz": -0.052,
+     "drift_cm": 0.93
+    }
+   ],
+   "lift_cm": 1.38,
+   "heading_deg": -25.1,
+   "qvel_max": {
+    "normal": [
+     8.17,
+     "r_knee"
+    ],
+    "push": [
+     9.72,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0239,
+     "vy": -0.0247,
+     "wz": -0.053,
+     "drift_cm": 4.2
+    }
+   ],
+   "lift_cm": 1.46,
+   "heading_deg": -31.0,
+   "qvel_max": {
+    "normal": [
+     8.47,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.27,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推5N",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0024,
+     "vy": 0.0046,
+     "wz": -0.093,
+     "drift_cm": 0.73
+    }
+   ],
+   "lift_cm": 1.37,
+   "heading_deg": -48.6,
+   "qvel_max": {
+    "normal": [
+     8.23,
+     "r_knee"
+    ],
+    "push": [
+     7.36,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0277,
+     "vy": -0.0012,
+     "wz": 0.044,
+     "drift_cm": 16.61
+    }
+   ],
+   "lift_cm": 1.69,
+   "heading_deg": 18.2,
+   "qvel_max": {
+    "normal": [
+     8.94,
+     "r_knee"
+    ],
+    "push": [
+     9.7,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.8,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0301,
+     "vy": -0.0156,
+     "wz": -0.119,
+     "drift_cm": 2.64
+    }
+   ],
+   "lift_cm": 1.4,
+   "heading_deg": -51.8,
+   "qvel_max": {
+    "normal": [
+     7.59,
+     "r_knee"
+    ],
+    "push": [
+     9.89,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0213,
+     "vy": 0.017,
+     "wz": -0.105,
+     "drift_cm": 18.88
+    }
+   ],
+   "lift_cm": 1.49,
+   "heading_deg": -46.0,
+   "qvel_max": {
+    "normal": [
+     7.55,
+     "r_knee"
+    ],
+    "push": [
+     8.55,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.592,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0098,
+     "vy": -0.021,
+     "wz": 0.039,
+     "drift_cm": 0.52
+    }
+   ],
+   "lift_cm": 1.44,
+   "heading_deg": 11.1,
+   "qvel_max": {
+    "normal": [
+     9.1,
+     "r_knee"
+    ],
+    "push": [
+     9.98,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.8,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0317,
+     "vy": 0.008,
+     "wz": 0.005,
+     "drift_cm": 1.79
+    }
+   ],
+   "lift_cm": 1.5,
+   "heading_deg": 1.6,
+   "qvel_max": {
+    "normal": [
+     9.49,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     8.58,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0268,
+     "vy": 0.0154,
+     "wz": -0.058,
+     "drift_cm": 10.35
+    }
+   ],
+   "lift_cm": 1.48,
+   "heading_deg": -27.2,
+   "qvel_max": {
+    "normal": [
+     6.99,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.24,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0123,
+     "vy": 0.0048,
+     "wz": -0.114,
+     "drift_cm": 1.69
+    }
+   ],
+   "lift_cm": 1.41,
+   "heading_deg": -50.4,
+   "qvel_max": {
+    "normal": [
+     8.47,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.42,
+     "l_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 0.6,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.003,
+     "vy": 0.0301,
+     "wz": -0.069,
+     "drift_cm": 3.45
+    }
+   ],
+   "lift_cm": 1.59,
+   "heading_deg": -22.6,
+   "qvel_max": {
+    "normal": [
+     8.59,
+     "r_knee"
+    ],
+    "push": [
+     9.72,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0015,
+     "vy": -0.0002,
+     "wz": -0.006,
+     "drift_cm": 1.82
+    }
+   ],
+   "lift_cm": 1.46,
+   "heading_deg": 2.4,
+   "qvel_max": {
+    "normal": [
+     9.52,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     8.75,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0001,
+     "vy": 0.0212,
+     "wz": -0.072,
+     "drift_cm": 1.94
+    }
+   ],
+   "lift_cm": 1.54,
+   "heading_deg": -35.7,
+   "qvel_max": {
+    "normal": [
+     8.21,
+     "l_knee"
+    ],
+    "push": [
+     8.47,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0258,
+     "vy": -0.0102,
+     "wz": 0.004,
+     "drift_cm": 0.92
+    }
+   ],
+   "lift_cm": 1.47,
+   "heading_deg": -2.6,
+   "qvel_max": {
+    "normal": [
+     8.41,
+     "r_knee"
+    ],
+    "push": [
+     9.41,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0217,
+     "vy": -0.0056,
+     "wz": -0.078,
+     "drift_cm": 0.93
+    }
+   ],
+   "lift_cm": 1.35,
+   "heading_deg": -31.9,
+   "qvel_max": {
+    "normal": [
+     7.76,
+     "r_knee"
+    ],
+    "push": [
+     9.3,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.78,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0327,
+     "vy": -0.0213,
+     "wz": -0.015,
+     "drift_cm": 23.78
+    }
+   ],
+   "lift_cm": 1.49,
+   "heading_deg": -4.3,
+   "qvel_max": {
+    "normal": [
+     9.33,
+     "r_knee"
+    ],
+    "push": [
+     9.54,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0073,
+     "vy": 0.0305,
+     "wz": -0.122,
+     "drift_cm": 0.75
+    }
+   ],
+   "lift_cm": 1.55,
+   "heading_deg": -56.5,
+   "qvel_max": {
+    "normal": [
+     8.67,
+     "r_knee"
+    ],
+    "push": [
+     8.88,
+     "l_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0199,
+     "vy": -0.0094,
+     "wz": -0.063,
+     "drift_cm": 0.88
+    }
+   ],
+   "lift_cm": 1.39,
+   "heading_deg": -27.7,
+   "qvel_max": {
+    "normal": [
+     7.68,
+     "r_knee"
+    ],
+    "push": [
+     9.66,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0178,
+     "vy": -0.0009,
+     "wz": -0.067,
+     "drift_cm": 0.79
+    }
+   ],
+   "lift_cm": 1.34,
+   "heading_deg": -38.4,
+   "qvel_max": {
+    "normal": [
+     8.63,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     8.98,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.759,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0024,
+     "vy": 0.0215,
+     "wz": -0.048,
+     "drift_cm": 11.46
+    }
+   ],
+   "lift_cm": 1.6,
+   "heading_deg": -21.5,
+   "qvel_max": {
+    "normal": [
+     8.68,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.54,
+     "l_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0056,
+     "vy": -0.0102,
+     "wz": -0.012,
+     "drift_cm": 3.22
+    }
+   ],
+   "lift_cm": 1.51,
+   "heading_deg": -11.1,
+   "qvel_max": {
+    "normal": [
+     8.98,
+     "r_knee"
+    ],
+    "push": [
+     9.51,
+     "l_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0133,
+     "vy": 0.0077,
+     "wz": -0.127,
+     "drift_cm": 1.5
+    }
+   ],
+   "lift_cm": 1.44,
+   "heading_deg": -51.4,
+   "qvel_max": {
+    "normal": [
+     9.15,
+     "r_knee"
+    ],
+    "push": [
+     12.0,
+     "r_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0159,
+     "vy": -0.0251,
+     "wz": -0.032,
+     "drift_cm": 1.51
+    }
+   ],
+   "lift_cm": 1.45,
+   "heading_deg": -19.9,
+   "qvel_max": {
+    "normal": [
+     9.07,
+     "r_knee"
+    ],
+    "push": [
+     9.02,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0114,
+     "vy": 0.0007,
+     "wz": -0.141,
+     "drift_cm": 9.85
+    }
+   ],
+   "lift_cm": 1.54,
+   "heading_deg": -58.1,
+   "qvel_max": {
+    "normal": [
+     9.08,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     8.66,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0054,
+     "vy": -0.0297,
+     "wz": 0.014,
+     "drift_cm": 1.04
+    }
+   ],
+   "lift_cm": 1.43,
+   "heading_deg": 3.4,
+   "qvel_max": {
+    "normal": [
+     8.17,
+     "r_knee"
+    ],
+    "push": [
+     9.87,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 6.5,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.038,
+     "vy": -0.0372,
+     "wz": -0.088,
+     "drift_cm": 11.15
+    }
+   ],
+   "lift_cm": 1.51,
+   "heading_deg": -46.1,
+   "qvel_max": {
+    "normal": [
+     8.47,
+     "l_ankle_pitch"
+    ],
+    "push": [
+     9.48,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推8N",
+   "friction": 1.5,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0035,
+     "vy": 0.0291,
+     "wz": -0.084,
+     "drift_cm": 0.77
+    }
+   ],
+   "lift_cm": 1.49,
+   "heading_deg": -44.7,
+   "qvel_max": {
+    "normal": [
+     8.23,
+     "r_knee"
+    ],
+    "push": [
+     8.6,
+     "l_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 0,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 5.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0133,
+     "vy": -0.0002,
+     "wz": 0.035,
+     "drift_cm": 1.95
+    }
+   ],
+   "lift_cm": 1.58,
+   "heading_deg": 20.2,
+   "qvel_max": {
+    "normal": [
+     9.52,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.13,
+     "r_knee"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 1,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.0,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0166,
+     "vy": 0.0366,
+     "wz": -0.124,
+     "drift_cm": 2.9
+    }
+   ],
+   "lift_cm": 1.57,
+   "heading_deg": -58.4,
+   "qvel_max": {
+    "normal": [
+     8.22,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     9.32,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 2,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.4,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0447,
+     "vy": -0.0095,
+     "wz": -0.005,
+     "drift_cm": 0.79
+    }
+   ],
+   "lift_cm": 1.47,
+   "heading_deg": -6.2,
+   "qvel_max": {
+    "normal": [
+     8.41,
+     "r_knee"
+    ],
+    "push": [
+     10.57,
+     "r_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 3,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 4.6,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.036,
+     "vy": -0.0078,
+     "wz": -0.061,
+     "drift_cm": 0.47
+    }
+   ],
+   "lift_cm": 1.47,
+   "heading_deg": -24.3,
+   "qvel_max": {
+    "normal": [
+     7.95,
+     "r_knee"
+    ],
+    "push": [
+     11.11,
+     "r_hip_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.78,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 4,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 7.7,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0569,
+     "vy": -0.0381,
+     "wz": 0.001,
+     "drift_cm": 45.57
+    }
+   ],
+   "lift_cm": 1.65,
+   "heading_deg": 2.4,
+   "qvel_max": {
+    "normal": [
+     9.33,
+     "r_knee"
+    ],
+    "push": [
+     10.63,
+     "r_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 5,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.1,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": -0.0034,
+     "vy": 0.0553,
+     "wz": -0.029,
+     "drift_cm": 0.5
+    }
+   ],
+   "lift_cm": 1.57,
+   "heading_deg": -16.5,
+   "qvel_max": {
+    "normal": [
+     8.67,
+     "r_knee"
+    ],
+    "push": [
+     9.87,
+     "l_ankle_roll"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 6,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.9,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.0371,
+     "vy": -0.0106,
+     "wz": -0.039,
+     "drift_cm": 0.79
+    }
+   ],
+   "lift_cm": 1.43,
+   "heading_deg": -17.6,
+   "qvel_max": {
+    "normal": [
+     7.57,
+     "r_knee"
+    ],
+    "push": [
+     10.33,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.8,
+    "push": 2.8
+   }
+  },
+  {
+   "test": "站+推12N",
+   "friction": 1.0,
+   "seed": 7,
+   "ok": true,
+   "fell_at": null,
+   "push_at": 3.2,
+   "segs": [
+    {
+     "cmd": [
+      0,
+      0,
+      0
+     ],
+     "done": true,
+     "vx": 0.042,
+     "vy": -0.004,
+     "wz": -0.036,
+     "drift_cm": 1.0
+    }
+   ],
+   "lift_cm": 1.41,
+   "heading_deg": -24.8,
+   "qvel_max": {
+    "normal": [
+     8.63,
+     "r_ankle_pitch"
+    ],
+    "push": [
+     10.33,
+     "l_ankle_pitch"
+    ]
+   },
+   "knee_Nm_max": {
+    "normal": 2.754,
+    "push": 2.8
+   }
+  }
+ ]
+}

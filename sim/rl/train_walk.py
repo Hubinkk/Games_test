@@ -46,8 +46,9 @@ def main():
     xml = os.path.join(HERE, "huaran_walk.xml")
     # 第 2 轮：--upper 让上身随意摆（策略看不到），--push=12 把推力上限从 6 N 加到 12 N
     # 第 3 轮续练：--stop=20 给"指令为零时脚和身体还在动"加扣分（要和 --init=walk_full_w3.npz 一起用）
+    # 第 3 轮续练之后：--qvel=<系数> 给腿上关节转速超过 8 rad/s 的部分加扣分（默认 0）
     # 第 3 轮：--smooth 让一半的局里上身连续地来回动（要和 --upper 一起给）
-    kw = dict(upper="--upper" in sys.argv, push_max=arg("push", 6.0), smooth="--smooth" in sys.argv, effort_w=arg("effort", 0.02), stop_w=arg("stop", 0.0))
+    kw = dict(upper="--upper" in sys.argv, push_max=arg("push", 6.0), smooth="--smooth" in sys.argv, effort_w=arg("effort", 0.02), stop_w=arg("stop", 0.0), qvel_w=arg("qvel", 0.0))
     env = Walk(xml, **kw)
     eval_env = Walk(xml, **kw)
     episode = 1000                         # 20 秒

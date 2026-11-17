@@ -37,8 +37,11 @@ VX, VY, WZ = (-0.10, 0.25), (-0.06, 0.06), (-0.8, 0.8)
 NOISE = dict(grav=0.03, gyro=0.2, q=0.02, qd=1.0)
 
 
+QVEL_SOFT = 8.0                                   # rad/s：qvel_w 从这个转速开始扣分
+
+
 class Walk(Env):
-    def __init__(self, xml_path, n_frames=10, noise=True, upper=False, push_max=PUSH_MAX, smooth=False, effort_w=0.02, stop_w=0.0):
+    def __init__(self, xml_path, n_frames=10, noise=True, upper=False, push_max=PUSH_MAX, smooth=False, effort_w=0.02, stop_w=0.0, qvel_w=0.0):
         """upper=True（第 2 轮）：上身（腰、脖子、手臂）每 2 秒被指挥到一个随机姿势，策略看不到也管不了，腿要照样走。"""
         # smooth=True（第 3 轮）：一半的局里上身不是每 2 秒跳一次，而是连续地来回动（每个关节一条正弦，0.2–1.2 Hz），
         # 更接近 VR 里头和手连续跟着人动的样子。
@@ -49,6 +52,9 @@ class Walk(Env):
         # stop_w：指令为零时"脚和身体还在动"的扣分系数（两只脚水平速度的平方和 + 身体水平速度的平方）。
         # 第 3 轮的策略不热了，但停下后一直小步挪（约 1 cm/s）；第 3 轮续练（w3b）加这一项，前三轮是 0。
         self.stop_w = float(stop_w)
+        # qvel_w：腿上关节转速超过 QVEL_SOFT（8 rad/s，比 10 rad/s 的上限留 2 的余量）的部分的平方，取平均，乘这个系数扣分。
+        # 第 3 轮续练（n1117b）正常走时右膝最快 10.22 rad/s；默认 0（前几轮都没有这一项）。不改力矩上限、不改 10 rad/s 的目标角限速。
+        self.qvel_w = float(qvel_w)
         self.mj = mujoco.MjModel.from_xml_path(xml_path)
         self.mx = mjx.put_model(self.mj)
         self.n_frames = n_frames
@@ -213,11 +219,12 @@ class Walk(Env):
         r = RATE * float(self.mj.opt.timestep)
 
         def sub(_, c):
-            d, tgt = c
+            d, tgt, qm = c
             tgt = tgt + jnp.clip(want - tgt, -r, r)
-            return mjx.step(mx, d.replace(ctrl=tgt)), tgt
+            d = mjx.step(mx, d.replace(ctrl=tgt))
+            return d, tgt, jnp.maximum(qm, jnp.abs(d.qvel[self.leg_v]))   # 每个小步的腿关节转速取最大（给 qvel_w 用）
 
-        d, target = jax.lax.fori_loop(0, self.n_frames, sub, (d0, prev))
+        d, target, qmax = jax.lax.fori_loop(0, self.n_frames, sub, (d0, prev, jnp.zeros(len(self.leg_v), dtype=jnp.float32)))
         s = self._sense(d)
         k1n = k + 1
         phases = self._phases(k1n, ph0)
@@ -242,8 +249,9 @@ class Walk(Env):
         pose = jnp.sum(self.pose_w * dq ** 2)
         still = (1.0 - moving) * (jnp.mean(dq ** 2) + 0.01 * jnp.mean(s["qd"] ** 2))
         stop = (1.0 - moving) * (jnp.sum(fv ** 2) + jnp.sum(s["v"][:2] ** 2))
+        overspeed = jnp.mean(jnp.maximum(qmax - QVEL_SOFT, 0.0) ** 2)   # 用这一步里每个小步的最大转速（评测也是每个小步都看）
         reward = (1.5 * r_lin + 0.8 * r_ang + 1.0 * r_step + 0.2
-                  - 2.0 * tilt - 0.02 * wob - 100.0 * dz - 5.0 * slip - 0.05 * rate - self.effort_w * effort - 0.3 * pose - 1.0 * still - self.stop_w * stop)
+                  - 2.0 * tilt - 0.02 * wob - 100.0 * dz - 5.0 * slip - 0.05 * rate - self.effort_w * effort - 0.3 * pose - 1.0 * still - self.stop_w * stop - self.qvel_w * overspeed)
         bad = jnp.any(jnp.isnan(d.qpos)) | jnp.any(jnp.isnan(d.qvel))
         fell = (s["z"] < FALL_Z) | (s["up"] < math.cos(math.radians(FALL_DEG)))
         done = bad | fell

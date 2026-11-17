@@ -42,7 +42,7 @@ RESULTS = os.path.join(ROOT, "practice-results")
 
 # ---------------- 边界 ----------------
 # 训练命令行里允许改的旋钮和硬上下限（规则表的上下限不能超出这里）
-ALLOWED_KNOBS = {"effort": (0.02, 0.16), "stop": (0.0, 80.0), "push": (6.0, 14.0), "lr": (1e-5, 3e-4)}
+ALLOWED_KNOBS = {"effort": (0.02, 0.16), "stop": (0.0, 80.0), "push": (6.0, 14.0), "lr": (1e-5, 3e-4), "qvel": (0.0, 8.0)}
 FIXED_FLAGS = ["--upper", "--smooth", "--envs=4096"]            # 每次都带、不改
 # 绝对不能写的地方（写文件前检查）和绝对不能变的文件（开始时记下指纹，每一步之后对一次；变了就停）
 FORBIDDEN_PATHS = [os.path.join(ROOT, "digital-huaran"), os.path.join(ROOT, "digital_huaran_day.js"),
@@ -68,7 +68,7 @@ ACCEPT = [
     dict(id="turn", unit="falls", name="原地转身 90°（原地转不摔、转速 > 0.2 rad/s）", src="卡片", better="lower"),
     dict(id="fast20", unit="cm_s", name="走到 20 cm/s 以上（快走实际）", src="卡片", better="higher"),
     dict(id="joint_normal", unit="max_rad_s", name="关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m（正常走）", src="卡片", better="lower"),
-    dict(id="joint_push", unit="max_rad_s", name="关节转速不超过 10 rad/s，膝盖扭矩不超过 2.8 N·m（被推后 1 秒内）", src="卡片（原文没分；被推的瞬间算不算，等云端/育苗人定）", better="lower"),
+    dict(id="joint_push", unit="max_rad_s", name="被推后 1 秒内：转速只记录（已豁免），膝盖扭矩不超过 2.8 N·m", src="卡片；转速豁免是用户 2026-11-17 的决定", better="lower"),
 ]
 SCREEN_IDS = ["no_fall_basic", "speed15", "back8", "drift", "stand_push8", "stand_push12", "walk_push12", "turn", "fast20", "joint_normal"]
 
@@ -82,6 +82,10 @@ RULES = [
          why="速度偏慢（指令 15 实际 < 14）→ 费力扣分除以 1.5"),
     dict(id="push", checks=["stand_push8", "stand_push12", "walk_push12", "no_fall_basic"], when="falls", knob="push", op="add", by=2.0, limit=14.0,
          why="被推摔得多 → 训练里的推力上限加 2 N"),
+    # 2026-11-17 加：正常走时关节转速超 10 rad/s。不动 effort（n1117b 发热 68.9 °C，离 70 只差 1 °C），也不动力矩上限和 10 rad/s 的目标角限速，
+    # 用 train_walk.py 新加的 --qvel（腿上关节转速超过 8 rad/s 的部分的平方扣分，默认 0）
+    dict(id="qvel", checks=["joint_normal"], when="speed", knob="qvel", op="set_then_mul", set=1.0, by=2.0, limit=4.0,
+         why="正常走时关节转速超 10 rad/s → 转速超过 8 rad/s 的部分的扣分从 0 到 1，再不过加倍"),
 ]
 
 
@@ -240,8 +244,12 @@ def seg_mean(rs, i, key):
     return sum(xs) / len(xs) if xs else None
 
 
-def judge(name, only=None):
-    """按 ACCEPT 表判一份策略。返回 {id: dict(ok, value, note, detail)}；缺评测的是 ok=None。"""
+PUSH_EXEMPT = "被推后 1 秒内的转速已豁免：外力带动，用户 2026-11-17 决定；只记录，不算不过关"
+
+
+def judge(name, only=None, screen=False):
+    """按 ACCEPT 表判一份策略。返回 {id: dict(ok, value, note, detail)}；缺评测的是 ok=None。
+    screen=True（筛副本）：只有 --hold 的结果也照判（标明"只看 --hold"），不然这几条全是"没量"、筛不出东西。"""
     W = {k: load(walk_json(name, k)) for k in EVAL_WALK}
     G = {k: load(goto_json(name, k)) for k in EVAL_GOTO}
     H = load(heat_json(name))
@@ -257,20 +265,21 @@ def judge(name, only=None):
             if a["id"] not in ("goto", "goto_push5", "goto_push5_upper", "heat"):
                 put(a["id"], None, None, "没有 eval_walk 结果")
     else:
-        miss = "" if len(have) == 3 else f"（只有 {'、'.join(have)}，缺 {'、'.join(k for k in EVAL_WALK if k not in have)}）"
+        full = len(have) == 3 or screen
+        miss = "" if full else ((f"（筛副本：只看 {'、'.join(have)}）") if screen else f"（只有 {'、'.join(have)}，缺 {'、'.join(k for k in EVAL_WALK if k not in have)}）")
         basic = [r for r in allruns if r["test"] in ("走停", "走+推5N", "快走", "原地转", "侧移后退")]
         nf = sum(1 for r in basic if not r["ok"])
         falls = sorted({f"{r['test']}" for r in basic if not r["ok"]})
-        put("no_fall_basic", (nf == 0) if len(have) == 3 else (False if nf else None), nf, f"摔 {nf}/{len(basic)} 次" + (f"（{'、'.join(falls)}）" if falls else "") + miss, falls=nf)
+        put("no_fall_basic", (nf == 0) if full else (False if nf else None), nf, f"摔 {nf}/{len(basic)} 次" + (f"（{'、'.join(falls)}）" if falls else "") + miss, falls=nf)
         sp = [(k, f, seg_mean(rs, 0, "vx") * 100) for k in have for f, rs in cells(W[k]["runs"], "走停").items() if seg_mean(rs, 0, "vx") is not None]
         lo, hi = min(v for *_, v in sp), max(v for *_, v in sp)
-        put("speed15", (lo >= 14 and hi <= 16) if len(have) == 3 else (False if lo < 14 or hi > 16 else None), round(lo if abs(lo - 15) > abs(hi - 15) else hi, 2),
+        put("speed15", (lo >= 14 and hi <= 16) if full else (False if lo < 14 or hi > 16 else None), round(lo if abs(lo - 15) > abs(hi - 15) else hi, 2),
             f"实际 {lo:.1f}–{hi:.1f} cm/s（每种地面、每种上身设置的平均）" + miss, slow=lo < 14, lo=round(lo, 2), hi=round(hi, 2))
         bk = [-seg_mean(rs, 1, "vx") * 100 for k in have for f, rs in cells(W[k]["runs"], "侧移后退").items() if seg_mean(rs, 1, "vx") is not None]
-        put("back8", (min(bk) >= 7) if len(have) == 3 else (False if min(bk) < 7 else None), round(min(bk), 2), f"后退 {min(bk):.1f}–{max(bk):.1f} cm/s" + miss)
+        put("back8", (min(bk) >= 7) if full else (False if min(bk) < 7 else None), round(min(bk), 2), f"后退 {min(bk):.1f}–{max(bk):.1f} cm/s" + miss)
         dr = {k: max(seg_mean(rs, 1, "drift_cm") for rs in cells(W[k]["runs"], "走停").values()) for k in have}
         dok = all(v < (1.0 if k == "hold" else 2.0) for k, v in dr.items())
-        put("drift", dok if len(have) == 3 else (False if not dok else None), round(max(dr.values()), 2),
+        put("drift", dok if full else (False if not dok else None), round(max(dr.values()), 2),
             "停下后最后 2 秒挪 " + "，".join(f"{k} {v:.1f} cm" for k, v in dr.items()) + "（每种地面平均里最大的）" + miss)
 
         def tally(test, need):
@@ -280,7 +289,7 @@ def judge(name, only=None):
             return good, len(rs) - ok, f"{ok}/{len(rs)} 没摔"
         for i, t, need in (("stand_push8", "站+推8N", "all"), ("stand_push12", "站+推12N", "half"), ("walk_push12", "走+推12N", "half")):
             g, nfail, note = tally(t, need)
-            put(i, g if len(have) == 3 else (False if not g else None), nfail, note + miss, falls=nfail)
+            put(i, g if full else (False if not g else None), nfail, note + miss, falls=nfail)
         tr = [r for r in allruns if r["test"] == "原地转"]
         wz = [abs(seg_mean([r], 0, "wz") or 0) for r in tr if r["ok"]]
         g = bool(tr) and all(r["ok"] for r in tr) and wz and min(wz) > 0.2
@@ -294,9 +303,20 @@ def judge(name, only=None):
                 continue
             q = max(rs, key=lambda r: r["qvel_max"][k][0])
             kn = max(r["knee_Nm_max"][k] for r in rs)
-            over = [r for r in rs if r["qvel_max"][k][0] > 10.0 or r["knee_Nm_max"][k] > 2.8]
-            put(i, not over, q["qvel_max"][k][0], f"转速最大 {q['qvel_max'][k][0]} rad/s（{q['qvel_max'][k][1]}，{q['test']}），膝盖最大 {kn} N·m；超的 {len(over)}/{len(rs)} 次"
-                + (f"（{'、'.join(sorted({r['test'] for r in over}))}）" if over else "") + miss)
+            over_q = [r for r in rs if r["qvel_max"][k][0] > 10.0]
+            over_k = [r for r in rs if r["knee_Nm_max"][k] > 2.8]
+            # 哪些关节超过 10 rad/s、各超了几次（每次试验记的是最快的那个关节）
+            jc = {}
+            for r in over_q:
+                jc[r["qvel_max"][k][1]] = jc.get(r["qvel_max"][k][1], 0) + 1
+            n_over = len(over_k) if k == "push" else len({id(r) for r in over_q + over_k})
+            note = (f"转速最大 {q['qvel_max'][k][0]} rad/s（{q['qvel_max'][k][1]}，{q['test']}），膝盖最大 {kn} N·m；"
+                    f"转速超 10 的 {len(over_q)}/{len(rs)} 次" + (f"（{'、'.join(sorted({r['test'] for r in over_q}))}；关节 "
+                    + "、".join(f"{j} {n} 次" for j, n in sorted(jc.items(), key=lambda x: -x[1])) + "）" if over_q else "")
+                    + (f"；膝盖超 2.8 N·m 的 {len(over_k)} 次" if over_k else ""))
+            if k == "push":
+                note += f"。{PUSH_EXEMPT}"
+            put(i, n_over == 0, q["qvel_max"][k][0], note + miss, speed_over=bool(over_q) and k == "normal", joints_over=jc)
     for i in ("goto", "goto_push5", "goto_push5_upper"):
         g = G[i]
         if not g:
@@ -336,6 +356,8 @@ def rule_applies(rule, res):
         hits = [c for c in hits if res[c].get("slow")]
     elif rule["when"] == "drift_cause":
         hits = [c for c in hits if c == "drift" or res[c].get("drift_cause")]
+    elif rule["when"] == "speed":
+        hits = [c for c in hits if res[c].get("speed_over")]
     elif rule["when"] == "falls":
         hits = [c for c in hits if (res[c].get("falls") or 0) > 0]
     return hits
@@ -480,7 +502,7 @@ def accept(att, log, dry, n_copies):
     screen = {}
     for c in cs:
         mins += evaluate(c, ["hold"], dry)
-        screen[c] = judge(c, only=SCREEN_IDS)
+        screen[c] = judge(c, only=SCREEN_IDS, screen=True)
         r = screen[c]
         log(f"  筛副本 {c}：没过 {n_fail(r)} 条；" + "；".join(f"{a['id']} {'过' if r[a['id']]['ok'] else ('没量' if r[a['id']]['ok'] is None else '没过')}"
                                                        for a in ACCEPT if a["id"] in r))
